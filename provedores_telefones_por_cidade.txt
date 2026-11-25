@@ -4,7 +4,7 @@ PROVEDORES REGIONAIS DE INTERNET | 24/11/2026
 Formato: provedor | telefone | tipo | fonte.
 Fontes: canais institucionais e cadastro SCM/STEL da Anatel. Para o cadastro, a cidade corresponde ao endereço registrado. Foram selecionados até 10 números de cadastro por cidade, sem completar dígitos ausentes.
 WhatsApp indicado quando anunciado pelo provedor na fonte consultada. A pesquisa não confirma que os números estejam ativos, que cheguem ao setor de compras ou que o provedor tenha interesse em contratar link.
-Os canais divulgados como WhatsApp estão em provedores_whatsapp_publico.txt, no formato Nome;telefone. Centrais 0800 ficam apenas neste relatório.
+Todos os telefones distintos deste relatório estão em provedores_whatsapp_publico.txt, no formato Nome;telefone. Centrais 0800 foram formatadas como 55800. Consulte a coluna tipo neste relatório para identificar os números divulgados como WhatsApp.
 
 Arapiraca - AL
   K2 Telecom | +55 (82) 99830-9113 | WhatsApp divulgado pelo provedor | https://www.k2telecom-isp.com.br/

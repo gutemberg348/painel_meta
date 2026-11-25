@@ -343,6 +343,9 @@ tbody tr:hover { background: #f8fbff; }
 .history-more[hidden] { display: none; }
 .closed-thread { display: flex; align-items: center; gap: 12px; color: #714b20; padding: 12px 16px; background: #fff7e8; border-top: 1px solid #efdfc3; font-size: .875rem; }
 .closed-thread p { margin: 2px 0 0; }
+.closed-thread { flex-wrap: wrap; }
+.closed-thread > div { flex: 1 1 220px; }
+#thread-model-preview { white-space: pre-wrap; }
 .reply-form { display: grid; gap: 5px; padding: 10px 16px 12px; }
 .reply-form label { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-weight: 600; color: #375371; }
 .reply-form textarea { min-width: 0; min-height: 50px; height: 54px; max-height: 14dvh; resize: vertical; }

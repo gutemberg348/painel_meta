@@ -435,22 +435,50 @@ export function apiRouter(db, flw, campaigns, config) {
     });
     res.json({ ...data, revision: version, replyVersion: versionAtRead });
   });
+  async function conversationTemplates(channelId) {
+    const templates = await flw.templates(channelId);
+    return templates.filter(t => t.channelId?.toLowerCase() === channelId.toLowerCase() &&
+      t.active && !t.archived && String(t.status).toUpperCase() === 'APPROVED');
+  }
+  router.get('/conversations/:id/templates', async (req, res) => {
+    const { channelId } = await inboxScope(req.query.channelId);
+    await scopedConversation(id.parse(req.params.id), channelId);
+    res.json(await conversationTemplates(channelId));
+  });
   router.post('/conversations/:id/reply', async (req, res) => {
     const sessionId = id.parse(req.params.id);
-    const { text, replyVersion } = z.object({
-      text: z.string().trim().min(1).max(4096), replyVersion: z.string().max(64).optional(),
-    }).parse(req.body);
+    const version = z.string().max(64).optional();
+    const body = z.union([
+      z.strictObject({ text: z.string().trim().min(1).max(4096), replyVersion: version }),
+      z.strictObject({ templateId: id, parameters: z.record(z.string(), z.string().trim().min(1).max(2000)),
+        fileUrl: z.url().startsWith('https://').optional(), replyVersion: version }),
+    ]).parse(req.body);
+    const { replyVersion } = body;
     const { channelId } = await inboxScope(req.query.channelId);
     const conversation = await scopedConversation(sessionId, channelId);
-    if (conversation.windowStatus !== 'ACTIVE')
+    if ('text' in body && conversation.windowStatus !== 'ACTIVE')
       fail('A janela de atendimento está fechada. Inicie uma nova conversa com um template aprovado.');
+    let templateMessage;
+    if ('templateId' in body) {
+      const template = (await conversationTemplates(channelId)).find(t => t.id === body.templateId);
+      if (!template) fail('Escolha um modelo aprovado deste canal.');
+      const keys = (template.params || []).map(p => p.name).filter(Boolean);
+      if (keys.some(key => !Object.hasOwn(body.parameters, key)) ||
+          Object.keys(body.parameters).some(key => !keys.includes(key))) fail('Confira os campos do modelo.');
+      if (template.fileType && template.fileType !== 'UNDEFINED' && !body.fileUrl) fail('Informe a mídia do modelo.');
+      templateMessage = { templateId: template.id, parameters: body.parameters };
+      if (body.fileUrl) templateMessage.fileUrl = body.fileUrl;
+      const phone = String(conversation.contactDetails?.phonenumber || '').replace(/\D/g, '');
+      if (phone && db.prepare('SELECT 1 FROM contacts WHERE phone=? AND opted_in=0').get(phone))
+        fail('Este contato está sem autorização de envio no painel.', 409);
+    }
     const key = `thread:${channelId}:${sessionId}:`;
     if (activeReplies.has(key) || (replyVersion !== undefined && replyVersion !== (lastReplies.get(key) || '0'))) {
       fail('A equipe respondeu ou está enviando uma resposta. Atualize as mensagens e revise seu rascunho.', 409);
     }
     activeReplies.add(key);
     try {
-      res.json(await flw.reply(sessionId, text));
+      res.json(templateMessage ? await flw.sessionMessage(sessionId, templateMessage) : await flw.reply(sessionId, body.text));
     } finally {
       activeReplies.delete(key);
       chatCache.invalidate(key);

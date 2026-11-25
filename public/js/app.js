@@ -642,7 +642,7 @@ function visibleConversations() {
   const phoneQuery = digits && /^[+\d\s().-]+$/.test(query);
   return state.conversations.filter((c) => (!state.unreadOnly || c.unreadCount > 0) && (
     phoneQuery
-      ? String(c.number || c.contactDetails?.phonenumber || '').replace(/\D/g, '').includes(digits)
+      ? String(c.contactDetails?.phonenumber || '').replace(/\D/g, '').includes(digits)
       : (c.contactDetails?.name || c.title || '').toLocaleLowerCase('pt-BR').includes(query)
   ));
 }
@@ -715,8 +715,8 @@ async function openConversation(id, reset = true) {
   const threadHeader = (status = '') => `<header class="thread-head">
     <button type="button" class="icon-button thread-back hidden" data-action="back-conversations" aria-label="Voltar às conversas">${icon('chevron-left')}</button>
     <span class="avatar">${escape(initials(name))}</span>
-    <div class="thread-contact"><strong>${escape(name)}</strong><small>${escape(phone(conversation.number || conversation.contactDetails?.phonenumber))}</small></div>
-    ${status ? `<span class="badge ${status === 'ACTIVE' ? 'green' : 'orange'}">${status === 'ACTIVE' ? 'Janela aberta' : 'Janela fechada'}</span>
+    <div class="thread-contact"><strong>${escape(name)}</strong>${conversation.contactDetails?.phonenumber ? `<small>${escape(phone(conversation.contactDetails.phonenumber))}</small>` : ''}</div>
+    ${status ? `<span class="badge ${status === 'ACTIVE' ? 'green' : 'orange'}">${status === 'ACTIVE' ? 'Janela aberta' : status === 'NOT_STARTED' ? 'Aguardando resposta' : status === 'EXPIRED' ? 'Janela encerrada' : 'Janela a confirmar'}</span>
       <button type="button" class="icon-button" data-action="reload-conversation" aria-label="Atualizar mensagens" title="Atualizar mensagens">${icon('refresh-cw')}</button>` : ''}
   </header>`;
   thread.innerHTML = threadHeader() + loading();
@@ -737,7 +737,7 @@ async function openConversation(id, reset = true) {
         <label for="reply-text">Responder a ${escape(name)}</label>
         <textarea id="reply-text" name="text" placeholder="Escreva sua mensagem…" aria-label="Sua resposta" rows="2" required maxlength="4096" ${sending ? 'readonly' : ''}>${escape(draft)}</textarea>
         <div class="reply-actions"><small class="reply-shortcut">Ctrl ou ⌘ + Enter para enviar</small><button class="button primary" type="submit" aria-label="Enviar resposta" ${sending || !draft.trim() ? 'disabled' : ''}>${icon('send')}<span>${sending ? 'Enviando…' : 'Enviar'}</span></button></div>
-      </form>` : `<div class="closed-thread">${icon('lock-keyhole')}<div><strong>Janela de resposta encerrada</strong><p>Para retomar o atendimento, use um template aprovado em uma campanha.</p></div></div>`}`;
+      </form>` : `<div class="closed-thread"><div><strong>${data.windowStatus === 'EXPIRED' ? 'O prazo de 24 horas para responder terminou' : data.windowStatus === 'NOT_STARTED' ? 'Aguardando a primeira mensagem do contato' : 'Texto livre indisponível no momento'}</strong><p>Cada mensagem do contato abre 24 horas para responder livremente.</p></div><button type="button" class="button" id="thread-template">Enviar modelo</button></div>`}`;
     icons();
     $('#messages').scrollTop = $('#messages').scrollHeight;
     const history = $('.chat-history', thread);
@@ -747,6 +747,10 @@ async function openConversation(id, reset = true) {
     let historyPage = 1;
     let revision = data.revision;
     let seenReply = data.replyVersion;
+    $('#thread-template', thread)?.addEventListener('click', () => {
+      openThreadTemplate(name, conversationPath(id, 'templates'), conversationPath(id, 'reply'), seenReply,
+        () => history.isConnected && openConversation(id, false));
+    });
     let retryAt = 0;
     syncVisibleThread = async () => {
       if (!history.isConnected || historyPage !== 1 || older.disabled || pendingReplies.has(key) || Date.now() < retryAt) return;

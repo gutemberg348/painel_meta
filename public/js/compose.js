@@ -6,12 +6,12 @@ function friendlyVariable(key) {
     .replace(/^./, (letter) => letter.toUpperCase());
 }
 
-function templateText(text, parameters, sample = {}) {
+function templateText(text, parameters, sample = {}, expandContactFields = true) {
   const name = sample?.name || 'Nome do contato';
   const number = sample?.phone || '5591999999999';
   const replacements = [];
   for (const [key, value] of Object.entries(parameters)) {
-    const resolved = value.split('{{nome}}').join(name).split('{{telefone}}').join(number);
+    const resolved = expandContactFields ? value.split('{{nome}}').join(name).split('{{telefone}}').join(number) : value;
     const tokens = key.startsWith('[') || key.startsWith('{{') ? [key] : [`{{${key}}}`, `[${key}]`];
     for (const token of tokens) replacements.push([token, resolved]);
   }
@@ -416,3 +416,56 @@ actions['download-txt'] = () => {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 actions['use-template'] = (element) => openEasyCampaign(element.dataset.id);
+
+async function openThreadTemplate(name, templatePath, replyPath, replyVersion, refresh) {
+  showModal('Enviar modelo', escape(name), loading());
+  const loadingView = $('#modal-content').firstElementChild;
+  try {
+    const templates = await api(templatePath);
+    if (!modal.open || !loadingView.isConnected) return;
+    if (!templates.length) {
+      showModal('Enviar modelo', escape(name), '<p>Nenhum modelo aprovado disponível neste canal.</p>', cancelButton);
+      return;
+    }
+    showModal('Enviar modelo', `Destinatário: ${escape(name)}`,
+      `<div class="form-stack"><label>Modelo aprovado<select name="templateId">${templates.map(t =>
+        `<option value="${escape(t.id)}">${escape(t.name)}</option>`).join('')}</select></label>
+        <div class="form-stack" id="thread-model-fields"></div><div><strong>Prévia da mensagem</strong>
+        <p id="thread-model-preview"></p></div></div>`,
+      formFooter('Enviar para este contato'), false, 'thread-model-form');
+    const form = $('#thread-model-form');
+    const select = $('select', form);
+    const selected = () => templates.find(t => t.id === select.value);
+    const parameters = () => Object.fromEntries([...form.querySelectorAll('[data-param]')].map(input =>
+      [input.dataset.param, input.value.trim()]));
+    function preview() {
+      const values = parameters();
+      for (const key of Object.keys(values)) if (!values[key]) delete values[key];
+      $('#thread-model-preview', form).textContent = templateText(selected().text || '', values, {}, false);
+    }
+    function updateFields() {
+      const template = selected();
+      const fields = (template.params || []).filter(p => p.name).map(p =>
+        `<label>${escape(friendlyVariable(p.name))}<input data-param="${escape(p.name)}" maxlength="2000" required></label>`);
+      if (template.fileType && template.fileType !== 'UNDEFINED')
+        fields.push('<label>Link HTTPS da mídia<input type="url" name="fileUrl" required></label>');
+      $('#thread-model-fields', form).innerHTML = fields.join('');
+      preview();
+    }
+    select.addEventListener('change', updateFields);
+    form.addEventListener('input', preview);
+    updateFields();
+    bindForm(form.id, async (fields) => {
+      const body = { templateId: select.value, parameters: parameters(), replyVersion };
+      if (fields.get('fileUrl')) body.fileUrl = fields.get('fileUrl');
+      await api(replyPath, { method: 'POST', body });
+      if (form.isConnected) modal.close();
+      toast(`Modelo enviado à FLW para ${name}.`);
+      await refresh();
+    });
+  } catch (error) {
+    if (loadingView.isConnected && modal.open) {
+      showModal('Enviar modelo', escape(name), `<p role="alert">${escape(error.message)}</p>`, cancelButton);
+    }
+  }
+}

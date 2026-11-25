@@ -99,7 +99,7 @@ export class FlwClient {
     });
   }
   session(id) {
-    return this.request(`/v2/session/${encodeURIComponent(id)}`);
+    return this.request(`/v2/session/${encodeURIComponent(id)}`, { query: { IncludeDetails: 'ContactDetails' } });
   }
   messages(id, page = 1) {
     return this.request(`/v1/session/${encodeURIComponent(id)}/message`, {
@@ -107,6 +107,9 @@ export class FlwClient {
     });
   }
   reply(id, text) {
-    return this.request(`/v1/session/${encodeURIComponent(id)}/message`, { method: 'POST', body: { text } });
+    return this.sessionMessage(id, { text });
+  }
+  sessionMessage(id, body) {
+    return this.request(`/v1/session/${encodeURIComponent(id)}/message`, { method: 'POST', body });
   }
 }

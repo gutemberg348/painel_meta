@@ -227,6 +227,23 @@ test('resposta exige janela ativa e preserva o texto', async () => {
   assert.equal(result.body.status, 'QUEUED');
 });
 
+test('conversa sem janela aceita modelo aprovado com os campos do canal', async () => {
+  f.conversations[0].windowStatus = 'NOT_STARTED';
+  const path = `/conversations/${f.sessionId}`;
+  const templates = await agent.get(`/api${path}/templates`).expect(200);
+  assert.equal(templates.body[0].id, f.templateId);
+  const message = { templateId: f.templateId, parameters: { '1': 'Marina' } };
+  const sent = [];
+  f.flw.sessionMessage = async (sessionId, body) => {
+    sent.push({ sessionId, body });
+    return { status: 'QUEUED' };
+  };
+  await post(`${path}/reply`, { ...message, text: 'Outro texto' }).expect(400);
+  await post(`${path}/reply`, { ...message, parameters: {} }).expect(400);
+  await post(`${path}/reply`, message).expect(200);
+  assert.deepEqual(sent, [{ sessionId: f.sessionId, body: message }]);
+});
+
 test('caixa de entrada exige canal e protege mensagens e respostas de outros canais', async () => {
   const otherChannelId = 'f57e2d3c-4579-431d-93d6-1c4852436558';
   const channels = await f.flw.channels();
