@@ -211,7 +211,7 @@ async function openEasyImport() {
   showModal(
     'Adicione seus contatos',
     'Cole os números ou envie um arquivo. A gente organiza a lista para você.',
-    `<div class="form-stack"><div class="form-grid"><label>Salvar em<select id="import-destination"><option value="">Criar uma nova lista</option>${state.lists.map((list) => `<option value="${list.id}">${escape(list.name)}</option>`).join('')}</select></label><label id="import-list-name-label">Nome da nova lista<input id="import-list-name" maxlength="120" required placeholder="Ex.: Provedores de internet"></label></div>${audienceMarkup(false)}</div>`,
+    `<div class="form-stack"><div class="form-grid"><label>Salvar em<select id="import-destination"><option value="">Criar uma nova lista</option>${state.lists.map((list) => `<option value="${list.id}">${escape(list.name)}</option>`).join('')}</select></label><label id="import-list-name-label">Nome da nova lista (opcional)<input id="import-list-name" maxlength="120" placeholder="Nome automático se ficar em branco"></label></div>${audienceMarkup(false)}</div>`,
     formFooter('Salvar contatos'),
     true,
     'easy-import-form',
@@ -219,7 +219,6 @@ async function openEasyImport() {
   const picker = new AudiencePicker();
   $('#import-destination').addEventListener('change', (event) => {
     $('#import-list-name-label').hidden = Boolean(event.target.value);
-    $('#import-list-name').required = !event.target.value;
     $('#import-list-name').disabled = Boolean(event.target.value);
   });
   bindForm('easy-import-form', async () => {
@@ -231,7 +230,7 @@ async function openEasyImport() {
       body: { ...payload, ...(listId ? { listId } : { listName }) },
     });
     modal.close();
-    toast(`${result.created} novos contatos e ${result.linked} contatos adicionados à lista.`);
+    toast(`${result.linked} contato(s) adicionado(s) à lista “${result.listName}”. Novos cadastros: ${result.created}.`);
     await renderPage(true);
   });
 }

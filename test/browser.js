@@ -42,11 +42,11 @@ try {
   await page.locator('dialog [name=phone]').fill('5591999999999');
   await page.locator('dialog [name=email]').fill('marina@example.com');
   await page.locator('dialog [name=listIds]').check();
-  await page.locator('dialog [name=optedIn]').check();
   await page.locator('dialog button[type=submit]').click();
   await page.locator('#contacts-table .table-primary').filter({ hasText: 'Marina Oliveira' }).waitFor();
   await page.getByRole('button', { name: 'Editar Marina Oliveira' }).click();
   await page.locator('dialog [name=name]').fill('Marina Souza');
+  await page.locator('dialog [name=permission]').selectOption('1');
   await page.locator('dialog button[type=submit]').click();
   await page.locator('#contacts-table .table-primary').filter({ hasText: 'Marina Souza' }).waitFor();
   await page.getByRole('button', { name: 'Adicionar em lote', exact: true }).click();

@@ -17,7 +17,7 @@ const contactSchema = z.object({
   name,
   phone: phoneSchema,
   email: z.union([z.email(), z.literal('')]).default(''),
-  optedIn: z.boolean(),
+  optedIn: z.boolean().optional(),
   listIds: z.array(id).max(100).default([]),
 });
 const listSchema = z.object({
@@ -25,6 +25,11 @@ const listSchema = z.object({
   description: z.string().trim().max(500).default(''),
   color: z.enum(['blue', 'purple', 'green', 'orange']).default('blue'),
 });
+const optionalListName = z.string().trim().max(120).optional();
+const createListSchema = listSchema.extend({ name: optionalListName });
+function resolveListName(value) {
+  return value || `Lista ${randomBytes(5).toString('hex')}`;
+}
 const pageNumber = (value) =>
   z.coerce
     .number()
@@ -157,16 +162,17 @@ export function apiRouter(db, flw, campaigns, config) {
     ),
   );
   router.post('/lists', (req, res) => {
-    const data = listSchema.parse(req.body);
+    const data = createListSchema.parse(req.body);
     const newId = randomUUID();
+    const listName = resolveListName(data.name);
     db.prepare('INSERT INTO lists VALUES (?,?,?,?,?)').run(
       newId,
-      data.name,
+      listName,
       data.description,
       data.color,
       now(),
     );
-    res.status(201).json({ id: newId });
+    res.status(201).json({ id: newId, name: listName });
   });
   router.put('/lists/:id', (req, res) => {
     required(db, 'lists', req.params.id);
@@ -204,7 +210,7 @@ export function apiRouter(db, flw, campaigns, config) {
     );
     res.json(rows.map((c) => ({ ...c, lists: memberships.all(c.id) })));
   });
-  function saveContact(data, contactId) {
+  function saveContact(data, contactId, currentPermission = 0) {
     for (const listId of data.listIds) required(db, 'lists', listId);
     const duplicate = db
       .prepare('SELECT id FROM contacts WHERE phone=? AND id!=?')
@@ -214,7 +220,7 @@ export function apiRouter(db, flw, campaigns, config) {
       db.prepare(
         `INSERT INTO contacts VALUES (?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name,
         phone=excluded.phone,email=excluded.email,opted_in=excluded.opted_in`,
-      ).run(contactId, data.name, data.phone, data.email, Number(data.optedIn), now());
+      ).run(contactId, data.name, data.phone, data.email, Number(data.optedIn ?? currentPermission), now());
       db.prepare('DELETE FROM list_contacts WHERE contact_id=?').run(contactId);
       const insert = db.prepare('INSERT INTO list_contacts VALUES (?,?)');
       for (const listId of new Set(data.listIds)) insert.run(listId, contactId);
@@ -226,8 +232,8 @@ export function apiRouter(db, flw, campaigns, config) {
     res.status(201).json({ id: newId });
   });
   router.put('/contacts/:id', (req, res) => {
-    required(db, 'contacts', req.params.id);
-    saveContact(contactSchema.parse(req.body), req.params.id);
+    const contact = required(db, 'contacts', req.params.id);
+    saveContact(contactSchema.parse(req.body), req.params.id, contact.opted_in);
     res.json({ ok: true });
   });
   router.delete('/contacts/:id', (req, res) => {
@@ -245,7 +251,7 @@ export function apiRouter(db, flw, campaigns, config) {
         csv: z.string().min(1).max(900000).optional(),
         audience: audienceSchema.optional(),
         listId: id.optional(),
-        listName: name.optional(),
+        listName: optionalListName,
         optedIn: z.literal(true, { error: 'Confirme a autorização dos contatos.' }),
       })
       .parse(req.body);
@@ -253,13 +259,13 @@ export function apiRouter(db, flw, campaigns, config) {
     const result = parseAudience(body.audience || { text: body.csv, format: 'csv' }, db);
     requireValidAudience(result);
     const list = body.listId ? required(db, 'lists', body.listId) : null;
-    if (!list && !body.listName) fail('Informe o nome da nova lista.');
     const listId = list?.id || randomUUID();
+    const listName = list?.name ?? resolveListName(body.listName);
     const saved = db.transaction(() => {
       if (!list)
         db.prepare('INSERT INTO lists VALUES (?,?,?,?,?)').run(
           listId,
-          body.listName,
+          listName,
           'Adicionada pelo painel',
           'blue',
           now(),
@@ -269,6 +275,7 @@ export function apiRouter(db, flw, campaigns, config) {
     res.json({
       ...saved,
       listId,
+      listName,
       total: result.total,
       duplicates: result.duplicates,
       blocked: result.blocked,

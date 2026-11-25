@@ -510,7 +510,7 @@ function listModal(list) {
   showModal(
     list ? 'Editar lista' : 'Nova lista',
     'Organize seus contatos por público, interesse ou campanha.',
-    `<div class="form-stack"><label>Nome da lista<input name="name" required maxlength="120" placeholder="Ex.: Clientes especiais" value="${escape(list?.name)}" autofocus></label><label>Descrição<textarea name="description" maxlength="500" placeholder="Para quem é esta lista?">${escape(list?.description)}</textarea></label><label>Cor da lista<select name="color">${[
+    `<div class="form-stack"><label>Nome da lista${list ? '' : ' (opcional)'}<input name="name" ${list ? 'required' : ''} maxlength="120" placeholder="${list ? 'Nome da lista' : 'Nome automático se ficar em branco'}" value="${escape(list?.name)}" autofocus></label><label>Descrição<textarea name="description" maxlength="500" placeholder="Para quem é esta lista?">${escape(list?.description)}</textarea></label><label>Cor da lista<select name="color">${[
       ['blue', 'Azul'],
       ['purple', 'Lilás'],
       ['green', 'Verde'],
@@ -523,12 +523,12 @@ function listModal(list) {
     'list-form',
   );
   bindForm('list-form', async (form) => {
-    await api(list ? `/lists/${list.id}` : '/lists', {
+    const result = await api(list ? `/lists/${list.id}` : '/lists', {
       method: list ? 'PUT' : 'POST',
       body: Object.fromEntries(form),
     });
     modal.close();
-    toast(list ? 'Lista atualizada.' : 'Lista criada. Hora de adicionar seus contatos!');
+    toast(list ? 'Lista atualizada.' : `Lista criada: ${result.name}.`);
     await renderPage(true);
   });
 }
@@ -560,19 +560,21 @@ async function contactModal(contact) {
   showModal(
     contact ? 'Editar contato' : 'Novo contato',
     'Mantenha as informações da sua audiência organizadas.',
-    `<div class="form-stack"><label>Nome completo<input name="name" required maxlength="120" placeholder="Ex.: Marina Oliveira" value="${escape(contact?.name)}" autofocus></label><div class="form-grid"><label>WhatsApp com DDI e DDD<input name="phone" required inputmode="tel" placeholder="55 91 99999-9999" value="${escape(contact?.phone)}"><p class="field-hint">Inclua o código do país. Ex.: 55 para Brasil.</p></label><label>E-mail <span class="muted">(opcional)</span><input name="email" type="email" placeholder="contato@empresa.com" value="${escape(contact?.email)}"></label></div><div><span class="field-label">Adicionar às listas</span>${state.lists.length ? `<div class="check-grid">${state.lists.map((l) => `<label class="check-label"><input type="checkbox" name="listIds" value="${l.id}" ${contact?.lists.some((item) => item.id === l.id) || (!contact && state.contactList === l.id) ? 'checked' : ''}>${escape(l.name)}</label>`).join('')}</div>` : '<p class="field-hint">Você pode criar listas e associar este contato depois.</p>'}</div><label class="check-label"><input type="checkbox" name="optedIn" ${contact?.opted_in ? 'checked' : ''}>Este contato autorizou o recebimento de mensagens pelo WhatsApp.</label></div>`,
+    `<div class="form-stack"><label>Nome completo<input name="name" required maxlength="120" placeholder="Ex.: Marina Oliveira" value="${escape(contact?.name)}" autofocus></label><div class="form-grid"><label>WhatsApp com DDI e DDD<input name="phone" required inputmode="tel" placeholder="55 91 99999-9999" value="${escape(contact?.phone)}"><p class="field-hint">Inclua o código do país. Ex.: 55 para Brasil.</p></label><label>E-mail <span class="muted">(opcional)</span><input name="email" type="email" placeholder="contato@empresa.com" value="${escape(contact?.email)}"></label></div><div><span class="field-label">Adicionar às listas</span>${state.lists.length ? `<div class="check-grid">${state.lists.map((l) => `<label class="check-label"><input type="checkbox" name="listIds" value="${l.id}" ${contact?.lists.some((item) => item.id === l.id) || (!contact && state.contactList === l.id) ? 'checked' : ''}>${escape(l.name)}</label>`).join('')}</div>` : '<p class="field-hint">Você pode criar listas e associar este contato depois.</p>'}</div>
+      ${contact ? `<label>Permissão de envio<select name="permission"><option value="0" ${contact.opted_in ? '' : 'selected'}>Sem autorização</option><option value="1" ${contact.opted_in ? 'selected' : ''}>Autorizado</option></select></label>` : ''}</div>`,
     formFooter(contact ? 'Salvar alterações' : 'Adicionar contato'),
     false,
     'contact-form',
   );
   bindForm('contact-form', async (form) => {
+    const permission = form.get('permission');
     await api(contact ? `/contacts/${contact.id}` : '/contacts', {
       method: contact ? 'PUT' : 'POST',
       body: {
         name: form.get('name'),
         phone: form.get('phone'),
         email: form.get('email'),
-        optedIn: form.has('optedIn'),
+        ...(contact && permission !== String(contact.opted_in) ? { optedIn: permission === '1' } : {}),
         listIds: form.getAll('listIds'),
       },
     });

@@ -74,7 +74,8 @@ Em erro, os scripts terminam com código de saída `1` (`$LASTEXITCODE` no Power
 - Login do gerente pelo `.env`, contas de equipe no SQLite, cookie HttpOnly, proteção CSRF e limitação de tentativas.
 - Dashboard com indicadores reais do banco e atividade dos últimos sete dias, agrupada por UTC.
 - Cadastro, edição, exclusão e busca de contatos; um contato pode estar em várias listas.
-- Listas com nome, descrição e cor; contagem de contatos autorizados.
+- Ao criar uma lista ou importar contatos para uma nova lista, o nome é opcional. Em branco, o painel gera um nome como `Lista 4d21a8bc19`.
+- No cadastro individual, basta salvar o contato. Ele começa sem autorização de envio. Para registrar ou revogar a autorização, abra **Editar contato → Permissão de envio**.
 - Importação CSV/TXT ou números colados, com prévia, validação integral, deduplicação por telefone e transação atômica.
 - Consulta de canais oficiais WhatsApp e templates aprovados da FLW.
 - Criação de campanhas com mensagem e destinatários no mesmo formulário, prévia, variáveis, URL de mídia quando necessária e rascunho. Criação automática da lista ao adicionar números diretamente.
