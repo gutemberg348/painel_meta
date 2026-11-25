@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Entrar · Totalk Studio</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/studio.css">
+  <script src="/vendor/icons/lucide.js" defer></script>
+  <script src="/js/login.js" defer></script>
+</head>
+<body class="access-page">
+  <main class="access-shell">
+    <div class="access-column">
+      <div class="brand">
+        <img src="/favicon.svg" width="36" height="36" alt="">
+        <span>totalk<span class="brand-light"> studio</span></span>
+      </div>
+      <section class="access-form" aria-labelledby="login-title">
+        <span class="access-symbol" aria-hidden="true"><i data-lucide="key-round"></i></span>
+        <h1 id="login-title">Entrar no painel</h1>
+        <p>Use sua conta de administrador para continuar.</p>
+        <% if (error) { %>
+          <div class="alert error" role="alert"><i data-lucide="circle-alert"></i><%= error %></div>
+        <% } %>
+        <form action="/login" method="post">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <div>
+            <label for="username">Usuário</label>
+            <div class="access-input">
+              <i data-lucide="user-round"></i>
+              <input id="username" name="username" autocomplete="username" placeholder="Seu usuário" required autofocus maxlength="120">
+            </div>
+          </div>
+          <div>
+            <label for="password">Senha</label>
+            <div class="access-input">
+              <i data-lucide="lock-keyhole"></i>
+              <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Sua senha" required maxlength="256">
+              <button type="button" id="toggle-password" class="icon-button" aria-label="Mostrar senha" aria-controls="password"><i data-lucide="eye"></i></button>
+            </div>
+          </div>
+          <button class="button primary access-submit" type="submit">Entrar no painel</button>
+        </form>
+      </section>
+      <div class="access-foot"><i data-lucide="shield-check"></i>Acesso administrativo</div>
+    </div>
+    <aside class="access-art" aria-label="Sobre o painel">
+      <div class="art-object" aria-hidden="true">
+        <div class="art-orbit"></div>
+        <div class="speech-shape speech-back"></div>
+        <div class="speech-shape speech-front"><span></span><span></span><span></span></div>
+      </div>
+      <div class="access-caption">
+        <p>WhatsApp Business</p>
+        <h2>Central de<br>comunicação.</h2>
+        <span>Campanhas, listas de contatos e respostas em um painel integrado à FLW Chat.</span>
+      </div>
+    </aside>
+  </main>
+</body>
+</html>

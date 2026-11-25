@@ -1,0 +1,761 @@
+PROVEDORES REGIONAIS DE INTERNET | 24/11/2026
+363 telefones distintos em 130 de 163 cidades da lista.
+394 registros por cidade (centrais regionais podem atender mais de um município).
+Formato: provedor | telefone | tipo | fonte.
+Fontes: canais institucionais e cadastro SCM/STEL da Anatel. Para o cadastro, a cidade corresponde ao endereço registrado. Foram selecionados até 10 números de cadastro por cidade, sem completar dígitos ausentes.
+WhatsApp indicado quando anunciado pelo provedor na fonte consultada. A pesquisa não confirma que os números estejam ativos, que cheguem ao setor de compras ou que o provedor tenha interesse em contratar link.
+Os canais divulgados como WhatsApp estão em provedores_whatsapp_publico.txt, no formato Nome;telefone. Centrais 0800 ficam apenas neste relatório.
+
+Arapiraca - AL
+  K2 Telecom | +55 (82) 99830-9113 | WhatsApp divulgado pelo provedor | https://www.k2telecom-isp.com.br/
+  Viaturbo Telecom | +55 (82) 99665-7420 | WhatsApp divulgado pelo provedor | https://viaturbo.com.br/
+  INFONET TELECOM LTDA | +55 (82) 99612-6653 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+  Ara Telecom Ltda | +55 (82) 99949-7808 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+  S DE OLIVEIRA SANTOS PROVEDOR LTDA | +55 (82) 3522-5638 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+  OOPS TELECOM LTDA | +55 (82) 3259-2324 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+  PROVEDORA CMA INTERNET LTDA | +55 (82) 3522-2324 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+
+Delmiro Gouveia - AL
+  DG Net Provedor | +55 (82) 98114-9568 | WhatsApp divulgado pelo provedor | https://www.dgnetprovedor.com.br/
+
+Maceió - AL
+  Rupi Telecom | +55 (82) 98193-6552 | WhatsApp divulgado pelo provedor | https://rupitelecom.com.br/
+  Perffect Telecom Ltda | +55 (82) 99688-9544 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+  Bnet Provedor Ltda | +55 (82) 3231-8111 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+  T2web Solucoes em Telecom Ltda | +55 (82) 3326-5579 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+  Ribeiro Telecomunicacoes Ltda | +55 (82) 3142-9885 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+  Sl Telecomunicacoes Eireli | +55 (82) 99126-9588 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+  ACCESS POINTER PROVEDOR DE INTERNET LTDA | +55 (82) 3317-7273 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+  EMG TELECOM LTDA | +55 (82) 99650-5857 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+  LINK BRASIL COMUNICACAO MULTIMIDIA LTDA - ME | +55 (82) 3271-1090 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+  IT TELECOMUNICACOES LTDA. | +55 (82) 3351-4704 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+
+Marechal Deodoro - AL
+  Rupi Telecom | +55 (82) 98193-6552 | WhatsApp divulgado pelo provedor | https://rupitelecom.com.br/
+  CONECT TECNOLOGIA E INTERNET LTDA | +55 (82) 98841-2497 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+
+Olho d’Água das Flores - AL
+  Super Connect Telecom | +55 (82) 3623-2170 | Telefone em lista empresarial pública | https://www.cylex.com.br/olho-dagua-das-flores/super-connect-telecom-13211160.html
+
+Palmeira dos Índios - AL
+  Supply Net | +55 (82) 3421-3256 | Telefone em lista empresarial pública | https://www.solutudo.com.br/empresas/al/palmeira-indios/provedores%2Bde%2Binternet?pagina=1
+
+Piranhas - AL
+  GNet Telecom | +55 (82) 98724-5403 | Telefone divulgado pelo provedor | https://gnettelecom.inf.br/fale-conosco
+
+Rio Largo - AL
+  Rupi Telecom | +55 (82) 98193-6552 | WhatsApp divulgado pelo provedor | https://rupitelecom.com.br/
+  Nmap Telecom Ltda | +55 (82) 3352-5030 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+  Popweb Telecom Ltda | +55 (82) 99601-7398 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=AL&pNumServico=045
+
+São Miguel dos Campos - AL
+  Rupi Telecom | +55 (82) 98193-6552 | WhatsApp divulgado pelo provedor | https://rupitelecom.com.br/
+
+Alagoinhas - BA
+  Primmus Fibra | +55 (75) 3031-0101 | Telefone divulgado pelo provedor | https://www.primmusfibra.com.br/
+  Rbn Rede de Comunicacao Ltda | +55 (75) 99871-3850 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045
+  Vibe Connect Fibra Ltda | +55 (75) 3181-6138 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=4&c=1
+  PRO TELECOMUNICACOES LTDA | +55 (75) 3366-0428 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=3&c=1
+  Servernet Servico de Internet Ltda | +55 (75) 3033-1201 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=3&c=1
+  REGIONAL FIBRA TELECOM PROVEDOR DE ACESSO LTDA | +55 (75) 3421-4921 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=3&c=1
+  ELETRONICS NET SERVICO DE INTERNET LTDA | +55 (75) 3421-0066 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=4&c=1
+  LINK NET WORLD SERVICO DE COMUNICACAO EIRELI | +55 (75) 3423-2350 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=4&c=1
+  INTERLIGADO TELECOM SERVICOS DE COMUNICACAO LTDA - ME | +55 (75) 3183-0750 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045
+  START TELECOM LTDA ME | +55 (75) 3181-5804 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=4&c=1
+  LINK VOIP TELECOM REDES DE COMUNICACAO LTDA | +55 (75) 3422-4274 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=2&c=1
+
+Camaçari - BA
+  SoftX | +55 (71) 2208-0000 | WhatsApp divulgado pelo provedor | https://softxbr.com.br/contato/
+  Spbt- Proverdor de Acesso A Internet Ltda | +55 (71) 3190-0340 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=4&c=1
+  Lexcom Comunicacao e Tecnologia Ltda | +55 (71) 3644-2950 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=4&c=1
+  Ws.net Telecomunicacoes e Servicos Ltda | +55 (71) 3621-9174 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045
+  G.F. CHAGAS SERVICOS DE OBRAS E PROVEDOR DE INTERNET LTDA | +55 (71) 3621-9873 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045
+  NET TELL - TELECOMUNICACOES E SERVICOS DE INTERNET LTDA | +55 (71) 3627-1661 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=2&c=1
+  VIVA TECNOLOGIA TELECOM LTDA - ME | +55 (71) 3624-3033 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=4&c=1
+  CAMACARI SIGNAL WIRELESS COMUNICACAO MULTIMIDIA EIRELI | +55 (75) 3522-3165 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=2&c=1
+  BIAFIBRA TELECOM LTDA | +55 (71) 2626-1215 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=2&c=1
+
+Catu - BA
+  10x Telecom & Store Ltda | +55 (71) 3500-2727 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=2&c=1
+  3l Telecomunicacoes Ltda | +55 (71) 3599-7000 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=2&c=1
+  LGA TELECOM LTDA | +55 (71) 3245-1883 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045
+  Downup Telecomunicaoes e Servicos Ltda | +55 (71) 3641-0639 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=4&c=1
+
+Dias d’Ávila - BA
+  Voanet | +55 (71) 3605-9000 | WhatsApp divulgado pelo provedor | https://voanet.com.br/para-voce/dias-davila-ba
+  Soft Bahia | +55 (71) 3190-6164 | WhatsApp divulgado pelo provedor | https://www.softbahia.com.br/fale.php
+
+Feira de Santana - BA
+  Nobre Fibra | +55 (75) 3030-5495 | WhatsApp divulgado pelo provedor | https://nobrenetwork.com.br/
+  Lealnet | +55 (75) 98191-9768 | WhatsApp divulgado pelo provedor | https://www.lealnet.com.br/contato/
+  A2J Telecom | +55 (75) 99167-6002 | Telefone divulgado pelo provedor | https://a2jtelecom.com.br/
+  L2K Telecom | +55 (75) 98186-3347 | Telefone divulgado pelo provedor | https://www.l2ktelecom.com.br/index.html
+  TURBOZONE INTERNET LTDA | +55 (75) 3021-1649 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045
+  Link+ Telecom Ltda | +55 (75) 99820-9322 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=3&c=1
+  EVOLUTION INTERNET TECNOLOGIA EM FIBRA OPTICA LTDA | +55 (75) 3199-0707 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045
+  Plug Tecnologias e Telecomunicacoes Ltda | +55 (75) 99230-5120 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045
+  Netfit Telecom Ltda | +55 (71) 98117-1395 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045
+  Wt Net Comunicacao Ltda | +55 (75) 3221-0288 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=2&c=1
+  NET NOVO TEMPO TELECOM LTDA | +55 (75) 3486-4496 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=4&c=1
+  LNK TELECOM SERVICOS DE INTERNET LTDA | +55 (75) 3484-9614 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=4&c=1
+  DOMINIO SERVICOS DE INTERNET LTDA - ME | +55 (75) 3224-3843 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=2&c=1
+  IGMAX COMERCIO E SERVICO DE TELECOMUNICACOES LTDA - ME | +55 (75) 3486-7861 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045
+
+Jeremoabo - BA
+  VTEK TELECOM LTDA - ME | +55 (75) 3203-1772 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=2&c=1
+
+Juazeiro - BA
+  Loop Telecom | +55 (74) 93300-9480 | WhatsApp divulgado pelo provedor | https://www.looptellecom.com/
+  Kasatech | +55 (74) 3614-9650 | WhatsApp divulgado pelo provedor | https://kasatech.net/
+  Vale Internet Ltda | +55 (74) 99926-8215 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=3&c=1
+  PORTAL SF SERVICOS DE PROVEDOR EIRELE EIRELI | +55 (74) 3612-9106 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=3&c=1
+  Infornet Servicos de Comunicacao Multimidia Ltda | +55 (74) 3612-4910 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045
+  IPOLO - GRUPO INTERNET DO BRASIL LTDA - ME | +55 (74) 98816-8817 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=4&c=1
+
+Paulo Afonso - BA
+  NEOTECH PROVEDOR DE INTERNET LTDA | +55 (75) 98843-2588 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045
+
+Ribeira do Pombal - BA
+  Net World Telecom | +55 (75) 3276-1058 | Telefone divulgado pelo provedor | https://networldtelecom.psi.br/
+  BR88 Telecom | +55 (75) 99999-0488 | Telefone divulgado pelo provedor | https://br88telecom.com.br/contato/
+
+Santo Amaro - BA
+  Novarede Comercio e Servicos de Informatica e Internet Ltda | +55 (75) 3241-2908 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=2&c=1
+  TI.NET SERVICOS DE COMUNICACAO E MULTIMIDIA LTDA | +55 (75) 3089-7839 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=3&c=1
+  CELINO RIBEIRO SERVIÇOS DE TELECOMUNICAÇÕES LTDA-ME | +55 (75) 3241-1952 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=4&c=1
+
+Simões Filho - BA
+  Salvadortech Comunicacao Ltda | +55 (71) 4042-0710 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=4&c=1
+  Variax Servicos de Internet Ltda | +55 (71) 3396-4571 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=BA&pNumServico=045&nav=2&c=1
+
+Acaraú - CE
+  CYBER INFO PROVEDOR DE ACESSO LTDA - ME | +55 (88) 3661-0236 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+
+Acopiara - CE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Aquiraz - CE
+  AQUIRAZ SERVICOS DE INTERNET LTDA | +55 (85) 98916-1538 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  Jerry Net Servicos de Internet Limitada | +55 (85) 3336-3006 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+
+Banabuiú - CE
+  XFibra Telecom | +55 (88) 99924-7400 | Telefone divulgado pelo provedor | https://www.xfibratelecom.com.br/
+  MEGANET TELECOMUNICACOES E INTERNET LTDA | +55 (88) 3426-1640 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+
+Barbalha - CE
+  Sv Telecom Internet Ltda | +55 (88) 3532-0000 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=3&c=1
+
+Brejo Santo - CE
+  RADIO ATIVO SERVICOS DE INTERNET LTDA | +55 (88) 3531-4702 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+
+Canindé - CE
+  POUPA NET TELECOM LTDA | +55 (85) 99788-1465 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+  E D TELECOMUNICACOES LTDA - ME | +55 (85) 98716-8694 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  SISTELBRAS SISTEMA DE TELECOMUNICAÇÃO BRASILEIRO LTDA | +55 (85) 3343-9300 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+
+Cascavel - CE
+  Home Link Internet Fibra Optica Ltda | +55 (85) 3274-4166 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+
+Caucaia - CE
+  Newlink Telecom Ltda | +55 (85) 98953-9647 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=3&c=1
+  K2l Telecom Internet Fibra Optica Ltda | +55 (85) 98622-2827 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=3&c=1
+  Inovar Telecomunicacao Servicos de Internet Ltda | +55 (85) 3266-1323 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=3&c=1
+  New Web Fibra Servicos de Telecomunicacoes Ltda | +55 (85) 4042-1121 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  SETEC.NET SERVICOS DE INFORMATICA E COMUNICACAO LTDA - ME | +55 (85) 3342-1598 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  UNT TELECOM SOLUCOES EM TELECOMUNICACOES E SERVICOS TI LTDA | +55 (85) 3253-3410 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+
+Cedro - CE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Crateús - CE
+  Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco
+
+Crato - CE
+  Rp de Morais Servicos e Multimidia Ltda | +55 (88) 98138-6896 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=3&c=1
+
+Eusébio - CE
+  ITS SOLUTION- PROVEDOR E TECNOLOGIA LTDA - ME | +55 (85) 3258-8580 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  INFOLINK TELECOM LTDA | +55 (85) 98636-2382 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+
+Fortaleza - CE
+  Ip2 Telecomunicacoes Ltda | +55 (85) 3022-3838 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=3&c=1
+  A K Servicos em Telecomunicacoes Ltda | +55 (85) 99199-8170 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+  Elos Telecomunicacoes Ltda | +55 (85) 99239-2708 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+  A H D Provedor de Internet Ltda | +55 (85) 98878-9178 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  Loopnet Fibra Telecomunicacoes Ltda | +55 (85) 4042-3344 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+  Telfo Brasil Servicos de Telecomunicacoes Ltda | +55 (85) 3082-0505 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  Multyplatelecom Ltda | +55 (85) 99717-0697 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  Mfc Telecomunicacoes Ltda | +55 (85) 3298-3543 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  Ping Net Telecom Ltda | +55 (85) 98559-5567 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+
+Guaraciaba do Norte - CE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Horizonte - CE
+  Informais Comercio e Servicos de Informatica e Telecomunicaces Ltda | +55 (85) 3348-0572 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+  KIM NET SOLUÇÕES EM INTERNET LIMITADA | +55 (85) 3336-1240 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=3&c=1
+
+Ibiapina - CE
+  M C F de M Freire Digital Net Telecom Ltda | +55 (88) 99441-6065 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+
+Icó - CE
+  Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco
+
+Iguatu - CE
+  Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco
+
+Ipu - CE
+  J S de Farias Telecomunicacoes e Comercio Ltda | +55 (88) 99762-7404 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+
+Iracema - CE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Itapajé - CE
+  Itapajenet Servicos de Acesso A Internet Eireli | +55 (85) 99177-5713 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  H E TELECOMUNICACOES & INFORMATICA LTDA - ME | +55 (85) 3346-1034 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  MEGGANET INTERNET E INFORMATICA LTDA | +55 (85) 3346-0073 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+
+Itapipoca - CE
+  JEBNET TELECOMUNICACOES LTDA | +55 (88) 3631-1992 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=3&c=1
+  ITAPIPOCA TELECOMUNICACOES E INFORMATICA LTDA | +55 (88) 3631-3568 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+
+Jaguaretama - CE
+  Fradenet Servicos de Comunicacao Multimidia Eireli | +55 (88) 3279-1713 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+
+Jaguaribara - CE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Jaguaribe - CE
+  VEX TELECOM SERVIÇOS DE TELECOMUNICAÇÃO LTDA - ME | +55 (88) 3522-1865 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=3&c=1
+
+Juazeiro do Norte - CE
+  Suno Telecom Ltda | +55 (88) 3512-2295 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+  Clicknet Telecom e Servicos Ltda | +55 (88) 98147-2212 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+  S. D. SERVICOS DE COMUNICACAO LTDA | +55 (88) 3571-8027 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+
+Lavras da Mangabeira - CE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Limoeiro do Norte - CE
+  Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco
+
+Maracanaú - CE
+  Zuck Telecom Ltda. | +55 (85) 99153-4132 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  Optilink Servicos de Telecomunicacoes Ltda | +55 (85) 3495-7164 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+  LINKCE TELECOM LTDA | +55 (85) 3371-7868 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+  POWER NET TELECOMUNICACOES EIRELI | +55 (85) 3298-5405 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+
+Maranguape - CE
+  Ajm Telecom Ltda | +55 (85) 98131-4377 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  R F Provedores e Tecnologia Ltda | +55 (85) 3015-2136 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  RAPIX TELECOMUNICACAO E SERVICOS LTDA | +55 (85) 3254-7617 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+
+Milagres - CE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Missão Velha - CE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Mombaça - CE
+  Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco
+
+Morada Nova - CE
+  Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco
+
+Orós - CE
+  LEVENET CONECTIVIDADE E TECNOLOGIA LTDA | +55 (88) 98188-7343 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+
+Pacajus - CE
+  Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco
+
+Pacatuba - CE
+  Toplink Provedor de Comunicacao Multimidia Ltda | +55 (85) 98758-3459 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+
+Paraipaba - CE
+  Tudo All Servicos de Internet Ltda | +55 (85) 3352-1440 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+
+Pedra Branca - CE
+  Nett Virtual Telecom | +55 (88) 99992-2627 | Telefone divulgado pelo provedor | https://nettvirtual.com.br/quem-somos/
+
+Pereiro - CE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Quixadá - CE
+  Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco
+
+Quixeramobim - CE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Quixeré - CE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Russas - CE
+  Solucoes Net Telecom Ltda | +55 (88) 3411-6418 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+  CONNECT SERVICOS DE INTERNET LTDA - ME | +55 (88) 3411-0515 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  PROVEDOR SPEED TELECOMUNICACOES LTDA - ME | +55 (88) 3411-0224 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+
+São Benedito - CE
+  Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco | https://www.gigamaisfibra.com.br/wp-content/uploads/2025/04/SO%CC%81CIO_VOZAO_Novo-regulamento-de-oferta-B2C-GIGA-FIBRA-Abr.25-1.pdf
+
+Senador Pompeu - CE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Sobral - CE
+  Cmnet Fibra Optica Ltda | +55 (88) 99360-1881 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  Telefibra Servicos de Telecomunicacao Ltda | +55 (88) 3611-1767 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+  HET INTERNET LTDA | +55 (88) 3614-7509 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+  SOBRALNET SERVICOS E TELECOMUNICACOES LTDA | +55 (85) 3032-3827 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=3&c=1
+  M R REDES DE TELECOMUNICAÇÕES LTDA | +55 (88) 3611-3418 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+
+Tabuleiro do Norte - CE
+  Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco | https://www.gigamaisfibra.com.br/wp-content/uploads/2025/04/SO%CC%81CIO_VOZAO_Novo-regulamento-de-oferta-B2C-GIGA-FIBRA-Abr.25-1.pdf
+
+Tauá - CE
+  Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco
+  Nett Virtual Telecom | +55 (88) 99992-2627 | Telefone divulgado pelo provedor | https://nettvirtual.com.br/quem-somos/
+
+Tianguá - CE
+  FIBER MAX SERVICOS DE TELECOMUNICACAO LTDA | +55 (88) 99994-2324 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
+
+Ubajara - CE
+  Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco | https://www.gigamaisfibra.com.br/wp-content/uploads/2025/04/SO%CC%81CIO_VOZAO_Novo-regulamento-de-oferta-B2C-GIGA-FIBRA-Abr.25-1.pdf
+
+Várzea Alegre - CE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Viçosa do Ceará - CE
+  Teknet Servicos de Telecomunicacoes Ltda | +55 (88) 98136-9466 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+  SERRA NET TELECOMUNICAÇÕES E INTERNET LTDA. - ME | +55 (88) 3636-1156 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
+
+Timon - MA
+  Portal Timon | +55 (86) 98851-1748 | WhatsApp divulgado pelo provedor | https://portaltimon.com.br/
+  Viana Telecom Ltda | +55 (99) 3212-7626 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=MA&pNumServico=045
+  Fly Connect Telecom Ltda | +55 (86) 98822-9659 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=MA&pNumServico=045
+  ON TELECOM LTDA | +55 (99) 3212-4974 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=MA&pNumServico=045
+
+Bayeux - PB
+  Ok Telecom PB Provedor e Servicos de Internet Ltda | +55 (83) 98635-0522 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  Ahp Telecomunicacoes Servicos e Comercio Ltda | +55 (83) 3232-1839 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  Dellta Telecom Servicos de Comunicacao Multimidia Ltda | +55 (83) 99944-9356 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045&nav=2&c=1
+  X Prime Servicos de Telecomunicacoes Ltda | +55 (83) 3232-7691 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  PORTAL.COM SERVICOS DE TELECOMUNICACOES E INFORMATICA EIRELI - ME | +55 (83) 3253-7580 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+
+Cabedelo - PB
+  G3 Servicos de Telecomunicacoes Ltda | +55 (83) 99953-7640 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045&nav=2&c=1
+
+Cajazeiras - PB
+  Globallig | +55 (83) 99103-6674 | WhatsApp divulgado pelo provedor | https://globallig.com.br/
+  Netline Telecom | 0800 281 4437 | WhatsApp divulgado pelo provedor | https://www.netlinetelecom.com.br/cidade/cajazeiras/
+  ATUAL NET PROVEDOR DE INTERNET LTDA - ME | +55 (83) 3531-4338 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  NETLINE TECNOLOGIA EM TELECOMUNICAÇÕES LTDA | +55 (83) 3531-2016 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  ADLLINK TELECOM PROVEDOR DE INTERNET LTDA | +55 (83) 3531-9800 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+
+Campina Grande - PB
+  Linax Internet | +55 (83) 4003-7738 | Telefone divulgado pelo provedor | https://linax.net.br/
+  Proxxima Telecom | 0800 083 1155 | WhatsApp divulgado pelo provedor | https://proxxima.net/atendimento/
+  Brlink Servicos de Telecomunicacoes Ltda | +55 (83) 99622-4398 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  Xprisma Solucoes em Internet Servicos Ltda | +55 (83) 98758-6403 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  AGILNET SERVICOS DE INFORMATICA E TELECOMUNICACOES LTDA | +55 (83) 3281-0100 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  LINAX SERVICOS DE TELECOMUNICACOES LTDA | +55 (83) 3335-6507 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  MEGA NET SERVICOS EM INTERNET E INFORMATICA LTDA - EPP | +55 (83) 3314-1279 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  MEGALINK TELECOMUNICACOES LTDA | +55 (83) 3321-6980 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  Telnet - Servicos em Telecomunicacoes Ltda | +55 (83) 3065-9600 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  Unica Conectividade Ltda | +55 (83) 3333-3639 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+
+Catolé do Rocha - PB
+  Alsol | +55 (83) 3142-6040 | Telefone divulgado pelo provedor | https://alsol.com.br/wp-content/uploads/2025/09/Contrato-Link-Dedicado-Consumo-Novo.pdf
+
+João Pessoa - PB
+  Area Digital Informatica e Telecomunicacoes dos Santos Ltda | +55 (83) 99662-3037 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  ONTELL SERVICOS DE BANDA LARGA E TECNOLOGIA LTDA | +55 (83) 3264-1200 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  Giganet Servicos de Telecomunicacoes Ltda | +55 (83) 99904-1187 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  Solucoes Servicos Internet Ltda | +55 (83) 98811-6117 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  INET SERVICOS DE TELECOMUNICACOES LTDA | +55 (83) 98800-7937 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  3ONE TELECOMUNICACOES E SERVICOS LTDA | +55 (83) 98671-0414 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  PROREDES INTERNET SERVICOS DE INFORMATICA LTDA | +55 (83) 3225-1563 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  GSM TELECOM SERVI OS DE PROVEDOR DE INTERNET LTDA - ME | +55 (83) 98134-5444 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  LINNET PROVEDOR DE INTERNET LTDA - ME | +55 (83) 3042-3282 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  Sys3 Internet Ltda | +55 (83) 3045-0585 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+
+Patos - PB
+  Glnet Telecomunicacoes e Servicos Ltda | +55 (83) 99961-2284 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  J L SERVICOS DE COMUNICACAO LTDA | +55 (83) 3421-3194 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  MIO SERVICOS DE TELECOMUNICACOES PATOS LTDA - ME | +55 (83) 3423-3381 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+
+Pombal - PB
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Queimadas - PB
+  AMOR SERVICOS DE TELECOMUNICACOES LTDA-ME | +55 (83) 3392-1130 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+
+Santa Luzia - PB
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Santa Rita - PB
+  Fibra Net Tecnologia e Telecomunicacoes Ltda | +55 (83) 99604-1035 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+  V1 TECNOLOGIA E TELECOMUNICACOES EIRELI | +55 (83) 3032-0354 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+
+São Bento - PB
+  Connect Line | +55 (83) 99634-9474 | Telefone divulgado pelo provedor | https://ebasaobento.com.br/
+  Oliveira e Nobre Servicos de Provedor de Internet Ltda | +55 (83) 99966-6605 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+
+Sousa - PB
+  RAPNET COMUNICAÇÃO MULTIMÍDIA LTDA - ME | +55 (83) 3535-2820 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
+
+Uiraúna - PB
+  Netline Telecom | 0800 281 4437 | WhatsApp divulgado pelo provedor | https://www.netlinetelecom.com.br/wp-content/uploads/REGULAMENTOS-MUITO-MAIS-QUE-INTERNET-1.pdf
+
+Abreu e Lima - PE
+  Ultra Fibra Servicos de Comunicacao Ltda | +55 (81) 3541-5143 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+
+Araripina - PE
+  Rede Leal | +55 (87) 99100-2656 | WhatsApp divulgado pelo provedor | https://redeleal.com.br/
+
+Arcoverde - PE
+  GZNET | +55 (87) 99683-4929 | WhatsApp divulgado pelo provedor | https://dktelecom.net.br/
+
+Belo Jardim - PE
+  NETCITY TECNOLOGIA EM INTERNET LTDA - ME | +55 (81) 3419-8525 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  Digital Tecnologia & Telecomunicacao Ltda | +55 (81) 3726-3125 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+
+Bezerros - PE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Bom Conselho - PE
+  J L Net Telecom Ltda | +55 (87) 98178-7187 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+
+Brejo da Madre de Deus - PE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Cabo de Santo Agostinho - PE
+  Turbo Net Telecomunicacoes Ltda | +55 (81) 3518-3810 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  I9 INOVE TELECOM LTDA | +55 (81) 93500-9772 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  ELINALDO M P TELECOM LTDA | +55 (81) 99264-7434 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  Protege Net Servicos em Telecomunicacoes Ltda | +55 (81) 98469-6087 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  PIX TELECOM PROVEDOR DE INTERNET LTDA | +55 (81) 98479-1653 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  PROVETECH SOLUCAO EM INTERNET LTDA - ME | +55 (81) 3521-3446 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  PROVEDOR CRNET TELECOM SERVIÇOS DE COMUNICAÇÃO E MULTIMÍDIA LTDA | +55 (81) 3518-1983 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  GVNET PROVEDORES DE COMUNICACOES LTDA | +55 (81) 3521-9697 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  BAIRRONET TELECOMUNICACOES LTDA | +55 (81) 3521-1859 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+
+Camaragibe - PE
+  Forts Internet Brasil Ltda | +55 (81) 98279-6449 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  Fiber Connect Provedor Ltda | +55 (81) 99928-8512 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  Novix Telecom Ltda | +55 (81) 98860-5597 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  P C ATIVO TELECOMUNICACOES EIRELI | +55 (81) 4112-0560 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  FORT LINK INTERNET CORPORATIVA BRASIL LTDA - EPP | +55 (81) 98735-3863 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  CYBERNET TELECOM SERVIÇOS DE INTERNET LTDA - ME | +55 (81) 3458-1293 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  IGNET LINHAS SERVIÇO DE TELECOMUNICAÇÕES LTDA | +55 (81) 4116-1415 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  SUPERNET TELECOM LTDA - ME | +55 (81) 3075-3993 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+
+Caruaru - PE
+  Smart Fibra | +55 (81) 99380-9338 | Telefone divulgado pelo provedor | https://www.provedorsmart.com.br/nova-pagina/
+  PGF Telecom | +55 (81) 3138-8700 | Telefone divulgado pelo provedor | https://www.pgftelecom.com.br/wp-content/uploads/2026/03/CONTRATO-REGISTRADO-PGF-TELECOM-CARUARU.pdf
+  Unic Fibra Telecon Ltda | +55 (81) 3045-4770 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  J L Telecom Ltda | +55 (81) 99158-1142 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  G Plus Telecom Ltda | +55 (81) 98128-8419 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  Mendes Telecom Ltda | +55 (81) 99991-8004 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  Global Itelecom Ltda | +55 (81) 3721-8456 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  FIRELINK SERVICOS DE COMUNICACAO LTDA | +55 (81) 3725-7041 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  F5 SOLUCOES EM COMUNICACAO MULTIMIDIA LTDA | +55 (81) 3428-3067 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  GFT COMÉRCIO DE TELEFONIA E COMUNICAÇÃO LTDA | +55 (81) 2103-7777 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+
+Custódia - PE
+  Maravilha Net Telecom Ltda | +55 (87) 98167-2866 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  GUERRA TELECOM LTDA | +55 (87) 3848-2742 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+
+Escada - PE
+  Sport Net Telecomunicacoes Ltda | +55 (81) 99297-8819 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  Matrix Telecom - Servicos de Comunicacao Multimidia Ltda | +55 (81) 3534-5740 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+
+Garanhuns - PE
+  S. Telecom Ltda | +55 (87) 99826-5398 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  H & A SERVICOS DE TELECOMUNICACOES LTDA | +55 (81) 3523-6704 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  Falcao Net Provedor de Internet Ltda | +55 (87) 3786-1299 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  BLUENET + TELECOM LTDA | +55 (87) 3762-1600 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+
+Gravatá - PE
+  STAR NET SERVICOS DE COMUNICACAO LTDA | +55 (81) 3252-7705 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  Net.com Provedor de Internet Ltda | +55 (81) 99243-2422 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  Locallink Telecomunicacoes Ltda | +55 (81) 3533-5276 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  NET.COM TELECOMUNICACOES EIRELI | +55 (81) 3533-1988 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+
+Igarassu - PE
+  RaioNet Telecom | +55 (81) 98627-9394 | WhatsApp divulgado pelo provedor | https://www.raionettelecom.com.br/
+
+Jaboatão dos Guararapes - PE
+  Proverlink Telecom Ltda | +55 (81) 98356-3184 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  Flippnet Servicos de Internet Telecom Ltda | +55 (81) 98348-4948 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  Universo Telecom Ltda | +55 (81) 3094-5262 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  Green Fibra Provedores de Acesso Ltda | +55 (81) 3251-4759 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  GO Fibra Servicos de Comunicacoes Ltda | +55 (81) 3321-3373 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  Id Link Servicos de Telecomunicacoes Ltda | +55 (81) 3453-7203 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  Unica Telecom Ltda | +55 (81) 2011-0047 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  LOGINNET PROVEDORES LTDA | +55 (81) 4062-9029 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+
+Limoeiro - PE
+  Provedor Space Ltda | +55 (81) 3628-3181 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  NET.COM PROVEDOR LTDA | +55 (81) 3533-9470 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+
+Olinda - PE
+  Mano Net Servico de Internet Ltda | +55 (81) 98418-1550 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  Arrobaweb Informatica e Telecomunicacoes Ltda | +55 (81) 3010-5830 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  Ultranet Telecomunicacoes Ltda | +55 (81) 98635-0278 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  Ja Net Fibra Ltda | +55 (81) 99265-3933 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  Connect World Telecomunicacoes & Informatica Ltda | +55 (81) 3132-2028 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  FIBERLINK TELECOM LTDA | +55 (81) 3438-1405 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  Tiw Isp Internet & Tecnologia Ltda | +55 (81) 2011-4969 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  SIDERAL.NET PROVEDOR DE INTERNET LTDA | +55 (81) 3014-4967 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  Rionet Tecnologia em Internet Ltda | +55 (81) 3495-3859 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+
+Ouricuri - PE
+  Ourinet | +55 (87) 3874-2613 | Telefone divulgado pelo provedor | https://www.ourinet.com.br/
+
+Paulista - PE
+  Globalnet Provedor e Internet Ltda | +55 (81) 3132-9937 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  Leandro A de Oliveira Silva Internet Ltda | +55 (81) 3091-8719 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  Apnet Telecom Servicos de Internet e Comunicacao Ltda | +55 (81) 98852-9971 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  Tr Fibra Ltda | +55 (81) 98474-3784 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  P & B COMERCIO E SERVICOS EM TELECOMUNICACOES LTDA | +55 (81) 3236-2232 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  FULL TECH TELECOM LTDA | +55 (81) 3075-8627 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+
+Pesqueira - PE
+  Neo Provedor Ltda | +55 (81) 99969-9628 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+
+Petrolina - PE
+  Loop Telecom | +55 (74) 93300-9480 | WhatsApp divulgado pelo provedor | https://www.looptellecom.com/
+  Kasatech | +55 (74) 3614-9650 | WhatsApp divulgado pelo provedor | https://kasatech.net/
+  MS Telecom Ltda | +55 (87) 3863-5157 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  Inova Tecnologias em Internet Ltda | +55 (87) 99912-9736 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  PNZ NET SERVICO DE COMUNICACAO E MULTIMIDIA EIRELI | +55 (87) 98807-2073 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  Space Telecomunicacao Ltda | +55 (87) 3202-8599 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  TURBO NET SERVICO DE COMUNICACAO E MULTIMIDIA LTDA. | +55 (87) 3031-1772 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  TOTALNET TELECOM LTDA | +55 (87) 3983-0394 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  JR LINK PROVEDOR DE INTERNET VIA RÁDIO LTDA ME | +55 (87) 3862-3938 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  L E M TELECOMUNICACOES LTDA | +55 (87) 3861-5633 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+
+Recife - PE
+  Speedy Paul Telecom Ltda | +55 (81) 3268-5869 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  Ability Fibra Servicos de Comunicacao Ltda | +55 (81) 4042-9727 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  Netway Fibra PE Ltda | +55 (81) 99686-3268 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  Fj Telecom Ltda | +55 (81) 4102-9031 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  Powernet Telecomunicacoes Ltda | +55 (81) 3049-3658 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  Pablom Fibra Telecom Ltda | +55 (81) 98734-6170 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+  Jh-network Telecom Ltda | +55 (81) 98550-7111 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  Contage Consultoria em Telecomunicacoes e Monitoramento Ltda | +55 (81) 3326-8262 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  V10 Telecom Comunicacoes Ltda | +55 (81) 98449-2215 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+
+Salgueiro - PE
+  UM TELECOM SOLUÇÕES EM INTERNET E TECNOLOGIA LTDA | +55 (87) 3871-2600 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+
+Santa Cruz do Capibaribe - PE
+  Rede.com Telecom Ltda | +55 (81) 3731-9783 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+
+São Lourenço da Mata - PE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Serra Talhada - PE
+  Serra Telecomunicacoes Ltda | +55 (87) 98154-9099 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  VIDATEL SERVICOS CONVERGENTES EM TELECOMUNICACOES LTDA - EPP | +55 (81) 3423-6532 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  MSE COMUNICAÇÃO MULTIMÍDIA LTDA - ME | +55 (87) 3831-8772 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+
+Surubim - PE
+  Fox Net Web Telecom Ltda | +55 (81) 3656-1030 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  Pointnet Provedor de Internet Ltda | +55 (81) 3634-1165 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  Gnet Provedor - Servicos e Internet Ltda | +55 (81) 3634-5897 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+
+Toritama - PE
+  BEZERRA NET TELECOM LTDA - ME | +55 (81) 4105-2323 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  TURBONET PROVEDOR DE NTERNET LTDA | +55 (81) 3741-3066 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
+
+Vitória de Santo Antão - PE
+  T & R TELECOMUNICACOES LTDA | +55 (81) 98169-3738 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
+  H M R Telecom Ltda | +55 (81) 3557-4040 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  FILHONET TELECOMUNICACOES LTDA - ME | +55 (81) 3526-1229 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+  VAITELECOM LTDA - ME | +55 (81) 3523-7956 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
+
+Altos - PI
+  Loop Fibra Ltda | +55 (86) 3263-2848 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PI&pNumServico=045
+
+Buriti dos Montes - PI
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Campo Maior - PI
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Hugo Napoleão - PI
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Luís Correia - PI
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Parnaíba - PI
+  Delta Connect | 0800 086 0100 | Telefone divulgado pelo provedor | https://www.deltaconnect.com.br/
+  Orl Telecom Ltda | +55 (86) 99987-3370 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PI&pNumServico=045
+  REDE ULTRACONECTA NET LTDA ME | +55 (86) 3323-8814 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PI&pNumServico=045
+  DC TELECOMUNICACOES LTDA | +55 (86) 3323-0926 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PI&pNumServico=045
+
+Picos - PI
+  VirteX Telecom | 0800 089 0089 | WhatsApp divulgado pelo provedor | https://virtex.com.br/fale-conosco
+
+Pio IX - PI
+  VirteX Telecom | 0800 089 0089 | WhatsApp divulgado pelo provedor | https://virtex.com.br/pio-ix
+
+Piripiri - PI
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Teresina - PI
+  G3 Telecom | 0800 186 6000 | Telefone divulgado pelo provedor | https://vemprag3.com.br/atendimento
+  Uniweb Telecom Ltda | +55 (86) 3305-5535 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PI&pNumServico=045
+  e R G2 Telecom Ltda | +55 (86) 98839-3541 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PI&pNumServico=045
+  Ultranet Telecom Ltda | +55 (86) 99465-0411 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PI&pNumServico=045
+  Ip Servicos de Comunicacao e Seguranca Ltda | +55 (86) 99807-9800 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PI&pNumServico=045
+  G W Telecomunicacoes Ltda | +55 (86) 99910-3920 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PI&pNumServico=045
+  Norte Telecom Ltda | +55 (86) 3223-5981 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PI&pNumServico=045
+  FORTHE TELECOM LTDA | +55 (86) 3011-1150 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PI&pNumServico=045
+  Ip Carrier Telecom do Brasil Ltda | +55 (86) 3301-5304 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PI&pNumServico=045
+  FONTE TELECOM LTDA - ME | +55 (86) 3234-8818 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PI&pNumServico=045
+  MAIS INFORMÁTICA E TELECOM LTDA - ME | +55 (86) 3081-8867 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PI&pNumServico=045
+
+Açu - RN
+  TCM Telecom | +55 (84) 3315-0700 | WhatsApp divulgado pelo provedor | https://tcmtelecom.com.br/
+  Inova Telecom Assu Ltda | +55 (84) 3331-1807 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+
+Baraúna - RN
+  Global Telecom Servicos de Comunicacao e Multimidia Ltda | +55 (84) 3323-1200 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  G & M Servicos de Comunicacao e Multimidia Ltda | +55 (84) 3034-9613 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  Conceitos Net Servicos de Comunicacao e Multimidia Ltda | +55 (84) 3320-2513 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+
+Caicó - RN
+  Cd Telecomunicacoes Ltda | +55 (84) 99900-1014 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+
+Ceará-Mirim - RN
+  Proxxima Telecom | 0800 083 1155 | WhatsApp divulgado pelo provedor | https://internet-fibra.proxxima.net/rn/ceara-mirim/ | https://proxxima.net/atendimento/
+
+Coronel João Pessoa - RN
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Doutor Severiano - RN
+  Local Telecom | +55 (84) 99617-9171 | Telefone em registro empresarial/documento público | https://guiapj.com.br/consulta-cnpj/25257331000132 | https://diariooficial.fecamrn.com.br/files/2340_2026-02-09.pdf
+
+Encanto - RN
+  TCM Telecom | +55 (84) 3315-0700 | WhatsApp divulgado pelo provedor | https://tcmtelecom.com.br/
+
+Extremoz - RN
+  Proxxima Telecom | 0800 083 1155 | WhatsApp divulgado pelo provedor | https://internet-fibra.proxxima.net/rn/ceara-mirim/ | https://proxxima.net/atendimento/
+
+Francisco Dantas - RN
+  TCM Telecom | +55 (84) 3315-0700 | WhatsApp divulgado pelo provedor | https://tcmtelecom.com.br/
+
+José da Penha - RN
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Luís Gomes - RN
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Macaíba - RN
+  Wr Net Provedor Limitada | +55 (84) 3211-9729 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  Cit - Servicos e Internet Ltda | +55 (84) 4042-1002 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  JFC PROVEDOR DE INTERNET LTDA | +55 (84) 99125-8586 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  MT INTERNET COMÉRCIO E SERVIÇOS LTDA | +55 (84) 99175-1000 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+
+Major Sales - RN
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Martins - RN
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Mossoró - RN
+  TCM Telecom | +55 (84) 3315-0700 | WhatsApp divulgado pelo provedor | https://tcmtelecom.com.br/
+  Interliga Servicos de Comunicacao e Automacao Ltda | +55 (84) 3191-1200 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  MK SERVICOS DE TELECOMUNICACOES LTDA | +55 (84) 3312-6924 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  TELECAB TELECOMUNICACOES LTDA | +55 (84) 3331-2593 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  SISTEMA OESTE DE COMUNICAÇÃO LTDA | +55 (84) 3316-0600 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+
+Natal - RN
+  Natal Fibra | +55 (84) 4042-2299 | Telefone divulgado pelo provedor | https://natalfibra.com.br/contato/
+  SuperGet | +55 (84) 98738-5490 | Telefone divulgado pelo provedor | https://www.supergetrn.com.br/
+  TCM Telecom | +55 (84) 3315-0700 | WhatsApp divulgado pelo provedor | https://tcmtelecom.com.br/
+  Interjato Telecom Ltda | +55 (84) 4008-4000 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  Vibecom Servicos de Telecomunicacoes Ltda | +55 (84) 99910-1189 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  World Telecom Ltda | +55 (84) 3206-3985 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  CLIKPOWER TELECOMUNICACOES EIRELI | +55 (84) 3302-6977 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  P. S. VIP SERVICOS DE TELECOMUNICACOES LTDA | +55 (84) 98600-3444 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  WILLNET SERVICOS DE MULTIMIDIA LTDA | +55 (84) 3614-8772 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  Cianet Provedor Movel Ltda | +55 (84) 99961-1806 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  HELLO WEB TELECOMUNICACOES E SERVICOS LTDA | +55 (84) 3645-4086 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  VEFRA TELECOMUNICACOES LTDA - ME | +55 (84) 3088-1969 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  ALIANCA LINK PROVEDOR DE INTERNET LTDA | +55 (84) 3661-0920 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+
+Nísia Floresta - RN
+  TCM Telecom | +55 (84) 3315-0700 | WhatsApp divulgado pelo provedor | https://tcmtelecom.com.br/
+
+Parnamirim - RN
+  TCM Telecom | +55 (84) 3315-0700 | WhatsApp divulgado pelo provedor | https://tcmtelecom.com.br/
+  NETULTRA POTIGUAR PROVEDOR DE INTERNET LTDA. | +55 (84) 3272-0400 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+
+Pau dos Ferros - RN
+  TCM Telecom | +55 (84) 3315-0700 | WhatsApp divulgado pelo provedor | https://tcmtelecom.com.br/
+  Fluxo Telecom Ltda | +55 (84) 99906-6712 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+  REDE OESTE DE COMUNICACAO LTDA | +55 (84) 3315-0717 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
+
+Portalegre - RN
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Rafael Fernandes - RN
+  TCM Telecom | +55 (84) 3315-0700 | WhatsApp divulgado pelo provedor | https://tcmtelecom.com.br/
+
+São Gonçalo do Amarante - RN
+  Proxxima Telecom | 0800 083 1155 | WhatsApp divulgado pelo provedor | https://internet-fibra.proxxima.net/rn/ceara-mirim/ | https://proxxima.net/atendimento/
+
+São José de Mipibu - RN
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+São Miguel - RN
+  Local Telecom | +55 (84) 99617-9171 | Telefone em registro empresarial/documento público | https://guiapj.com.br/consulta-cnpj/25257331000132
+
+Umarizal - RN
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Aracaju - SE
+  Fibracom Servicos de Comunicacao Ltda | +55 (79) 99848-5710 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+  Paz Telecom Ltda | +55 (79) 98837-6448 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+  LINKSE PROVEDOR DE INTERNET LTDA | +55 (79) 99837-2519 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+  APX NET PROVEDOR DE INTERNET LTDA | +55 (79) 3214-6408 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+  M G Telecomunicacoes Ltda | +55 (79) 3234-9000 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+  TALLISSON TELECOMUNICACOES EIRELI | +55 (79) 3211-9179 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+  REDE FIBRA TELECOM LTDA | +55 (79) 3431-1417 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+  INFRANET - TECNOLOGIA EM COMUNICACAO LTDA | +55 (79) 3222-3310 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+  ACESSO PONTO COM COMUNICAÇÃO MULTIMÍDIA LTDA - ME | +55 (79) 3021-6321 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+  SPEED TELECOM LTDA - ME | +55 (79) 3231-8781 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+
+Barra dos Coqueiros - SE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Canindé de São Francisco - SE
+  Turbo Online | +55 (79) 99832-8629 | WhatsApp divulgado pelo provedor | https://turboonline.com.br/contato
+
+Estância - SE
+  Sem telefone empresarial localizado nas fontes consultadas.
+
+Itabaiana - SE
+  ITNET | +55 (79) 3431-5555 | Telefone em registro empresarial/documento público | https://itabaiana.se.gov.br/download/licitanet-ata-de-registro-de-preco_ddb279047f426984a454a87.pdf
+  TEMPERNET TELECOM EIRELI | +55 (79) 99884-1528 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+
+Lagarto - SE
+  Ficarnet | +55 (79) 99986-1053 | WhatsApp divulgado pelo provedor | https://ficarnet.com.br/
+  INTERV SERVICO COMUNICACAO LTDA | +55 (79) 3631-1028 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+  DIGASIM TELECOMUNICACOES E SERVICOS EIRELI | +55 (79) 3631-6191 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+  MINAS TELECOMUNICACOES LTDA | +55 (79) 3631-2790 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+
+Nossa Senhora do Socorro - SE
+  GUIGO NET EMPRESA TOP NET PROVEDORES LTDA ME | +55 (79) 3113-2001 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+
+São Cristóvão - SE
+  Jr Conect Internet Ltda | +55 (79) 3261-1926 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+  Mais Ativa Provedor de Internet Ltda | +55 (79) 3022-3841 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+
+Tobias Barreto - SE
+  Ligeirinha Solucoes de Internet Ltda | +55 (79) 3431-1640 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+  G R V TELECOM LTDA | +55 (79) 3541-3572 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
+

@@ -1,0 +1,15 @@
+# Envie ao builder apenas os arquivos usados pelo Dockerfile.
+**
+!package.json
+!package-lock.json
+!src/
+!src/**
+!views/
+!views/**
+!public/
+!public/**
+!scripts/
+!scripts/flw-conexao.js
+!scripts/flw-templates.js
+!scripts/lib/
+!scripts/lib/**
