@@ -85,11 +85,13 @@ export class FlwClient {
   messageStatus(id) {
     return this.request(`/v1/send/message/${encodeURIComponent(id)}`);
   }
-  sessions(page = 1) {
+  sessions(channelId, after, page = 1) {
     return this.request('/v2/session', {
       query: {
         PageNumber: page,
-        PageSize: 30,
+        PageSize: 20,
+        ChannelsId: channelId,
+        'LastInteractionAt.After': after,
         IncludeDetails: 'ContactDetails',
         OrderBy: 'LastInteractionAt',
         OrderDirection: 'DESCENDING',
@@ -101,7 +103,7 @@ export class FlwClient {
   }
   messages(id, page = 1) {
     return this.request(`/v1/session/${encodeURIComponent(id)}/message`, {
-      query: { PageNumber: page, PageSize: 50, OrderBy: 'CreatedAt', OrderDirection: 'DESCENDING' },
+      query: { PageNumber: page, PageSize: 25, OrderBy: 'CreatedAt', OrderDirection: 'DESCENDING' },
     });
   }
   reply(id, text) {

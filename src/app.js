@@ -8,6 +8,8 @@ import { join, dirname } from 'node:path';
 import { ZodError } from 'zod';
 import { SQLiteSessionStore } from './db.js';
 import { apiRouter } from './routes/api.js';
+import { usersRouter } from './routes/users.js';
+import { verifyPassword, roleNames, landingPage, canUseApi } from './services/users.js';
 import { applyProviderStatus, now } from './services/campaigns.js';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -94,8 +96,20 @@ export function createApp({ config, db, flw, campaigns }) {
     }
     next();
   });
+  app.use((req, res, next) => {
+    if (req.session.authenticated) {
+      // Sessões emitidas antes das contas de equipe pertenciam ao único administrador.
+      if (!req.session.accountId || req.session.accountId === 'manager') {
+        res.locals.account = { username: config.username, role: 'manager' };
+      } else {
+        res.locals.account = db.prepare('SELECT username, role FROM staff_users WHERE id=? AND active=1 AND version=?')
+          .get(req.session.accountId, req.session.accountVersion);
+      }
+    }
+    next();
+  });
   app.get('/login', (req, res) =>
-    req.session.authenticated ? res.redirect('/') : res.render('login', { error: null }),
+    res.locals.account ? res.redirect('/') : res.render('login', { error: null }),
   );
   const loginLimit = rateLimit({
     windowMs: 15 * 60000,
@@ -106,18 +120,29 @@ export function createApp({ config, db, flw, campaigns }) {
     handler: (req, res) =>
       res.status(429).render('login', { error: 'Muitas tentativas. Aguarde 15 minutos e tente novamente.' }),
   });
-  app.post('/login', loginLimit, (req, res, next) => {
-    if (!equal(req.body.username, config.username) || !equal(req.body.password, config.password))
+  app.post('/login', loginLimit, async (req, res, next) => {
+    const { username, password } = req.body || {};
+    if (typeof username !== 'string' || typeof password !== 'string' || password.length > 256)
       return res.status(401).render('login', { error: 'Usuário ou senha incorretos.' });
+    let account;
+    if (equal(username, config.username) && equal(password, config.password)) {
+      account = { id: 'manager', version: 1 };
+    } else {
+      const staff = db.prepare('SELECT id, version, password_hash, active FROM staff_users WHERE username=?').get(username);
+      if (await verifyPassword(password, staff?.password_hash) && staff?.active && username.toLowerCase() !== config.username.toLowerCase()) account = staff;
+    }
+    if (!account) return res.status(401).render('login', { error: 'Usuário ou senha incorretos.' });
     req.session.regenerate((error) => {
       if (error) return next(error);
       req.session.authenticated = true;
+      req.session.accountId = account.id;
+      req.session.accountVersion = account.version;
       req.session.csrf = randomBytes(32).toString('hex');
       req.session.save((error) => (error ? next(error) : res.redirect('/')));
     });
   });
   app.use((req, res, next) => {
-    if (req.session.authenticated) return next();
+    if (res.locals.account) return next();
     if (req.path.startsWith('/api/')) return res.status(401).json({ error: 'Faça login para continuar.' });
     res.redirect('/login');
   });
@@ -128,8 +153,17 @@ export function createApp({ config, db, flw, campaigns }) {
       res.redirect('/login');
     }),
   );
+  app.use('/api', (req, res, next) => {
+    if (canUseApi(res.locals.account.role, req.path)) return next();
+    res.status(403).json({ error: 'Seu perfil não tem acesso a esta operação.' });
+  });
+  app.use('/api/users', usersRouter(db, config));
   app.use('/api', apiRouter(db, flw, campaigns, config));
-  app.get('/', (req, res) => res.render('index', { username: config.username }));
+  app.get('/', (req, res) => {
+    const { username, role } = res.locals.account;
+    res.render('index', { username, role, roleName: roleNames[role], homePage: landingPage[role],
+      configured: Boolean(config.apiToken), inboxChannelId: config.inboxChannelId || '' });
+  });
   app.use((req, res) => res.status(404).json({ error: 'Página não encontrada.' }));
   app.use((error, req, res, next) => {
     if (error instanceof ZodError)

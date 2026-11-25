@@ -16,6 +16,53 @@ afterEach(() => {
   f.db.close();
 });
 const post = (path, body = {}) => agent.post(`/api${path}`).set('x-csrf-token', csrf).send(body);
+
+test('gerente cadastra equipe, permissões protegem a API e alterações revogam a sessão', async () => {
+  const entry = { username: 'ana', password: 'senha-da-equipe', role: 'agent' };
+  const { body: { id } } = await post('/users', entry).expect(201);
+  await post('/users', { ...entry, username: 'ANA' }).expect(409);
+  await post('/users', { ...entry, username: 'admin' }).expect(409);
+  await post('/users', { ...entry, role: 'manager' }).expect(400);
+  const staff = request.agent(f.app);
+  let token = await authenticate(staff, entry.username, entry.password);
+  await staff.get('/api/conversations').expect(200);
+  await staff.get('/api/contacts').expect(403);
+  await staff.get('/api/users').expect(403);
+  await staff.post('/api/users').set('x-csrf-token', token).send(entry).expect(403);
+  await staff.post('/api/campaigns').set('x-csrf-token', token).send({}).expect(403);
+  assert.doesNotMatch((await staff.get('/')).text, /data-page="(?:settings|campaigns|users)"/);
+  const edit = (body) => agent.put('/api/users/' + id).set('x-csrf-token', csrf).send(body);
+  await edit({ role: 'sender', active: true }).expect(200);
+  await staff.get('/api/conversations').expect(401);
+  token = await authenticate(staff, entry.username, entry.password);
+  await staff.get('/api/campaigns').expect(200);
+  await staff.get('/api/contacts').expect(200);
+  await staff.get('/api/conversations').expect(200);
+  await staff.post('/api/lists').set('x-csrf-token', token).send({ name: 'Lista do enviador' }).expect(201);
+  await staff.get('/api/settings').expect(403);
+  await staff.get('/api/users').expect(403);
+  await edit({ role: 'sender', active: false }).expect(200);
+  await staff.get('/api/conversations').expect(401);
+});
+
+test('leituras simultâneas compartilham resultado e uma resposta invalida o histórico', async () => {
+  const messages = f.flw.messages;
+  let reads = 0;
+  f.flw.messages = async (...args) => {
+    reads++;
+    return messages(...args);
+  };
+  const path = '/conversations/' + f.sessionId;
+  const read = () => agent.get('/api' + path + '/messages').expect(200);
+  const [first] = await Promise.all([read(), read()]);
+  assert.equal(reads, 1);
+  await post(path + '/reply', { text: 'Recebido', replyVersion: first.body.replyVersion }).expect(200);
+  await post(path + '/reply', { text: 'Repetido', replyVersion: first.body.replyVersion }).expect(409);
+  const next = await read();
+  assert.notEqual(next.body.replyVersion, first.body.replyVersion);
+  assert.equal(reads, 2);
+  assert.ok(next.body.items.some(m => m.text === 'Recebido'));
+});
 async function addAudience(optedIn = true) {
   const list = (await post('/lists', { name: 'Clientes VIP' }).expect(201)).body;
   const contact = (
@@ -180,6 +227,29 @@ test('resposta exige janela ativa e preserva o texto', async () => {
   assert.equal(result.body.status, 'QUEUED');
 });
 
+test('caixa de entrada exige canal e protege mensagens e respostas de outros canais', async () => {
+  const otherChannelId = 'f57e2d3c-4579-431d-93d6-1c4852436558';
+  const channels = await f.flw.channels();
+  f.flw.channels = async () => [...channels, { id: otherChannelId }];
+  let listCalls = 0;
+  f.flw.sessions = async (channelId, after, page) => {
+    listCalls++;
+    assert.equal(channelId, f.channelId);
+    assert.equal(page, 1);
+    assert.ok(Math.abs(Date.now() - Date.parse(after) - 7 * 86400000) < 10000);
+    return { items: [...f.conversations, { channelId: otherChannelId }] };
+  };
+  assert.equal((await agent.get('/api/conversations').expect(200)).body.channelId, '');
+  assert.equal(listCalls, 0);
+  const listed = await agent.get(`/api/conversations?channelId=${f.channelId}`).expect(200);
+  assert.equal(listed.body.items.length, 1);
+  assert.equal(listed.body.items[0].channelId, f.channelId);
+  const path = `/conversations/${f.sessionId}`;
+  await agent.get(`/api${path}/messages?channelId=${f.channelId}`).expect(200);
+  await agent.get(`/api${path}/messages?channelId=${otherChannelId}`).expect(404);
+  await post(`${path}/reply?channelId=${otherChannelId}`, { text: 'Oi' }).expect(404);
+});
+
 test('cliente FLW usa Bearer, parâmetros documentados e páginas completas', async () => {
   const previous = globalThis.fetch;
   const calls = [];
@@ -200,6 +270,12 @@ test('cliente FLW usa Bearer, parâmetros documentados e páginas completas', as
     assert.equal(calls[0].options.headers.Authorization, 'Bearer fake-test-token');
     await client.reply(f.sessionId, 'Texto');
     assert.deepEqual(JSON.parse(calls[2].options.body), { text: 'Texto' });
+    const after = '2026-11-18T00:00:00.000Z';
+    await client.sessions(f.channelId, after, 2);
+    const query = new URL(calls[3].url).searchParams;
+    assert.equal(query.get('ChannelsId'), f.channelId);
+    assert.equal(query.get('LastInteractionAt.After'), after);
+    assert.equal(query.get('PageSize'), '20');
   } finally {
     globalThis.fetch = previous;
   }

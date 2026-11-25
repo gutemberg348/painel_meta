@@ -33,6 +33,7 @@ export function fixture() {
   const conversations = [
     {
       id: sessionId,
+      channelId,
       title: 'Marina Oliveira',
       number: '5591999999999',
       contactDetails: { name: 'Marina Oliveira' },
@@ -93,13 +94,13 @@ export function fixture() {
   return { config, db, flw, campaigns, app, calls, channelId, templateId, sessionId, conversations };
 }
 
-export async function authenticate(agent) {
+export async function authenticate(agent, username = 'admin', password = 'test-password') {
   const login = await agent.get('/login');
   const csrf = login.text.match(/name="_csrf" value="([^"]+)"/)[1];
   await agent
     .post('/login')
     .type('form')
-    .send({ username: 'admin', password: 'test-password', _csrf: csrf })
+    .send({ username, password, _csrf: csrf })
     .expect(302);
   const home = await agent.get('/').expect(200);
   return home.text.match(/name="csrf-token" content="([^"]+)"/)[1];

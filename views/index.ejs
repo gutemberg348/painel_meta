@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="csrf-token" content="<%= csrf %>">
-  <meta name="description" content="Painel de campanhas, contatos e conversas do Totalk Studio.">
-  <title>Visão geral · Totalk Studio</title>
+  <meta name="description" content="Painel de campanhas, contatos e conversas da Vieira Link.">
+  <title>Visão geral · Vieira Link</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/compose.css">
@@ -14,33 +14,37 @@
   <script src="/js/app.js" defer></script>
   <script src="/js/compose.js" defer></script>
 </head>
-<body>
+<body data-home="<%= homePage %>" data-role="<%= role %>" data-configured="<%= configured %>" data-inbox-channel="<%= inboxChannelId %>">
   <a href="#main" class="skip-link" id="skip-content">Pular para o conteúdo</a>
   <aside class="sidebar" id="sidebar" aria-label="Menu do painel">
     <button class="icon-button menu-close" id="menu-close" aria-label="Fechar menu"><i data-lucide="x"></i></button>
-    <a class="brand" href="#dashboard" aria-label="Totalk Studio">
+    <a class="brand" href="#<%= homePage %>" aria-label="Vieira Link">
       <img src="/favicon.svg" width="36" height="36" alt="">
-      <span>totalk<span class="brand-light"> studio</span></span>
+      <span>Vieira<span class="brand-light"> Link</span></span>
     </a>
     <nav aria-label="Navegação principal">
       <span class="nav-label">Operação</span>
-      <a href="#dashboard" data-page="dashboard"><i data-lucide="layout-dashboard"></i>Visão geral</a>
+      <% if (role === 'manager') { %><a href="#dashboard" data-page="dashboard"><i data-lucide="layout-dashboard"></i>Visão geral</a><% } %>
+      <% if (role !== 'agent') { %>
       <a href="#campaigns" data-page="campaigns"><i data-lucide="send"></i>Campanhas</a>
+      <% } %>
       <a href="#conversations" data-page="conversations"><i data-lucide="inbox"></i>Caixa de entrada</a>
-      <span class="nav-label">Biblioteca</span>
+      <% if (role !== 'agent') { %><span class="nav-label">Biblioteca</span>
       <a href="#contacts" data-page="contacts"><i data-lucide="contact-round"></i>Contatos</a>
       <a href="#lists" data-page="lists"><i data-lucide="folders"></i>Listas de contatos</a>
       <a href="#templates" data-page="templates"><i data-lucide="panels-top-left"></i>Templates</a>
+      <% } %>
     </nav>
     <div class="sidebar-bottom">
-      <nav aria-label="Administração">
+      <% if (role === 'manager') { %><nav aria-label="Administração">
         <span class="nav-label">Administração</span>
+        <a href="#users" data-page="users"><i data-lucide="users-round"></i>Usuários</a>
         <a href="#settings" data-page="settings"><i data-lucide="settings-2"></i>Configurações</a>
         <a href="https://flwchat.readme.io/reference/autentica%C3%A7%C3%A3o" target="_blank" rel="noreferrer"><i data-lucide="book-open"></i>Documentação<i class="external-icon" data-lucide="external-link"></i></a>
-      </nav>
+      </nav><% } %>
       <div class="profile">
         <span class="avatar" aria-hidden="true"><%= username.slice(0, 2).toUpperCase() %></span>
-        <div><strong><%= username %></strong><small>Administrador</small></div>
+        <div><strong><%= username %></strong><small><%= roleName %></small></div>
         <form method="post" action="/logout">
           <input type="hidden" name="_csrf" value="<%= csrf %>">
           <button class="icon-button" aria-label="Sair da conta" title="Sair da conta"><i data-lucide="log-out"></i></button>
@@ -55,7 +59,8 @@
         <button class="icon-button mobile-menu" id="menu-toggle" aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false"><i data-lucide="menu"></i></button>
         <span>Painel</span><i data-lucide="chevron-right"></i><strong id="breadcrumb-title">Visão geral</strong>
       </div>
-      <a href="#settings" class="connection-badge" id="connection-badge"><span class="status-dot"></span>Integração FLW</a>
+      <% if (role === 'manager') { %><a href="#settings" class="connection-badge" id="connection-badge"><span class="status-dot"></span>Integração FLW</a>
+      <% } else { %><span class="connection-badge" id="connection-badge"><span class="status-dot"></span>Integração FLW</span><% } %>
     </header>
     <main id="main" tabindex="-1"><div class="loading-state"><span class="spinner"></span>Carregando painel…</div></main>
   </div>

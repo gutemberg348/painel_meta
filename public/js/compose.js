@@ -32,8 +32,8 @@ function audienceMarkup(allowList = true) {
       <button type="button" class="source-option" data-source="file" aria-pressed="false">${icon('file-up')}<strong>Enviar arquivo</strong><span>CSV ou TXT</span></button>
       ${allowList ? `<button type="button" class="source-option" data-source="list" aria-pressed="false">${icon('folder-open')}<strong>Usar uma lista</strong><span>Contatos já salvos</span></button>` : ''}
     </div>
-    <div data-source-panel="paste"><label for="audience-text">Números ou contatos</label><textarea id="audience-text" class="numbers-input" placeholder="5591999999999&#10;5591888888888&#10;&#10;Ou nome e número:&#10;Provedor Alfa;5591777777777" spellcheck="false"></textarea><p class="field-hint">Um número por linha. Para incluir um nome, use <strong>Nome;telefone</strong>.</p></div>
-    <div data-source-panel="file" hidden><label class="upload-area" id="audience-drop" for="audience-file">${icon('cloud-upload')}<strong>Arraste seu arquivo aqui</strong><span>ou clique para escolher no computador</span><small>CSV ou TXT · até 900 KB · 5.000 contatos</small><input id="audience-file" type="file" accept=".csv,.txt,text/csv,text/plain"></label><p id="audience-file-name" class="field-hint" role="status"></p><div class="file-examples"><span>CSV: <code>nome,telefone,email</code> ou apenas <code>telefone</code></span><span>TXT: um telefone por linha ou <code>Nome;telefone</code></span><div>${button('Modelo CSV', 'download-csv', 'download', 'ghost')}${button('Modelo TXT', 'download-txt', 'download', 'ghost')}</div></div></div>
+    <div data-source-panel="paste"><label for="audience-text">Números ou contatos</label><textarea id="audience-text" class="numbers-input" placeholder="5591999999999&#10;5591888888888&#10;&#10;Ou nome e número:&#10;Provedor Alfa;5591777777777" spellcheck="false"></textarea><p class="field-hint">Para salvar a empresa como nome do contato, cole uma linha por empresa no formato <strong>Empresa;telefone</strong>. Também aceitamos apenas números.</p></div>
+    <div data-source-panel="file" hidden><label class="upload-area" id="audience-drop" for="audience-file">${icon('cloud-upload')}<strong>Arraste seu arquivo aqui</strong><span>ou clique para escolher no computador</span><small>CSV ou TXT · até 900 KB · 5.000 contatos</small><input id="audience-file" type="file" accept=".csv,.txt,text/csv,text/plain"></label><p id="audience-file-name" class="field-hint" role="status"></p><div class="file-examples"><span>CSV: <code>nome,telefone,email</code> ou apenas <code>telefone</code></span><span>TXT sem cabeçalho · uma linha por empresa, por exemplo <code>Provedor Alfa;5591999990001</code>. Também aceitamos um telefone por linha.</span><div>${button('Modelo CSV', 'download-csv', 'download', 'ghost')}${button('Modelo TXT', 'download-txt', 'download', 'ghost')}</div></div></div>
     ${allowList ? `<div data-source-panel="list" hidden><label>Lista de contatos<select id="audience-list"><option value="">Selecione uma lista</option>${state.lists.map((list) => `<option value="${list.id}">${escape(list.name)} · ${number(list.opted_in_count)} autorizados</option>`).join('')}</select></label>${!state.lists.length ? '<p class="field-hint">Ainda não há listas. Use “Colar números” ou “Enviar arquivo”; a lista será criada ao salvar a campanha.</p>' : ''}</div>` : ''}
     <div id="audience-new-options"><label class="country-field">Formato dos números<select id="audience-country"><option value="55">Brasil (+55) · adicionar DDI aos números com 10 ou 11 dígitos</option><option value="">Internacional · todos os números já incluem DDI</option></select></label><p class="field-hint">Números começando com + mantêm o DDI informado. Confira a prévia abaixo.</p></div>
     <div id="audience-result" class="audience-result" aria-live="polite"><span>${icon('users-round')} Seus contatos aparecerão aqui para conferência.</span></div>
@@ -237,13 +237,12 @@ async function openEasyImport() {
 }
 
 async function openEasyCampaign(preselectedTemplate) {
-  const settings = await api('/settings');
-  if (!settings.configured) {
+  if (!state.configured) {
     showModal(
       'Conecte sua conta para começar',
       'Configure o token da sua conta FLW.',
       connectionBanner(),
-      '<button type="button" class="button primary" data-action="go-settings">Ver configurações</button>',
+      account.role === 'manager' ? '<button type="button" class="button primary" data-action="go-settings">Ver configurações</button>' : cancelButton,
     );
     return;
   }
@@ -409,7 +408,7 @@ async function openEasyCampaign(preselectedTemplate) {
 
 actions['download-txt'] = () => {
   const url = URL.createObjectURL(
-    new Blob(['5591999999999\n5591888888888\n'], { type: 'text/plain;charset=utf-8' }),
+    new Blob(['Provedor Alfa;5591999990001\nProvedor Beta;5591999990002\n'], { type: 'text/plain;charset=utf-8' }),
   );
   const link = document.createElement('a');
   link.href = url;

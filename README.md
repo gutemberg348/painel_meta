@@ -71,7 +71,7 @@ Em erro, os scripts terminam com código de saída `1` (`$LASTEXITCODE` no Power
 
 ## O que está implementado
 
-- Login fixo pelo `.env`, sessão persistida em SQLite, cookie HttpOnly, proteção CSRF e limitação de tentativas.
+- Login do gerente pelo `.env`, contas de equipe no SQLite, cookie HttpOnly, proteção CSRF e limitação de tentativas.
 - Dashboard com indicadores reais do banco e atividade dos últimos sete dias, agrupada por UTC.
 - Cadastro, edição, exclusão e busca de contatos; um contato pode estar em várias listas.
 - Listas com nome, descrição e cor; contagem de contatos autorizados.
@@ -80,8 +80,20 @@ Em erro, os scripts terminam com código de saída `1` (`$LASTEXITCODE` no Power
 - Criação de campanhas com mensagem e destinatários no mesmo formulário, prévia, variáveis, URL de mídia quando necessária e rascunho. Criação automática da lista ao adicionar números diretamente.
 - Confirmação antes do disparo, fila persistente, pausa, retomada, cancelamento e resultado por destinatário.
 - Atualização manual de entregas e callback opcional com verificação na API.
-- Caixa de conversas com paginação, mensagens recebidas/enviadas, atualização a cada 15 segundos e resposta de texto quando a janela está ativa.
+- Caixa de entrada com filtro por canal e período, atualização sob demanda e resposta de texto quando a janela está ativa.
 - Tela de configuração e teste de conexão sem envio de mensagens.
+
+## Contas da equipe
+
+O administrador configurado no `.env` é o gerente. Em **Administração → Usuários → Criar usuário**, ele define login, senha e perfil. Em **Editar**, pode mudar o perfil, redefinir a senha e desativar o acesso. Alterar o cadastro invalida as sessões anteriores da pessoa. Cada usuário entra pelo mesmo endereço do painel com suas próprias credenciais.
+
+| Perfil | Acesso |
+| --- | --- |
+| Atendente | Caixa de entrada, histórico e respostas |
+| Enviador | Caixa de entrada, contatos, listas, templates e operações de campanha, incluindo o disparo |
+| Gerente | Todas as áreas, incluindo usuários, indicadores e configurações |
+
+As senhas da equipe são armazenadas como hashes scrypt com salt individual. Inclua o banco SQLite no backup para preservar as contas.
 
 ## Fluxo de uso
 
@@ -93,7 +105,13 @@ Em erro, os scripts terminam com código de saída `1` (`$LASTEXITCODE` no Power
 6. Clique em **Salvar e revisar envio**. Confira o resumo, clique em **Revisar e disparar** e confirme. Salvar o rascunho não envia mensagens.
 7. Abra os detalhes para pausar ou atualizar entregas. As respostas ficam na **Caixa de entrada**.
 
-A criação/aprovação de templates ocorre na FLW/Meta. A caixa de entrada mostra as conversas da conta FLW, não apenas as iniciadas neste painel. Mensagens com mídia são identificadas; a visualização/download dos anexos fica na FLW.
+A criação/aprovação de templates ocorre na FLW/Meta. A caixa de entrada mostra conversas do canal WhatsApp selecionado, inclusive as iniciadas na FLW. Mensagens com mídia são identificadas. Os anexos podem ser visualizados na FLW.
+
+Na caixa de entrada, escolha o canal da empresa se o token der acesso a vários canais. O período inicial é de sete dias e usa a data da última interação. As conversas são carregadas em páginas de até 20. A busca atua na página atual. Leituras simultâneas da mesma página compartilham uma consulta à FLW e seu resultado pode ser reutilizado por quatro segundos.
+
+Enquanto a conversa está visível e exibe as mensagens recentes, o navegador consulta a versão do histórico no painel a cada cinco segundos. Um envio pela equipe invalida o cache daquela conversa e da lista do canal. O histórico aberto também consulta novidades externas em ciclos de aproximadamente 30 segundos. A lista continua com atualização manual. Uma resposta concorrente pode pedir revisão do rascunho antes de um novo envio.
+
+Para deixar a caixa de entrada fixa em um canal, configure `FLW_INBOX_CHANNEL_ID` no `.env` e recrie o contêiner. Use o ID retornado por `npm run flw:conexao` (na VPS, `sudo docker compose exec painel npm run flw:conexao`). O painel confere se esse canal aparece entre os canais WhatsApp do token. Confirme o nome e o número do canal antes de escolher seu ID.
 
 O botão **Nome do contato**, ao lado de uma variável, preenche `{{nome}}`: cada destinatário recebe o nome salvo no contato. Você também pode digitar `{{telefone}}`. Para usar um nome de provedor diferente por destinatário, importe o nome do provedor na coluna `nome` e use esse botão no campo correspondente. Variáveis como `[nome_provedor]` e `[nome_empresa]` aparecem com rótulos legíveis; as chaves originais são preservadas no envio à FLW.
 
@@ -166,7 +184,7 @@ Base documentada: `https://api.wts.chat/chat`. Autenticação: `Authorization: B
 | Templates aprovados              | `GET /v1/template?ApprovedOnly=true&Archived=false` |
 | Disparo individual por template  | `POST /v1/send/template`                            |
 | Status de envio                  | `GET /v1/send/message/{id}`                         |
-| Conversas                        | `GET /v2/session`                                   |
+| Conversas                        | `GET /v2/session` com `ChannelsId` e `LastInteractionAt.After` |
 | Detalhe e janela de uma conversa | `GET /v2/session/{id}`                              |
 | Mensagens de uma conversa        | `GET /v1/session/{id}/message`                      |
 | Resposta em uma conversa         | `POST /v1/session/{id}/message`                     |
@@ -196,7 +214,7 @@ Referências: [autenticação](https://flwchat.readme.io/reference/autentica%C3%
 Para os callbacks de status, configure:
 
 ```dotenv
-PUBLIC_URL=https://seu-dominio.com
+PUBLIC_URL=https://totalk.testes-techcode.shop
 WEBHOOK_SECRET=um-segredo-longo-e-aleatorio
 ```
 
@@ -226,7 +244,7 @@ Formata JavaScript, CSS e documentação para facilitar a leitura. As views EJS 
 O serviço `painel` roda **um contêiner**. O processo `node src/server.js` serve o painel Express, abre o SQLite e inicia a fila de campanhas. Use uma única instância por banco. O acesso público passa por um proxy HTTPS instalado na própria VPS.
 
 ```text
-Navegador → HTTPS → proxy da VPS → 127.0.0.1:3000 → painel
+Navegador → HTTPS → proxy da VPS → 127.0.0.1:3038 → painel
                                                       ├── Express e fila → API FLW
                                                       └── /app/data → ./data na VPS
 ```
@@ -245,6 +263,8 @@ Instale Docker Engine com o plugin Compose. Copie o projeto para uma pasta da VP
 
 Confira `ADMIN_USERNAME`, `ADMIN_PASSWORD` e `SESSION_SECRET` (mínimo de 32 caracteres). A aplicação rejeita a senha de exemplo em produção. Preencha `FLW_API_TOKEN` para habilitar a integração. Se uma senha contiver um cifrão, use aspas simples ao redor do valor no `.env` para o Compose preservá-lo. Para callbacks, configure também `PUBLIC_URL` com o domínio HTTPS e `WEBHOOK_SECRET`.
 
+O Nginx encaminha para `127.0.0.1:3038` na VPS. O Docker publica essa porta e encaminha para a porta 3000 interna do painel. Se o `.env` da VPS já definir `TOTALK_HOST_PORT`, use `TOTALK_HOST_PORT=3038` para coincidir com o Nginx.
+
 Para migrar os cadastros do computador, encerre primeiro o painel local e transfira a pasta `data` inteira para a VPS antes da primeira inicialização. Uma pasta vazia cria um banco novo. Em uma VPS Linux com Docker convencional, o usuário `node` da imagem usa UID e GID 1000. Prepare a pasta para esse usuário gravar:
 
 ```bash
@@ -257,26 +277,35 @@ docker compose ps
 
 O primeiro `up` baixa a base, instala as dependências e inicia o painel em segundo plano. Em `ps`, o serviço deve passar de `starting` para `healthy`. Essa verificação consulta apenas `/health` no Express. Para investigar um serviço que reinicia ou fica `unhealthy`, use `docker compose logs --tail=80 painel`.
 
-#### 2. Abrir o painel pelo domínio
+#### 2. Adicionar o painel ao Nginx existente
 
-O Compose fixa `NODE_ENV=production`, `HOST=0.0.0.0`, `PORT=3000`, `DATABASE_PATH=/app/data/totalk.sqlite` e `TRUST_PROXY=true`. Esses valores prevalecem sobre o `.env` de desenvolvimento. O Express escuta dentro do contêiner e a porta publicada fica em `127.0.0.1:3000` na VPS. O login usa cookie seguro e precisa de HTTPS no navegador. [Publicação de portas no Docker](https://docs.docker.com/engine/network/port-publishing/)
+O arquivo [deploy/nginx/totalk.conf](deploy/nginx/totalk.conf) usa `totalk.testes-techcode.shop` para o painel, as rotas `/api/` e os callbacks da FLW. Aponte o registro DNS A de `totalk` para o IPv4 da VPS. Se usar IPv6, configure também o registro AAAA e o `listen [::]:80;` nesse bloco, conforme os demais sites. A emissão com Certbot usa a porta pública 80 e o painel usa a 443. [Como o Nginx seleciona o site](https://nginx.org/en/docs/http/request_processing.html)
 
-Aponte o DNS do domínio para a VPS e libere as portas públicas 80 e 443 para o proxy. A configuração presume **um proxy confiável** no host. Se já usa Nginx, encaminhe para `http://127.0.0.1:3000` e faça o proxy definir `X-Forwarded-Proto` com o protocolo do cliente e `X-Forwarded-For` com o IP do cliente.
-
-Se usar Caddy como serviço Linux da VPS, acrescente o bloco ao `/etc/caddy/Caddyfile`, substituindo o domínio. O Caddy cuida do certificado e encaminha os cabeçalhos. [Guia de proxy HTTPS do Caddy](https://caddyserver.com/docs/quick-starts/reverse-proxy)
-
-```caddyfile
-painel.seudominio.com.br {
-    reverse_proxy 127.0.0.1:3000
-}
-```
+**Copiar e editar.** Em Debian/Ubuntu com `sites-enabled`, execute na pasta do projeto:
 
 ```bash
-sudo caddy validate --config /etc/caddy/Caddyfile
-sudo systemctl reload caddy
+sudo cp -n deploy/nginx/totalk.conf /etc/nginx/sites-available/totalk.conf
+sudo nano /etc/nginx/sites-available/totalk.conf
 ```
 
-Abra `https://painel.seudominio.com.br/login` e entre com as credenciais do `.env`. Para validar o acesso aos canais quando desejar, rode `docker compose exec painel npm run flw:conexao`. O comando apenas consulta a conta.
+O primeiro comando copia o arquivo apenas se o destino for novo. Se você já instalou uma cópia anterior, ajuste `server_name` para `totalk.testes-techcode.shop` no arquivo da VPS. Na linha `proxy_pass`, use a porta escolhida no primeiro passo. Salve com Ctrl+O, Enter e saia com Ctrl+X.
+
+**Ativar.** O primeiro comando cria o link que habilita o site e só precisa ser feito na primeira instalação. O segundo valida a configuração do Nginx e aplica por recarga se a validação passar. Se aparecer `conflicting server name`, confira qual site já usa o subdomínio antes de prosseguir.
+
+```bash
+sudo ln -s /etc/nginx/sites-available/totalk.conf /etc/nginx/sites-enabled/totalk.conf
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+Se os sites atuais usam `/etc/nginx/conf.d/*.conf`, copie com `sudo cp -n deploy/nginx/totalk.conf /etc/nginx/conf.d/totalk.conf`, edite essa cópia e faça a validação e a recarga. Nesse layout o próprio arquivo já habilita o site. Escolha apenas o diretório incluído pela instalação da VPS.
+
+**Ativar HTTPS.** Com o subdomínio apontando para a VPS e o plugin Nginx do Certbot instalado, execute o comando abaixo. Ele solicita o certificado, instala o HTTPS e configura o redirecionamento. Se a VPS já tem um certificado que cobre o subdomínio e usa outro gerenciador, aplique a configuração TLS desse gerenciador ao bloco do Totalk. [Guia oficial do Certbot](https://eff-certbot.readthedocs.io/en/stable/using.html#nginx)
+
+```bash
+sudo certbot --nginx --redirect -d totalk.testes-techcode.shop
+```
+
+Abra `https://totalk.testes-techcode.shop/login` e use as credenciais do `.env`. A proteção de sessão exige HTTPS. Antes de configurar o certificado, o site responde 403 em HTTP por esse motivo. O Nginx se comunica com o Docker pelo endereço local e informa o protocolo ao Express, que roda com `TRUST_PROXY=true`.
 
 #### 3. Atualizar e guardar os dados
 

@@ -1,19 +1,29 @@
-/* Totalk Studio — interface sem build. Cada operação é validada pelo servidor. */
+/* Vieira Link — interface sem build. Cada operação é validada pelo servidor. */
 const $ = (selector, root = document) => root.querySelector(selector);
 const main = $('#main');
 const modal = $('#modal');
 const csrf = $('meta[name="csrf-token"]').content;
+const account = document.body.dataset;
+const allowedPages = new Set([...document.querySelectorAll('[data-page]')].map(link => link.dataset.page));
+const staffRoles = { agent: 'Atendente', sender: 'Enviador', manager: 'Gerente' };
 const state = {
+  configured: account.configured === 'true',
+  users: [],
   page: '',
   lists: [],
   contacts: [],
   campaigns: [],
   templates: [],
+  templateChannel: '',
   channels: [],
   conversations: [],
   selectedConversation: null,
   conversationPage: 1,
-  messagePage: 1,
+  conversationChannel: '',
+  conversationDays: '7',
+  conversationSearch: '',
+  unreadOnly: false,
+  inboxFiltersOpen: false,
   campaignFilter: 'all',
   contactList: '',
   search: '',
@@ -28,6 +38,7 @@ const titles = {
   lists: 'Listas de contatos',
   templates: 'Templates',
   settings: 'Configurações',
+  users: 'Usuários',
 };
 const icons = () => lucide.createIcons();
 const icon = (name) => `<i data-lucide="${name}"></i>`;
@@ -116,15 +127,16 @@ function toast(message, error = false) {
   setTimeout(() => element.remove(), error ? 9000 : 5000);
 }
 function connectionBanner() {
+  if (account.role !== 'manager') return `<div class="alert">${icon('plug-zap')}Peça ao gerente para configurar a integração FLW.</div>`;
   return `<div class="alert">${icon('plug-zap')}<span>Conecte sua conta FLW para carregar canais, templates e conversas. Configure o token no <strong>.env</strong> e reinicie o servidor. <a href="#settings">Ver configuração</a></span></div>`;
 }
 
 async function renderPage(silent = false) {
-  const page = window.location.hash.slice(1).split('?')[0] || 'dashboard';
-  state.page = titles[page] ? page : 'dashboard';
+  const page = window.location.hash.slice(1).split('?')[0];
+  state.page = allowedPages.has(page) ? page : account.home;
   const current = ++navigation;
   $('#breadcrumb-title').textContent = titles[state.page];
-  document.title = `${titles[state.page]} · Totalk Studio`;
+  document.title = `${titles[state.page]} · Vieira Link`;
   document.querySelectorAll('[data-page]').forEach((link) => {
     const currentPage = link.dataset.page === state.page;
     link.classList.toggle('active', currentPage);
@@ -134,12 +146,13 @@ async function renderPage(silent = false) {
   if (!silent) setMenuOpen(false);
   if (!silent) main.innerHTML = loading();
   try {
-    const html = await pages[state.page]();
+    const html = await pages[state.page](current);
     if (current !== navigation) return;
     main.innerHTML = html;
     icons();
-    if (state.page === 'conversations' && state.selectedConversation)
+    if (state.page === 'conversations' && state.selectedConversation) {
       await openConversation(state.selectedConversation.id, false);
+    }
   } catch (error) {
     if (current !== navigation) return;
     main.innerHTML =
@@ -287,51 +300,113 @@ const pages = {
         button('Adicionar em lote', 'import-contacts', 'upload', '') +
           button('Novo contato', 'new-contact', 'user-plus'),
       ) +
-      `<div class="toolbar"><div class="toolbar-left"><div class="search-field">${icon('search')}<input id="contact-search" placeholder="Buscar nome, telefone ou e-mail..." aria-label="Buscar contatos" value="${escape(state.search)}"></div><select id="contact-list-filter" aria-label="Filtrar por lista"><option value="">Todas as listas</option>${state.lists.map((l) => `<option value="${l.id}" ${state.contactList === l.id ? 'selected' : ''}>${escape(l.name)}</option>`).join('')}</select></div><span class="badge blue">${icon('shield-check')}Autorização por contato</span></div><div class="panel" id="contacts-table">${contactsTable()}</div>`
+      `<div class="filter-bar contact-filters">
+        <label for="contact-search">Buscar contato<span class="search-field">${icon('search')}<input type="search" id="contact-search" placeholder="Nome, telefone ou e-mail" value="${escape(state.search)}"></span></label>
+        <label for="contact-list-filter">Lista de contatos<select id="contact-list-filter"><option value="">Todas as listas</option>${state.lists.map((l) => `<option value="${escape(l.id)}" ${state.contactList === l.id ? 'selected' : ''}>${escape(l.name)}</option>`).join('')}</select></label>
+      </div><div class="panel" id="contacts-table">${contactsTable()}</div>`
     );
   },
-  async templates() {
-    const settings = await api('/settings');
-    if (!settings.configured)
+  async templates(current) {
+    if (!state.configured)
       return (
         pageHeading(
           'Templates de mensagem',
           'Seus templates aprovados, prontos para iniciar uma conversa.',
         ) +
-        connectionBanner() +
-        `<div class="panel">${empty('Seus templates aparecerão aqui', 'Conecte sua conta para consultar os modelos aprovados na FLW.', '<a class="button primary" href="#settings">Configurar integração</a>', 'panels-top-left')}</div>`
+        connectionBanner()
       );
-    state.templates = await api('/templates');
+    const channels = (await api('/channels')).filter((channel) => channel.active && /cloudapi|dialog360/i.test(channel.type));
+    if (current !== navigation) return;
+    const heading = pageHeading('Templates de mensagem', 'Escolha um modelo aprovado para iniciar uma campanha.');
+    if (!channels.length) return heading + `<div class="panel">${empty('Nenhum canal oficial ativo', 'Confira os canais WhatsApp vinculados à conta FLW.', '', 'smartphone')}</div>`;
+    const selected = [state.templateChannel, state.conversationChannel, account.inboxChannel]
+      .find((id) => channels.some((channel) => channel.id === id))
+      || (channels.length === 1 ? channels[0].id : '');
+    const filter = `<form id="template-filter" class="filter-bar template-filters">
+      <label for="template-channel">Canal WhatsApp<select id="template-channel" required>
+        <option value="" disabled ${selected ? '' : 'selected'}>Selecione um canal</option>
+        ${channels.map((c) => `<option value="${escape(c.id)}" ${selected === c.id ? 'selected' : ''}>${escape([c.identity?.displayName || c.name || 'WhatsApp', c.numberFormatted || c.number].filter(Boolean).join(' · '))}</option>`).join('')}
+      </select></label>
+      <button class="button primary" type="submit">${icon('list-filter')}Filtrar templates</button>
+    </form>`;
+    if (!selected) return heading + filter + `<div class="panel">${empty('Escolha um canal', 'Selecione o número e clique em Filtrar templates para consultar os modelos.', '', 'panels-top-left')}</div>`;
+    let models;
+    try {
+      models = await api(`/templates?channelId=${encodeURIComponent(selected)}`);
+    } catch (error) {
+      return heading + filter + `<div class="alert error" role="alert">${escape(error.message)}</div>`;
+    }
+    if (current !== navigation) return;
+    state.templateChannel = selected;
+    state.templates = models.filter((t) => t.channelId === selected && t.active && !t.archived && String(t.status).toUpperCase() === 'APPROVED');
     return (
-      pageHeading(
-        'Templates de mensagem',
-        'Templates aprovados e sincronizados com sua conta FLW.',
-        button('Sincronizar templates', 'refresh', 'refresh-cw', ''),
-      ) +
-      `<div class="alert">${icon('info')}<span>A criação e a aprovação dos modelos são feitas na plataforma FLW/Meta. Aqui você escolhe os modelos aprovados para suas campanhas.</span></div>` +
+      heading + filter +
       (state.templates.length
         ? `<div class="list-grid">${state.templates.map((t) => `<article class="template-card"><span class="badge green">${icon('check-check')}Aprovado</span><h3>${escape(t.name)}</h3><div class="message-preview">${escape(t.text || 'Template com mídia ou conteúdo interativo.')}</div><div class="template-card-footer"><span>${number(t.params?.length)} variáveis · ${escape(t.fileType && t.fileType !== 'UNDEFINED' ? t.fileType.toLowerCase() : 'texto')}</span><button class="button ghost" data-action="use-template" data-id="${escape(t.id)}">Usar template</button></div></article>`).join('')}</div>`
-        : `<div class="panel">${empty('Nenhum template aprovado', 'Crie um modelo na FLW e aguarde a aprovação para começar os disparos.', '', 'panels-top-left')}</div>`)
+        : `<div class="panel">${empty('Nenhum template aprovado neste canal', 'Os modelos ativos aparecem aqui após a aprovação na FLW.', '', 'panels-top-left')}</div>`)
     );
   },
-  async conversations() {
-    const settings = await api('/settings');
-    if (!settings.configured)
+  async conversations(current) {
+    if (!state.configured)
       return (
         pageHeading('Caixa de entrada', 'Acompanhe suas conversas e continue de onde parou.') +
-        connectionBanner() +
-        `<div class="panel">${empty('Sua caixa de entrada, conectada', 'As conversas reais da sua conta aparecerão aqui assim que a integração estiver configurada.', '<a class="button primary" href="#settings">Configurar integração</a>', 'messages-square')}</div>`
+        connectionBanner()
       );
-    const data = await api(`/conversations?page=${state.conversationPage}`);
+    const query = new URLSearchParams({
+      page: state.conversationPage,
+      days: state.conversationDays,
+    });
+    if (state.conversationChannel) query.set('channelId', state.conversationChannel);
+    const data = await api(`/conversations?${query}`);
+    if (current !== navigation) return;
+    state.conversationChannel = data.channelId;
     state.conversations = data.items || [];
-    return (
-      pageHeading(
-        'Caixa de entrada',
-        'Conversas da sua conta FLW · atualização automática a cada 15 segundos.',
-        button('Atualizar', 'refresh', 'refresh-cw', ''),
-      ) +
-      `<div class="inbox" id="inbox"><section class="conversation-list"><div class="conversation-list-head"><h3>Conversas <span class="badge blue">${number(data.totalItems)}</span></h3><div class="search-field">${icon('search')}<input id="conversation-search" placeholder="Buscar nesta página..." aria-label="Buscar conversas nesta página"></div></div><div class="conversation-items" id="conversation-items">${conversationItems()}</div><div class="pagination"><button class="icon-button" data-action="conversation-prev" ${state.conversationPage <= 1 ? 'disabled' : ''} aria-label="Página anterior">${icon('chevron-left')}</button>Página ${state.conversationPage}<button class="icon-button" data-action="conversation-next" ${!data.hasMorePages ? 'disabled' : ''} aria-label="Próxima página">${icon('chevron-right')}</button></div></section><section class="conversation-thread" id="conversation-thread"><div class="thread-empty">${empty('Selecione uma conversa', 'Selecione um contato ao lado para visualizar as mensagens e responder.', '', 'messages-square')}</div></section></div>`
-    );
+    const channels = data.channels || [];
+    const channelLabel = (channel) => escape([channel.name, channel.number].filter(Boolean).join(' · '));
+    const channelField = channels.length === 1
+      ? `<div class="inbox-channel">${icon('smartphone')}<span>${channelLabel(channels[0])}</span></div>`
+      : `<select id="conversation-channel" aria-label="Canal WhatsApp"><option value="">Escolha um canal WhatsApp</option>${channels.map((channel) => `<option value="${escape(channel.id)}" ${channel.id === data.channelId ? 'selected' : ''}>${channelLabel(channel)}</option>`).join('')}</select>`;
+    const heading = `<div class="page-heading inbox-heading"><h1>Caixa de entrada</h1>
+      ${button('Atualizar lista', 'conversation-refresh', 'refresh-cw', '')}</div>`;
+    if (!channels.length) {
+      return heading + `<div class="panel">${empty('Nenhum canal WhatsApp disponível', 'Confira os canais associados ao token nas configurações da FLW.', '', 'inbox')}</div>`;
+    }
+    return heading + `
+      <div class="inbox" id="inbox">
+        <section class="conversation-list" aria-label="Lista de conversas">
+          <div class="conversation-list-head">
+            <div class="inbox-list-title"><div><h2>Conversas</h2><small>${data.channelId ? channelLabel(channels.find(c => c.id === data.channelId)) : 'Selecione o canal de atendimento'}</small></div>
+              <button class="icon-button inbox-filter-button" type="button" data-action="toggle-inbox-filters" aria-controls="inbox-filters" aria-label="Filtros de canal e período" aria-expanded="${!data.channelId || state.inboxFiltersOpen}">${icon('sliders-horizontal')}Filtros</button></div>
+            <div id="inbox-filters" class="inbox-filter-fields" ${!data.channelId || state.inboxFiltersOpen ? '' : 'hidden'}>
+              <div class="filter-field"><span>Canal WhatsApp</span>${channelField}</div>
+              ${data.channelId ? `<label>Última interação<select id="conversation-days">${[
+                ['1', 'Últimas 24 horas'], ['7', 'Últimos 7 dias'], ['30', 'Últimos 30 dias'], ['90', 'Últimos 90 dias'],
+              ].map(([days, label]) => `<option value="${days}" ${days === state.conversationDays ? 'selected' : ''}>${label}</option>`).join('')}</select></label>` : ''}
+            </div>
+            ${data.channelId ? `<div class="search-field">${icon('search')}<input id="conversation-search" type="search" placeholder="Buscar nome ou telefone" aria-label="Buscar conversas por nome ou telefone nesta página" value="${escape(state.conversationSearch)}"></div>
+              <div class="inbox-segments" role="group" aria-label="Conversas nesta página">
+                <button type="button" data-action="filter-inbox-rows" data-mode="all" aria-pressed="${!state.unreadOnly}">Todas</button>
+                <button type="button" data-action="filter-inbox-rows" data-mode="unread" aria-pressed="${state.unreadOnly}">Não lidas <b>${number(state.conversations.filter(c => c.unreadCount > 0).length)}</b></button>
+              </div>` : ''}
+          </div>
+          <div class="conversation-items" id="conversation-items">
+            ${data.channelId ? conversationItems() : empty('Escolha um canal', 'Selecione o número que você quer acompanhar.', '', 'smartphone', true)}
+          </div>
+          ${data.channelId ? `<div class="pagination"><button class="icon-button" data-action="conversation-prev" ${state.conversationPage <= 1 ? 'disabled' : ''} aria-label="Página anterior">${icon('chevron-left')}</button>Página ${state.conversationPage}<button class="icon-button" data-action="conversation-next" ${!data.hasMorePages ? 'disabled' : ''} aria-label="Próxima página">${icon('chevron-right')}</button></div>` : ''}
+        </section>
+        <section class="conversation-thread" id="conversation-thread">
+          ${idleThread()}
+        </section>
+      </div>`;
+  },
+  async users() {
+    state.users = await api('/users');
+    return pageHeading('Usuários', 'Gerencie o acesso da equipe ao painel.', button('Criar usuário', 'new-user', 'user-plus')) +
+      `<div class="panel table-wrap"><table><thead><tr><th>Usuário</th><th>Perfil</th><th>Acesso</th><th></th></tr></thead><tbody>${state.users.map(user => `<tr>
+        <td><strong>${escape(user.username)}</strong></td><td>${staffRoles[user.role]}</td>
+        <td><span class="badge ${user.active ? 'green' : ''}">${user.active ? 'Ativo' : 'Desativado'}</span></td>
+        <td>${user.role === 'manager' ? 'Conta do servidor' : `<button class="button ghost" data-action="edit-user" data-id="${escape(user.id)}" aria-label="Editar ${escape(user.username)}">${icon('pencil')}Editar</button>`}</td>
+      </tr>`).join('')}</tbody></table></div>`;
   },
   async settings() {
     const data = await api('/settings');
@@ -341,7 +416,7 @@ const pages = {
         'Configurações',
         'Gerencie a integração e confira as configurações do workspace.',
       ) +
-      `<div class="settings-grid"><section class="panel"><div class="panel-head"><div><h2>Integração FLW Chat</h2><p>Seus canais e mensagens em um só lugar.</p></div><span class="stat-icon">${icon('plug-zap')}</span></div><div class="settings-body"><div class="settings-row"><div><strong>Token da API</strong><small>${data.configured ? 'Token configurado no servidor. Teste para validar.' : 'Adicione seu token permanente no arquivo .env.'}</small></div><span class="badge ${data.configured ? 'blue' : 'orange'}">${data.configured ? 'Configurado' : 'Não configurado'}</span></div><div class="settings-row"><div><strong>Endereço da API</strong><small>Servidor usado nas requisições</small></div><code>${escape(data.apiBase)}</code></div><div class="settings-row"><div><strong>Intervalo entre envios</strong><small>Fila persistente com processamento individual</small></div><span class="badge blue">${data.sendInterval / 1000}s / contato</span></div><div class="settings-row"><div><strong>Callbacks de entrega</strong><small>${data.webhookConfigured ? `Último evento: ${data.lastWebhook ? date(data.lastWebhook) + ' às ' + time(data.lastWebhook) : 'nenhum recebido'}` : 'Opcional. Configure PUBLIC_URL e WEBHOOK_SECRET.'}</small></div><span class="badge ${data.webhookConfigured ? 'green' : ''}">${data.webhookConfigured ? 'Configurado' : 'Não configurado'}</span></div><div class="settings-row"><div><strong>Administrador</strong><small>Usuário definido em ADMIN_USERNAME</small></div><span class="badge">${escape(data.username)}</span></div><div class="settings-row"><div><strong>Validar integração</strong><small>Consulta seus canais sem enviar mensagens.</small></div>${button('Testar conexão', 'test-connection', 'activity', 'primary', data.configured ? '' : 'disabled')}</div><div id="connection-result"></div></div></section>
+      `<div class="settings-grid"><section class="panel"><div class="panel-head"><div><h2>Integração FLW Chat</h2><p>Seus canais e mensagens em um só lugar.</p></div><span class="stat-icon">${icon('plug-zap')}</span></div><div class="settings-body"><div class="settings-row"><div><strong>Token da API</strong><small>${data.configured ? 'Token configurado no servidor. Teste para validar.' : 'Adicione seu token permanente no arquivo .env.'}</small></div><span class="badge ${data.configured ? 'green' : 'orange'}">${data.configured ? 'Configurado' : 'Não configurado'}</span></div><div class="settings-row"><div><strong>Endereço da API</strong><small>Servidor usado nas requisições</small></div><code>${escape(data.apiBase)}</code></div><div class="settings-row"><div><strong>Intervalo entre envios</strong><small>Fila persistente com processamento individual</small></div><span class="badge blue">${data.sendInterval / 1000}s / contato</span></div><div class="settings-row"><div><strong>Callbacks de entrega</strong><small>${data.webhookConfigured ? `Último evento: ${data.lastWebhook ? date(data.lastWebhook) + ' às ' + time(data.lastWebhook) : 'nenhum recebido'}` : 'Opcional. Configure PUBLIC_URL e WEBHOOK_SECRET.'}</small></div><span class="badge ${data.webhookConfigured ? 'green' : ''}">${data.webhookConfigured ? 'Configurado' : 'Não configurado'}</span></div><div class="settings-row"><div><strong>Administrador</strong><small>Usuário definido em ADMIN_USERNAME</small></div><span class="badge">${escape(data.username)}</span></div><div class="settings-row"><div><strong>Validar integração</strong><small>Consulta seus canais sem enviar mensagens.</small></div>${button('Testar conexão', 'test-connection', 'activity', 'primary', data.configured ? '' : 'disabled')}</div><div id="connection-result"></div></div></section>
       <aside class="settings-guide">${icon('book-open')}<h3>Conecte em poucos passos</h3><p>O token fica protegido no servidor. Ele não é enviado ao navegador.</p><ol><li>Na FLW, abra <strong>Ajustes → Integrações → Integração via API</strong>.</li><li>Copie seu token permanente.</li><li>Preencha <strong>FLW_API_TOKEN</strong> no arquivo <strong>.env</strong> deste projeto.</li><li>Reinicie o servidor e teste a conexão.</li></ol><a class="button" href="https://flwchat.readme.io/reference/autentica%C3%A7%C3%A3o" target="_blank" rel="noreferrer">${icon('external-link')}Consultar documentação</a><p>As respostas são consultadas diretamente na API. O webhook é opcional para atualizar as entregas.</p></aside></div>`
     );
   },
@@ -349,8 +424,10 @@ const pages = {
 
 function updateConnection(configured, verified = false) {
   const element = $('#connection-badge');
-  element.classList.toggle('connected', verified);
-  element.innerHTML = `<span class="status-dot"></span>${verified ? 'Conexão verificada' : configured ? 'Token configurado' : 'Conexão pendente'}`;
+  state.configured = configured;
+  state.connectionVerified = configured && (verified || state.connectionVerified);
+  element.classList.toggle('connected', configured);
+  element.innerHTML = `<span class="status-dot"></span>${state.connectionVerified ? 'Conexão verificada' : configured ? 'Token configurado' : 'Conexão pendente'}`;
 }
 function contactsTable() {
   const query = state.search.toLocaleLowerCase();
@@ -455,6 +532,29 @@ function listModal(list) {
     await renderPage(true);
   });
 }
+function staffModal(user) {
+  const editing = Boolean(user);
+  const staffRole = user?.role || 'agent';
+  showModal(editing ? 'Editar usuário' : 'Criar usuário',
+    editing ? 'Salvar alterações encerra as sessões anteriores deste usuário.' : 'Defina o login da pessoa e as áreas que ela poderá acessar.',
+    `<div class="form-stack">
+      <label>Usuário<input name="username" autocomplete="off" required minlength="3" maxlength="80" pattern="[a-zA-Z0-9._\\-]{3,80}" value="${escape(user?.username || '')}" ${editing ? 'readonly' : 'autofocus'}></label>
+      <label>${editing ? 'Nova senha (opcional)' : 'Senha'}<input name="password" type="password" autocomplete="new-password" minlength="10" maxlength="256" ${editing ? '' : 'required'} placeholder="Pelo menos 10 caracteres"></label>
+      <label>Perfil<select name="role"><option value="agent" ${staffRole === 'agent' ? 'selected' : ''}>Atendente</option><option value="sender" ${staffRole === 'sender' ? 'selected' : ''}>Enviador</option></select></label>
+      <p class="field-hint">Atendentes leem e respondem conversas. Enviadores também organizam contatos e listas e usam templates aprovados para disparar campanhas.</p>
+      ${editing ? `<label class="check-label"><input type="checkbox" name="active" ${user.active ? 'checked' : ''}>Acesso ativo</label>` : ''}
+    </div>`, formFooter(editing ? 'Salvar alterações' : 'Criar usuário'), false, 'staff-form');
+  bindForm('staff-form', async (form) => {
+    const body = { role: form.get('role') };
+    if (editing) body.active = form.has('active');
+    else body.username = form.get('username');
+    if (form.get('password')) body.password = form.get('password');
+    await api(editing ? `/users/${user.id}` : '/users', { method: editing ? 'PUT' : 'POST', body });
+    modal.close();
+    toast(editing ? 'Acesso atualizado.' : 'Usuário criado.');
+    await renderPage(true);
+  });
+}
 async function contactModal(contact) {
   state.lists = await api('/lists');
   showModal(
@@ -530,72 +630,225 @@ async function campaignDetails(id) {
   );
 }
 
-function conversationItems(query = '') {
-  const rows = state.conversations.filter((c) =>
-    `${c.contactDetails?.name || c.title || ''} ${c.number || ''}`
-      .toLowerCase()
-      .includes(query.toLowerCase()),
-  );
+const replyDrafts = new Map();
+const pendingReplies = new Set();
+const draftKey = (id) => state.conversationChannel + '/' + id;
+
+function visibleConversations() {
+  const query = state.conversationSearch.trim().toLocaleLowerCase('pt-BR');
+  const digits = query.replace(/\D/g, '');
+  const phoneQuery = digits && /^[+\d\s().-]+$/.test(query);
+  return state.conversations.filter((c) => (!state.unreadOnly || c.unreadCount > 0) && (
+    phoneQuery
+      ? String(c.number || c.contactDetails?.phonenumber || '').replace(/\D/g, '').includes(digits)
+      : (c.contactDetails?.name || c.title || '').toLocaleLowerCase('pt-BR').includes(query)
+  ));
+}
+
+function idleThread() {
+  const rows = visibleConversations();
+  const next = rows.find(c => c.unreadCount > 0) || rows[0];
+  const action = next ? `<button class="button primary" data-action="open-conversation" data-id="${escape(next.id)}">${icon('message-square')}${next.unreadCount > 0 ? 'Abrir primeira não lida' : 'Abrir conversa mais recente'}</button>` : '';
+  return `<div class="thread-empty">${empty('Selecione uma conversa', 'Escolha um contato na lista para consultar o histórico e responder.', action, 'messages-square')}</div>`;
+}
+
+function conversationItems() {
+  const rows = visibleConversations();
+  const query = state.conversationSearch.trim();
   if (!rows.length)
     return empty(
-      'Nenhuma conversa por aqui',
-      'As conversas da sua conta aparecerão nesta lista.',
+      query ? 'Nenhum resultado nesta página' : state.unreadOnly ? 'Nenhuma não lida nesta página' : 'Nenhuma conversa no período',
+      query ? 'Tente outro nome ou número.' : state.unreadOnly ? 'Use Todas para ver as conversas lidas.' : 'Abra os filtros para selecionar um período maior.',
       '',
       'messages-square',
       true,
     );
   return rows
     .map(
-      (c) =>
-        `<button class="conversation-item ${state.selectedConversation?.id === c.id ? 'active' : ''}" data-action="open-conversation" data-id="${escape(c.id)}"><span class="avatar ${c.unreadCount ? 'mint' : ''}">${escape(initials(c.contactDetails?.name || c.title))}</span><div class="conversation-item-content"><strong>${escape(c.contactDetails?.name || c.title || c.number || 'Contato')}</strong><p>${escape(c.lastMessageText || 'Ver conversa')}</p></div><div><small>${date(c.lastInteractionDate || c.createdAt)}</small>${c.unreadCount ? `<br><span class="badge blue">${number(c.unreadCount)}</span>` : ''}</div></button>`,
+      (c) => {
+        const selected = state.selectedConversation?.id === c.id;
+        const updated = c.lastInteractionDate || c.createdAt;
+        const today = updated && new Date(updated).toDateString() === new Date().toDateString();
+        const draft = replyDrafts.get(draftKey(c.id));
+        return `<button type="button" class="conversation-item ${selected ? 'active' : ''}" aria-pressed="${selected}" data-action="open-conversation" data-id="${escape(c.id)}"><span class="avatar ${c.unreadCount ? 'mint' : ''}">${escape(initials(c.contactDetails?.name || c.title))}</span><span class="conversation-item-content"><strong>${escape(c.contactDetails?.name || c.title || c.number || 'Contato')}</strong><span class="conversation-snippet">${draft ? '<b>Rascunho</b> ' + escape(draft) : escape(c.lastMessageText || 'Ver conversa')}</span></span><span class="conversation-meta"><small>${today ? time(updated) : date(updated)}</small>${c.unreadCount ? `<span class="badge blue" aria-label="${number(c.unreadCount)} não lidas">${number(c.unreadCount)}</span>` : ''}</span></button>`;
+      },
     )
     .join('');
 }
 let conversationRequest = 0;
+let syncVisibleThread;
+let threadSyncBusy = false;
+setInterval(async () => {
+  if (!syncVisibleThread || threadSyncBusy || document.hidden || modal.open) return;
+  threadSyncBusy = true;
+  try {
+    await syncVisibleThread();
+  } finally {
+    threadSyncBusy = false;
+  }
+}, 5000);
+function conversationPath(id, route, page) {
+  const query = new URLSearchParams({ channelId: state.conversationChannel });
+  if (page) query.set('page', page);
+  return `/conversations/${encodeURIComponent(id)}/${route}?${query}`;
+}
+
 async function openConversation(id, reset = true) {
-  const conversation = state.conversations.find((c) => c.id === id) || state.selectedConversation;
+  const conversation = state.conversations.find((c) => c.id === id)
+    || (state.selectedConversation?.id === id ? state.selectedConversation : null);
   if (!conversation) return;
   state.selectedConversation = conversation;
-  if (reset) state.messagePage = 1;
   const request = ++conversationRequest;
+  syncVisibleThread = null;
   const thread = $('#conversation-thread');
   if (!thread) return;
   $('#inbox').classList.add('thread-open');
   document
     .querySelectorAll('.conversation-item')
-    .forEach((row) => row.classList.toggle('active', row.dataset.id === id));
-  thread.innerHTML = loading();
+    .forEach((row) => {
+      row.classList.toggle('active', row.dataset.id === id);
+      row.setAttribute('aria-pressed', String(row.dataset.id === id));
+    });
+  const name = conversation.contactDetails?.name || conversation.title || 'Contato';
+  const threadHeader = (status = '') => `<header class="thread-head">
+    <button type="button" class="icon-button thread-back hidden" data-action="back-conversations" aria-label="Voltar às conversas">${icon('chevron-left')}</button>
+    <span class="avatar">${escape(initials(name))}</span>
+    <div class="thread-contact"><strong>${escape(name)}</strong><small>${escape(phone(conversation.number || conversation.contactDetails?.phonenumber))}</small></div>
+    ${status ? `<span class="badge ${status === 'ACTIVE' ? 'green' : 'orange'}">${status === 'ACTIVE' ? 'Janela aberta' : 'Janela fechada'}</span>
+      <button type="button" class="icon-button" data-action="reload-conversation" aria-label="Atualizar mensagens" title="Atualizar mensagens">${icon('refresh-cw')}</button>` : ''}
+  </header>`;
+  thread.innerHTML = threadHeader() + loading();
+  icons();
   try {
-    const data = await api(`/conversations/${id}/messages?page=${state.messagePage}`);
+    const data = await api(conversationPath(id, 'messages', 1));
     if (request !== conversationRequest || !thread.isConnected) return;
-    const active = conversation.windowStatus === 'ACTIVE';
-    thread.innerHTML = `<header class="thread-head"><button class="icon-button thread-back hidden" data-action="back-conversations" aria-label="Voltar às conversas">${icon('chevron-left')}</button><span class="avatar">${escape(initials(conversation.contactDetails?.name || conversation.title))}</span><div><strong>${escape(conversation.contactDetails?.name || conversation.title || 'Contato')}</strong><small>${escape(phone(conversation.number || conversation.contactDetails?.phonenumber))}</small></div><span class="badge ${active ? 'green' : 'orange'}">${active ? 'Janela aberta' : 'Janela fechada'}</span></header><div class="messages" id="messages">${messageItems(data)}</div><div class="pagination"><button class="button small" data-action="messages-older" ${!data.hasMorePages ? 'disabled' : ''}>Mensagens anteriores</button><span>Página ${state.messagePage}</span><button class="button small" data-action="messages-newer" ${state.messagePage <= 1 ? 'disabled' : ''}>Mais recentes</button></div>${active ? `<form class="reply-form" id="reply-form"><textarea name="text" placeholder="Escreva sua resposta..." aria-label="Sua resposta" required maxlength="4096"></textarea><button class="button primary" type="submit" aria-label="Enviar resposta">${icon('send')}Enviar</button></form>` : '<div class="alert warning">A janela de atendimento está fechada. Use um template aprovado em uma campanha para iniciar uma nova conversa.</div>'}`;
+    const active = data.windowStatus === 'ACTIVE';
+    const key = draftKey(id);
+    const draft = replyDrafts.get(key) || '';
+    const sending = pendingReplies.has(key);
+    thread.innerHTML = threadHeader(data.windowStatus || 'CLOSED') + `
+      <div class="messages" id="messages" role="region" aria-label="Histórico de mensagens" tabindex="0">
+        <button type="button" class="history-more" ${data.hasMorePages ? '' : 'hidden'}>Carregar mensagens anteriores</button>
+        <div class="chat-history">${messageItems(data)}</div>
+      </div>
+      ${active ? `<form class="reply-form" id="reply-form">
+        <label for="reply-text">Responder a ${escape(name)}</label>
+        <textarea id="reply-text" name="text" placeholder="Escreva sua mensagem…" aria-label="Sua resposta" rows="2" required maxlength="4096" ${sending ? 'readonly' : ''}>${escape(draft)}</textarea>
+        <div class="reply-actions"><small class="reply-shortcut">Ctrl ou ⌘ + Enter para enviar</small><button class="button primary" type="submit" aria-label="Enviar resposta" ${sending || !draft.trim() ? 'disabled' : ''}>${icon('send')}<span>${sending ? 'Enviando…' : 'Enviar'}</span></button></div>
+      </form>` : `<div class="closed-thread">${icon('lock-keyhole')}<div><strong>Janela de resposta encerrada</strong><p>Para retomar o atendimento, use um template aprovado em uma campanha.</p></div></div>`}`;
     icons();
     $('#messages').scrollTop = $('#messages').scrollHeight;
+    const history = $('.chat-history', thread);
+    const scrollArea = $('#messages', thread);
+    const older = $('.history-more', thread);
+    let loaded = data.items || [];
+    let historyPage = 1;
+    let revision = data.revision;
+    let seenReply = data.replyVersion;
+    let retryAt = 0;
+    syncVisibleThread = async () => {
+      if (!history.isConnected || historyPage !== 1 || older.disabled || pendingReplies.has(key) || Date.now() < retryAt) return;
+      try {
+        const fresh = await api(conversationPath(id, 'messages', 1) + '&since=' + encodeURIComponent(revision));
+        if (!history.isConnected || older.disabled || historyPage !== 1 || request !== conversationRequest || fresh.unchanged) return;
+        revision = fresh.revision;
+        seenReply = fresh.replyVersion;
+        if (fresh.windowStatus !== data.windowStatus) {
+          await openConversation(id, false);
+          return;
+        }
+        older.hidden = !fresh.hasMorePages;
+        if (JSON.stringify(loaded) === JSON.stringify(fresh.items)) return;
+        const follow = scrollArea.scrollHeight - scrollArea.clientHeight - scrollArea.scrollTop < 64;
+        loaded = fresh.items || [];
+        history.innerHTML = messageItems({ items: loaded });
+        if (follow) scrollArea.scrollTop = scrollArea.scrollHeight;
+      } catch (error) {
+        retryAt = Date.now() + 30000;
+        if (history.isConnected) toast(error.message, true);
+      }
+    };
+    older?.addEventListener('click', async () => {
+      if (older.disabled) return;
+      older.disabled = true;
+      older.textContent = 'Carregando histórico…';
+      try {
+        const page = await api(conversationPath(id, 'messages', historyPage + 1));
+        if (request !== conversationRequest || !history.isConnected) return;
+        historyPage++;
+        const ids = new Set(loaded.map(message => message.id).filter(Boolean));
+        loaded = [...(page.items || []).filter(message => !message.id || !ids.has(message.id)), ...loaded];
+        const before = scrollArea.scrollHeight;
+        const top = scrollArea.scrollTop;
+        history.innerHTML = messageItems({ items: loaded });
+        if (!page.hasMorePages) {
+          older.hidden = true;
+          scrollArea.focus({ preventScroll: true });
+        }
+        scrollArea.scrollTop = top + scrollArea.scrollHeight - before;
+      } catch (error) {
+        if (history.isConnected) toast(error.message, true);
+      } finally {
+        older.disabled = false;
+        older.textContent = 'Carregar mensagens anteriores';
+      }
+    });
+    if (reset && window.matchMedia('(max-width: 760px)').matches) {
+      $('.thread-back', thread)?.focus({ preventScroll: true });
+    }
+    const reply = $('#reply-form');
+    reply?.addEventListener('input', () => {
+      const value = $('textarea', reply).value;
+      if (value) replyDrafts.set(key, value);
+      else replyDrafts.delete(key);
+      $('button', reply).disabled = !value.trim() || pendingReplies.has(key);
+      const snippet = $('.conversation-item.active .conversation-snippet');
+      if (snippet) snippet.textContent = value ? 'Rascunho · ' + value : conversation.lastMessageText || 'Ver conversa';
+    });
+    reply?.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && !event.isComposing && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        if (!$('button', reply).disabled) reply.requestSubmit();
+      }
+    });
     $('#reply-form')?.addEventListener('submit', async (event) => {
       event.preventDefault();
       const form = event.currentTarget;
       const submit = $('button', form);
       const field = $('textarea', form);
       const text = field.value.trim();
-      if (!text) return;
+      if (!text || pendingReplies.has(key)) return;
+      pendingReplies.add(key);
       submit.disabled = true;
+      field.readOnly = true;
+      $('span', submit).textContent = 'Enviando…';
       try {
-        const result = await api(`/conversations/${id}/reply`, { method: 'POST', body: { text } });
-        field.value = '';
+        const result = await api(conversationPath(id, 'reply'), { method: 'POST', body: { text, replyVersion: seenReply } });
+        replyDrafts.delete(key);
         toast(
           `Resposta recebida pela FLW. Status: ${statusMap[result.status?.toLowerCase()]?.[0] || result.status || 'na fila'}.`,
         );
-        await refreshMessages();
       } catch (error) {
         toast(error.message, true);
+        return;
       } finally {
-        submit.disabled = false;
+        pendingReplies.delete(key);
+        const currentForm = $('#reply-form');
+        if (currentForm && draftKey(state.selectedConversation?.id) === key) {
+          const currentField = $('textarea', currentForm);
+          currentField.readOnly = false;
+          $('button', currentForm).disabled = !currentField.value.trim();
+          $('button span', currentForm).textContent = 'Enviar';
+        }
+      }
+      if ($('#conversation-items')) $('#conversation-items').innerHTML = conversationItems();
+      if ($('#conversation-thread') && draftKey(state.selectedConversation?.id) === key) {
+        await openConversation(id, false);
       }
     });
   } catch (error) {
-    if (request === conversationRequest)
-      thread.innerHTML = empty(
+    if (request === conversationRequest && thread.isConnected)
+      thread.innerHTML = threadHeader() + empty(
         'Não foi possível carregar as mensagens',
         escape(error.message),
         button('Tentar novamente', 'reload-conversation', 'refresh-cw'),
@@ -606,12 +859,19 @@ async function openConversation(id, reset = true) {
 }
 function messageItems(data) {
   const messages = [...(data.items || [])].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  let previousDay;
   return messages.length
     ? messages
-        .map(
-          (m) =>
-            `<div class="message ${m.direction === 'FROM_HUB' ? 'outgoing' : ''}">${escape(m.text || `[${m.type || 'Mídia'} — consulte o arquivo na FLW]`)}<span class="message-time">${date(m.createdAt)} · ${time(m.createdAt)} ${m.direction === 'FROM_HUB' ? `· ${escape(statusMap[m.status?.toLowerCase()]?.[0] || m.status)}` : ''}</span></div>`,
-        )
+        .map((m, index) => {
+          const day = m.createdAt ? new Date(m.createdAt).toLocaleDateString('pt-BR', { dateStyle: 'long' }) : '';
+          const separator = day && day !== previousDay ? `<span class="message-day">${escape(day)}</span>` : '';
+          previousDay = day;
+          const outgoing = m.direction === 'FROM_HUB';
+          const status = outgoing && m.status ? ` · ${escape(statusMap[m.status.toLowerCase()]?.[0] || m.status)}` : '';
+          const startsGroup = separator || index === 0 || messages[index - 1].direction !== m.direction;
+          const author = outgoing ? 'Equipe' : (state.selectedConversation?.contactDetails?.name || state.selectedConversation?.title || 'Contato');
+          return `${separator}${startsGroup ? `<span class="message-author ${outgoing ? 'from-team' : ''}">${escape(author)}</span>` : ''}<div class="message ${outgoing ? 'outgoing' : ''}">${escape(m.text || `[${m.type || 'Mídia'} — consulte o arquivo na FLW]`)}<span class="message-time">${time(m.createdAt)}${status}</span></div>`;
+        })
         .join('')
     : empty(
         'Ainda sem mensagens',
@@ -621,20 +881,10 @@ function messageItems(data) {
         true,
       );
 }
-async function refreshMessages() {
-  const id = state.selectedConversation?.id;
-  const element = $('#messages');
-  if (!id || !element) return;
-  const page = state.messagePage;
-  const data = await api(`/conversations/${id}/messages?page=${page}`);
-  if (!element.isConnected || state.selectedConversation?.id !== id || state.messagePage !== page) return;
-  const nearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 60;
-  element.innerHTML = messageItems(data);
-  icons();
-  if (nearBottom) element.scrollTop = element.scrollHeight;
-}
 
 const actions = {
+  'new-user': () => staffModal(),
+  'edit-user': element => staffModal(state.users.find(user => user.id === element.dataset.id)),
   refresh: () => renderPage(true),
   'close-modal': () => modal.close(),
   'go-settings': () => {
@@ -734,7 +984,34 @@ const actions = {
   },
   'open-conversation': (element) => openConversation(element.dataset.id),
   'reload-conversation': () => openConversation(state.selectedConversation.id, false),
-  'back-conversations': () => $('#inbox').classList.remove('thread-open'),
+  'toggle-inbox-filters': (element) => {
+    const filters = $('#inbox-filters');
+    filters.hidden = !filters.hidden;
+    state.inboxFiltersOpen = !filters.hidden;
+    element.setAttribute('aria-expanded', String(!filters.hidden));
+  },
+  'filter-inbox-rows': (element) => {
+    state.unreadOnly = element.dataset.mode === 'unread';
+    document.querySelectorAll('.inbox-segments button').forEach(button => {
+      button.setAttribute('aria-pressed', String(button === element));
+    });
+    $('#conversation-items').innerHTML = conversationItems();
+    if (!state.selectedConversation) $('#conversation-thread').innerHTML = idleThread();
+    icons();
+  },
+  'back-conversations': () => {
+    syncVisibleThread = null;
+    conversationRequest++;
+    const previous = state.selectedConversation?.id;
+    state.selectedConversation = null;
+    $('#inbox').classList.remove('thread-open');
+    $('#conversation-items').innerHTML = conversationItems();
+    $('#conversation-thread').innerHTML = idleThread();
+    icons();
+    const row = [...document.querySelectorAll('.conversation-item')].find(item => item.dataset.id === previous);
+    (row || $('#conversation-search'))?.focus();
+  },
+  'conversation-refresh': () => renderPage(true),
   'conversation-prev': () => {
     state.conversationPage--;
     state.selectedConversation = null;
@@ -744,14 +1021,6 @@ const actions = {
     state.conversationPage++;
     state.selectedConversation = null;
     return renderPage(true);
-  },
-  'messages-older': () => {
-    state.messagePage++;
-    return openConversation(state.selectedConversation.id, false);
-  },
-  'messages-newer': () => {
-    state.messagePage--;
-    return openConversation(state.selectedConversation.id, false);
   },
 };
 
@@ -770,6 +1039,12 @@ document.addEventListener('click', async (event) => {
     element.disabled = false;
   }
 });
+document.addEventListener('submit', (event) => {
+  if (event.target.id !== 'template-filter') return;
+  event.preventDefault();
+  state.templateChannel = $('#template-channel').value;
+  renderPage();
+});
 document.addEventListener('input', (event) => {
   if (event.target.id === 'contact-search') {
     state.search = event.target.value;
@@ -777,7 +1052,9 @@ document.addEventListener('input', (event) => {
     icons();
   }
   if (event.target.id === 'conversation-search') {
-    $('#conversation-items').innerHTML = conversationItems(event.target.value);
+    state.conversationSearch = event.target.value;
+    $('#conversation-items').innerHTML = conversationItems();
+    if (!state.selectedConversation) $('#conversation-thread').innerHTML = idleThread();
     icons();
   }
 });
@@ -786,6 +1063,15 @@ document.addEventListener('change', (event) => {
     state.contactList = event.target.value;
     $('#contacts-table').innerHTML = contactsTable();
     icons();
+  }
+  if (['conversation-channel', 'conversation-days'].includes(event.target.id)) {
+    if (event.target.id === 'conversation-channel') state.conversationChannel = event.target.value;
+    else state.conversationDays = event.target.value;
+    state.conversationPage = 1;
+    state.conversationSearch = '';
+    state.inboxFiltersOpen = false;
+    state.selectedConversation = null;
+    renderPage();
   }
 });
 function setMenuOpen(open) {
@@ -814,36 +1100,22 @@ $('#skip-content').addEventListener('click', (event) => {
   main.focus();
 });
 window.addEventListener('hashchange', () => {
+  syncVisibleThread = null;
   modal.close();
+  state.selectedConversation = null;
   renderPage();
 });
 setInterval(async () => {
-  if (document.hidden || modal.open || refreshBusy) return;
+  if (document.hidden || modal.open || refreshBusy || !['dashboard', 'campaigns'].includes(state.page)) return;
   refreshBusy = true;
   try {
-    if (state.page === 'conversations' && state.configured) {
-      const data = await api(`/conversations?page=${state.conversationPage}`);
-      if (state.page === 'conversations' && $('#conversation-items')) {
-        state.conversations = data.items || [];
-        $('#conversation-items').innerHTML = conversationItems($('#conversation-search')?.value || '');
-        icons();
-        await refreshMessages();
-      }
-    }
     const controlFocused = document.activeElement !== main && main.contains(document.activeElement);
-    if (['dashboard', 'campaigns'].includes(state.page) && !controlFocused) {
-      await renderPage(true);
-    }
+    if (!controlFocused) await renderPage(true);
   } catch (error) {
     toast(error.message, true);
   } finally {
     refreshBusy = false;
   }
 }, 15000);
-api('/settings')
-  .then((settings) => {
-    state.configured = settings.configured;
-    updateConnection(settings.configured);
-  })
-  .catch(() => {});
+updateConnection(state.configured);
 renderPage();

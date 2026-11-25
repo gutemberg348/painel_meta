@@ -14,6 +14,10 @@ export function loadConfig(env = process.env) {
   if (apiBase.protocol !== 'https:') throw new Error('FLW_API_BASE_URL deve usar HTTPS.');
   const publicUrl = (env.PUBLIC_URL || '').replace(/\/$/, '');
   if (publicUrl && new URL(publicUrl).protocol !== 'https:') throw new Error('PUBLIC_URL deve usar HTTPS.');
+  const inboxChannelId = (env.FLW_INBOX_CHANNEL_ID || '').trim().toLowerCase();
+  if (inboxChannelId && !/^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/.test(inboxChannelId)) {
+    throw new Error('FLW_INBOX_CHANNEL_ID deve conter o ID UUID de um canal WhatsApp da FLW.');
+  }
   return {
     username: env.ADMIN_USERNAME,
     password: env.ADMIN_PASSWORD,
@@ -25,6 +29,7 @@ export function loadConfig(env = process.env) {
     databasePath: resolve(env.DATABASE_PATH || './data/totalk.sqlite'),
     apiBase: apiBase.toString().replace(/\/$/, ''),
     apiToken: env.FLW_API_TOKEN || '',
+    inboxChannelId,
     sendInterval: Math.max(500, Number(env.SEND_INTERVAL_MS) || 1000),
     publicUrl,
     webhookSecret: env.WEBHOOK_SECRET || '',

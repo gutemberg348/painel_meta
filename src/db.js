@@ -38,6 +38,13 @@ export function openDatabase(path) {
       UNIQUE(campaign_id, phone)
     );
     CREATE TABLE IF NOT EXISTS sessions (sid TEXT PRIMARY KEY, data TEXT NOT NULL, expires INTEGER NOT NULL);
+    CREATE INDEX IF NOT EXISTS sessions_expires ON sessions(expires);
+    CREATE TABLE IF NOT EXISTS staff_users (
+      id TEXT PRIMARY KEY, username TEXT NOT NULL COLLATE NOCASE UNIQUE,
+      role TEXT NOT NULL CHECK(role IN ('agent','sender')),
+      password_hash TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1,
+      version INTEGER NOT NULL DEFAULT 1
+    );
     CREATE TABLE IF NOT EXISTS webhook_events (id TEXT PRIMARY KEY, event_type TEXT NOT NULL, received_at TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);
     CREATE INDEX IF NOT EXISTS deliveries_campaign ON deliveries(campaign_id);
@@ -84,7 +91,13 @@ export class SQLiteSessionStore extends session.Store {
       callback(error);
     }
   }
-  touch(sid, value, callback) {
-    this.set(sid, value, callback);
+  touch(sid, value, callback = () => {}) {
+    try {
+      const expires = value.cookie.expires ? new Date(value.cookie.expires).getTime() : Date.now() + 28800000;
+      this.db.prepare('UPDATE sessions SET expires = MAX(expires, ?) WHERE sid=?').run(expires, sid);
+      callback();
+    } catch (error) {
+      callback(error);
+    }
   }
 }

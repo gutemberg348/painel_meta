@@ -127,8 +127,13 @@ try {
     await page.getByRole('button', { name: 'Voltar às conversas' }).click();
   await page.locator('.conversation-item').first().click();
   await page.locator('#reply-form').waitFor();
+  await page.locator('#reply-text').fill('Rascunho de atendimento');
   await page.getByRole('button', { name: 'Voltar às conversas' }).click();
   await page.locator('.conversation-list').waitFor({ state: 'visible' });
+  await page.locator('.conversation-item').filter({ hasText: 'Rascunho de atendimento' }).click();
+  await page.locator('#reply-text').waitFor();
+  assert.equal(await page.locator('#reply-text').inputValue(), 'Rascunho de atendimento');
+  await page.getByRole('button', { name: 'Voltar às conversas' }).click();
   await page.getByRole('button', { name: 'Abrir menu' }).click();
   await page.locator('nav [data-page=dashboard]').click();
   await page.getByRole('heading', { name: 'Visão geral', level: 1 }).waitFor();

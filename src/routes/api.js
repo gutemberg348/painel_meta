@@ -1,8 +1,9 @@
 import { Router } from 'express';
-import { randomUUID } from 'node:crypto';
+import { createHmac, randomBytes, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { audienceSchema, parseAudience, requireValidAudience, saveAudience } from '../services/audience.js';
 import { now } from '../services/campaigns.js';
+import { ChatCache } from '../services/chat-cache.js';
 
 const name = z.string().trim().min(1, 'Informe um nome.').max(120);
 const id = z.string().uuid();
@@ -31,6 +32,7 @@ const pageNumber = (value) =>
     .min(1)
     .max(10000)
     .parse(value || 1);
+const inboxPeriod = z.enum(['1', '7', '30', '90']).default('7');
 function fail(message, status = 400) {
   throw Object.assign(new Error(message), { status });
 }
@@ -42,6 +44,51 @@ function required(db, table, value) {
 
 export function apiRouter(db, flw, campaigns, config) {
   const router = Router();
+  const chatCache = new ChatCache();
+  const lastReplies = new Map();
+  const activeReplies = new Set();
+  const revisionSecret = randomBytes(32);
+  const revision = (key) => createHmac('sha256', revisionSecret)
+    .update(`${key}:${Math.floor(Date.now() / 30000)}:${lastReplies.get(key) || '0'}`).digest('base64url');
+  let inboxChannelsRequest;
+  let inboxChannelsExpireAt = 0;
+  async function inboxChannels() {
+    if (!inboxChannelsRequest || Date.now() >= inboxChannelsExpireAt) {
+      inboxChannelsExpireAt = Infinity;
+      inboxChannelsRequest = flw.channels()
+        .then((channels) => {
+          inboxChannelsExpireAt = Date.now() + 60000;
+          return channels.filter((channel) => id.safeParse(channel.id).success);
+        })
+        .catch((error) => {
+          inboxChannelsRequest = undefined;
+          throw error;
+        });
+    }
+    const channels = await inboxChannelsRequest;
+    if (!config.inboxChannelId) return channels;
+    const channel = channels.find((item) => item.id.toLowerCase() === config.inboxChannelId);
+    if (!channel) {
+      fail('O canal configurado em FLW_INBOX_CHANNEL_ID não aparece entre os canais WhatsApp desse token.', 409);
+    }
+    return [channel];
+  }
+  async function inboxScope(requestedId) {
+    const rawId = requestedId === undefined ? undefined : id.parse(requestedId).toLowerCase();
+    const channels = await inboxChannels();
+    if (!rawId) return { channels, channelId: channels.length === 1 ? channels[0].id : undefined };
+    const channelId = channels.find((item) => item.id.toLowerCase() === rawId)?.id;
+    if (rawId && !channelId) fail('Este canal não está disponível nesta caixa de entrada.', 403);
+    return { channels, channelId };
+  }
+  async function scopedConversation(sessionId, channelId) {
+    if (!channelId) fail('Selecione um canal WhatsApp antes de abrir a conversa.');
+    const conversation = await flw.session(sessionId);
+    if (conversation.channelId?.toLowerCase() !== channelId.toLowerCase()) {
+      fail('Conversa indisponível neste canal.', 404);
+    }
+    return conversation;
+  }
   const campaignRows = () =>
     db
       .prepare(
@@ -84,6 +131,7 @@ export function apiRouter(db, flw, campaigns, config) {
       username: config.username,
       configured: Boolean(config.apiToken),
       apiBase: config.apiBase,
+      inboxChannelId: config.inboxChannelId || '',
       sendInterval: config.sendInterval,
       webhookConfigured: Boolean(config.publicUrl && config.webhookSecret),
       lastWebhook: db.prepare("SELECT value FROM metadata WHERE key='lastWebhook'").get()?.value || null,
@@ -346,17 +394,64 @@ export function apiRouter(db, flw, campaigns, config) {
     required(db, 'campaigns', req.params.id);
     res.json({ synced: await campaigns.sync(req.params.id) });
   });
-  router.get('/conversations', async (req, res) => res.json(await flw.sessions(pageNumber(req.query.page))));
-  router.get('/conversations/:id/messages', async (req, res) =>
-    res.json(await flw.messages(id.parse(req.params.id), pageNumber(req.query.page))),
-  );
+  router.get('/conversations', async (req, res) => {
+    const page = pageNumber(req.query.page);
+    const days = Number(inboxPeriod.parse(req.query.days));
+    const { channels, channelId } = await inboxScope(req.query.channelId);
+    const scope = {
+      channelId: channelId || '',
+      channels: channels.map((channel) => ({
+        id: channel.id,
+        name: channel.identity?.displayName || channel.name || 'WhatsApp',
+        number: channel.numberFormatted || channel.number || '',
+      })),
+    };
+    if (!channelId) return res.json({ ...scope, items: [], hasMorePages: false });
+    const after = new Date(Date.now() - days * 86400000).toISOString();
+    const data = await chatCache.read(`list:${channelId}:${days}:${page}`, () => flw.sessions(channelId, after, page));
+    const items = (data.items || []).filter((item) => item.channelId?.toLowerCase() === channelId.toLowerCase());
+    res.json({ ...scope, items, hasMorePages: Boolean(data.hasMorePages || data.totalPages > page) });
+  });
+  router.get('/conversations/:id/messages', async (req, res) => {
+    const sessionId = id.parse(req.params.id);
+    const page = pageNumber(req.query.page);
+    const { channelId } = await inboxScope(req.query.channelId);
+    if (!channelId) fail('Selecione um canal WhatsApp antes de abrir a conversa.');
+    const key = `thread:${channelId}:${sessionId}:`;
+    const versionAtRead = lastReplies.get(key) || '0';
+    const version = revision(key);
+    if (page === 1 && req.query.since === version) return res.json({ unchanged: true });
+    const data = await chatCache.read(key + page, async () => {
+      const conversation = await scopedConversation(sessionId, channelId);
+      const messages = await flw.messages(sessionId, page);
+      return { ...messages, windowStatus: conversation.windowStatus };
+    });
+    res.json({ ...data, revision: version, replyVersion: versionAtRead });
+  });
   router.post('/conversations/:id/reply', async (req, res) => {
     const sessionId = id.parse(req.params.id);
-    const { text } = z.object({ text: z.string().trim().min(1).max(4096) }).parse(req.body);
-    const conversation = await flw.session(sessionId);
+    const { text, replyVersion } = z.object({
+      text: z.string().trim().min(1).max(4096), replyVersion: z.string().max(64).optional(),
+    }).parse(req.body);
+    const { channelId } = await inboxScope(req.query.channelId);
+    const conversation = await scopedConversation(sessionId, channelId);
     if (conversation.windowStatus !== 'ACTIVE')
       fail('A janela de atendimento está fechada. Inicie uma nova conversa com um template aprovado.');
-    res.json(await flw.reply(sessionId, text));
+    const key = `thread:${channelId}:${sessionId}:`;
+    if (activeReplies.has(key) || (replyVersion !== undefined && replyVersion !== (lastReplies.get(key) || '0'))) {
+      fail('A equipe respondeu ou está enviando uma resposta. Atualize as mensagens e revise seu rascunho.', 409);
+    }
+    activeReplies.add(key);
+    try {
+      res.json(await flw.reply(sessionId, text));
+    } finally {
+      activeReplies.delete(key);
+      chatCache.invalidate(key);
+      chatCache.invalidate(`list:${channelId}:`);
+      lastReplies.delete(key);
+      if (lastReplies.size >= 512) lastReplies.delete(lastReplies.keys().next().value);
+      lastReplies.set(key, randomUUID());
+    }
   });
   return router;
 }
