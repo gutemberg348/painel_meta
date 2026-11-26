@@ -30,6 +30,25 @@ export function pushAvailable(config) {
   return Boolean(config.apiToken);
 }
 
+// Guardar apenas códigos de diagnóstico conhecidos. O corpo bruto pode conter a inscrição.
+const providerReasons = new Set([
+  'BadTtl', 'BadUrgency', 'BadWebPushRequest', 'BadWebPushTopic', 'VapidPkHashMismatch',
+  'BadAuthorizationHeader', 'BadJwtToken', 'BadVapidPublicKey', 'BadPath', 'IdleTimeout',
+  'MethodNotAllowed', 'PayloadTooLarge', 'TooManyRequests', 'InternalServerError', 'ServiceUnavailable',
+  'Shutdown', 'INVALID_ARGUMENT', 'UNREGISTERED', 'NOT_FOUND', 'PERMISSION_DENIED', 'UNAUTHENTICATED',
+]);
+function pushFailure(error, endpoint) {
+  const host = new URL(endpoint).hostname;
+  const provider = host.endsWith('.apple.com') ? 'Apple' : host === 'fcm.googleapis.com' ? 'Google' :
+    host.endsWith('.mozilla.com') ? 'Mozilla' : 'Web Push';
+  let body;
+  try { body = JSON.parse(error.body); } catch { /* Alguns serviços respondem sem JSON. */ }
+  const code = body?.reason || body?.error?.status;
+  const reason = providerReasons.has(code) ? code :
+    provider === 'Mozilla' && Number.isInteger(body?.errno) ? 'errno ' + body.errno : 'motivo não identificado';
+  return { at: Date.now(), code: Number(error.statusCode) || 0, provider, reason };
+}
+
 function signingKeys(db) {
   let row = db.prepare("SELECT value FROM metadata WHERE key='pushVapid'").get();
   if (!row) {
@@ -81,11 +100,13 @@ export function startPushWorker(db, config) {
     try {
       const response = await sendNotification({ endpoint: row.endpoint, keys: JSON.parse(row.keys_json) }, row.event_id, {
         vapidDetails: { subject: config.publicUrl || 'https://totalk.testes-techcode.shop', ...signingKeys(db) },
-        topic: 'vieira-link-inbox', TTL: Math.max(0, Math.floor((row.expires_at - Date.now()) / 1000)), timeout: 8000,
+        TTL: Math.max(0, Math.floor((row.expires_at - Date.now()) / 1000)), timeout: 8000,
       });
       saveResult.run('pushLastAccepted', JSON.stringify({ at: Date.now(), code: response.statusCode }));
     } catch (error) {
-      saveResult.run('pushLastFailure', JSON.stringify({ at: Date.now(), code: Number(error.statusCode) || 0 }));
+      const failure = pushFailure(error, row.endpoint);
+      saveResult.run('pushLastFailure', JSON.stringify(failure));
+      console.warn('Falha na entrega de push:', failure.provider, failure.code || 'rede', failure.reason);
       if ([404, 410].includes(error.statusCode)) {
         db.prepare('DELETE FROM push_subscriptions WHERE endpoint=? AND keys_json=?').run(row.endpoint, row.keys_json);
       } else {
@@ -96,7 +117,6 @@ export function startPushWorker(db, config) {
             .run(row.event_id, Date.now() + delay, row.attempts + 1, row.expires_at, row.channel, row.session_id, row.message_time,
               row.endpoint, row.keys_json, row.channel, row.message_time);
         }
-        console.warn('Falha na entrega de push. Código:', error.statusCode || 'rede');
       }
     }
   }

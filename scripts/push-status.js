@@ -27,6 +27,7 @@ try {
     const row = db.prepare('SELECT value FROM metadata WHERE key=?').get(key);
     const result = row && JSON.parse(row.value);
     console.log(label + ' (UTC):', result ? time(result.at) + ' (' + (result.code ? 'HTTP ' + result.code : 'sem resposta HTTP') + ')' : 'sem registro');
+    if (result?.provider) console.log('Serviço e motivo da última recusa:', result.provider, '·', result.reason);
   }
 } catch {
   console.error('Não foi possível consultar o estado das notificações. Confira a versão do container e o banco configurado.');
