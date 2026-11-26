@@ -91,6 +91,12 @@ export function openDatabase(path) {
     })();
   }
   // Não repetir automaticamente uma requisição cujo resultado ficou desconhecido.
+  if (!db.pragma('table_info(staff_users)').some(column => column.name === 'channel_id')) {
+    db.transaction(() => {
+      db.exec('ALTER TABLE staff_users ADD COLUMN channel_id TEXT');
+      db.exec("DELETE FROM push_subscriptions WHERE account_id IN (SELECT id FROM staff_users WHERE role='agent')");
+    })();
+  }
   db.prepare(
     "UPDATE deliveries SET status='unknown', error='Servidor reiniciado durante o envio. Confira na FLW antes de reenviar.' WHERE status='sending'",
   ).run();

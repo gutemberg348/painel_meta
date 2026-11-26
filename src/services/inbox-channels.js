@@ -3,7 +3,8 @@ import { z } from 'zod';
 export function createInboxChannels(flw, config) {
   let request;
   let expires = 0;
-  return async function inboxChannels() {
+  return async function inboxChannels(account) {
+    if (account?.role === 'agent' && !account.channelId) return [];
     if (!request || Date.now() >= expires) {
       expires = Infinity;
       request = flw.channels().then(channels => {
@@ -15,9 +16,12 @@ export function createInboxChannels(flw, config) {
       });
     }
     const channels = await request;
-    if (!config.inboxChannelId) return channels;
-    const channel = channels.find(item => item.id.toLowerCase() === config.inboxChannelId);
-    if (!channel) throw Object.assign(new Error('O canal configurado em FLW_INBOX_CHANNEL_ID não aparece entre os canais WhatsApp desse token.'), { status: 409 });
-    return [channel];
+    let allowed = channels;
+    if (config.inboxChannelId) {
+      allowed = channels.filter(item => item.id.toLowerCase() === config.inboxChannelId);
+      if (!allowed.length) throw Object.assign(new Error('O canal configurado em FLW_INBOX_CHANNEL_ID não aparece entre os canais WhatsApp desse token.'), { status: 409 });
+    }
+    if (account?.role === 'agent') return allowed.filter(c => c.id.toLowerCase() === account.channelId && c.active !== false);
+    return allowed;
   };
 }

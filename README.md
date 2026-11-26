@@ -90,9 +90,11 @@ O administrador configurado no `.env` é o gerente. Em **Administração → Usu
 
 | Perfil | Acesso |
 | --- | --- |
-| Atendente | Caixa de entrada, histórico e respostas |
+| Atendente | Conversas, respostas e notificações do número de WhatsApp atribuído ao login |
 | Enviador | Caixa de entrada, contatos, listas, templates e operações de campanha, incluindo o disparo |
 | Gerente | Todas as áreas, incluindo usuários, indicadores e configurações |
+
+Em **Usuários → Criar usuário**, escolha **Atendente** e selecione o **WhatsApp de atendimento**. O mesmo número é usado automaticamente na caixa de entrada e nas notificações dos aparelhos desse atendente. Cada aparelho precisa autorizar as notificações. Para cadastros anteriores à atribuição por número, edite o usuário e salve o vínculo para liberar o atendimento. Trocar o número encerra as sessões anteriores e remove as inscrições de push antigas. Se `FLW_INBOX_CHANNEL_ID` estiver configurado, ele delimita os canais disponíveis para atribuição.
 
 As senhas da equipe são armazenadas como hashes scrypt com salt individual. Inclua o banco SQLite no backup para preservar as contas.
 

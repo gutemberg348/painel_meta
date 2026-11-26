@@ -43,16 +43,18 @@ export function pushRouter(db, config, inboxChannels) {
   const router = Router();
   router.get('/', async (req, res) => {
     if (!pushAvailable(config)) return res.json({ publicKey: null, channels: [] });
-    const channels = (await inboxChannels()).map(c => ({ id: c.id, name: c.identity?.displayName || c.name || 'WhatsApp', number: c.numberFormatted || c.number || '' }));
+    const channels = (await inboxChannels(res.locals.account)).map(c => ({ id: c.id, name: c.identity?.displayName || c.name || 'WhatsApp', number: c.numberFormatted || c.number || '' }));
     res.json({ publicKey: signingKeys(db).publicKey, channels });
   });
   router.put('/', rateLimit({ windowMs: 60000, limit: 40 }), async (req, res) => {
     if (!pushAvailable(config)) return res.status(503).json({ error: 'Conecte a conta FLW para receber avisos de mensagens.' });
     const sub = subscription.parse(req.body);
     const account = req.session.accountId || 'manager';
-    const channels = await inboxChannels();
-    const channel = channels.length === 1 ? channels[0] : channels.find(c => c.id === req.body.channelId);
+    const channels = await inboxChannels(res.locals.account);
+    const channel = req.body.channelId ? channels.find(c => c.id === req.body.channelId) : channels.length === 1 && channels[0];
     if (!channel) return res.status(400).json({ error: 'Selecione o WhatsApp que deseja acompanhar.' });
+    if (account !== 'manager' && !db.prepare('SELECT 1 FROM staff_users WHERE id=? AND active=1 AND version=?')
+      .get(account, req.session.accountVersion)) return res.status(401).json({ error: 'Faça login novamente.' });
     db.transaction(() => {
       db.prepare('DELETE FROM push_subscriptions WHERE endpoint=? AND (account_id<>? OR channel IS NOT ?)').run(sub.endpoint, account, channel.id);
       db.prepare(`INSERT INTO push_subscriptions(endpoint,keys_json,account_id,sid,subscribed_at,channel) VALUES (?,?,?,?,?,?)
@@ -101,7 +103,10 @@ export function startPushWorker(db, config) {
     try {
       db.prepare('DELETE FROM push_deliveries WHERE expires_at<=?').run(Date.now());
       const due = db.prepare(`SELECT d.*, s.keys_json FROM push_deliveries d JOIN push_subscriptions s USING(endpoint)
-        WHERE d.next_attempt<=? ORDER BY d.next_attempt, d.rowid LIMIT 16`).all(Date.now());
+        LEFT JOIN staff_users u ON u.id=s.account_id
+        WHERE d.next_attempt<=? AND d.channel=s.channel AND (s.account_id='manager' OR
+        (u.active=1 AND (u.role='sender' OR u.channel_id=lower(d.channel))))
+        ORDER BY d.next_attempt, d.rowid LIMIT 16`).all(Date.now());
       await Promise.all(due.map(deliver));
     } finally {
       busy = false;

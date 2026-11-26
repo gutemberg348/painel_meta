@@ -115,7 +115,7 @@ export function createApp({ config, db, flw, campaigns, inboxChannels = createIn
       if (!req.session.accountId || req.session.accountId === 'manager') {
         res.locals.account = { username: config.username, role: 'manager' };
       } else {
-        res.locals.account = db.prepare('SELECT username, role FROM staff_users WHERE id=? AND active=1 AND version=?')
+        res.locals.account = db.prepare('SELECT username, role, channel_id AS channelId FROM staff_users WHERE id=? AND active=1 AND version=?')
           .get(req.session.accountId, req.session.accountVersion);
       }
     }
@@ -171,13 +171,13 @@ export function createApp({ config, db, flw, campaigns, inboxChannels = createIn
     if (canUseApi(res.locals.account.role, req.path)) return next();
     res.status(403).json({ error: 'Seu perfil não tem acesso a esta operação.' });
   });
-  app.use('/api/users', usersRouter(db, config));
+  app.use('/api/users', usersRouter(db, config, inboxChannels));
   app.use('/api/push', pushRouter(db, config, inboxChannels));
   app.use('/api', apiRouter(db, flw, campaigns, config, inboxChannels, chatCache));
   app.get('/', (req, res) => {
     const { username, role } = res.locals.account;
     res.render('index', { username, role, roleName: roleNames[role], homePage: landingPage[role],
-      configured: Boolean(config.apiToken), inboxChannelId: config.inboxChannelId || '' });
+      configured: Boolean(config.apiToken), inboxChannelId: (role === 'agent' ? res.locals.account.channelId : config.inboxChannelId) || '' });
   });
   app.use((req, res) => res.status(404).json({ error: 'Página não encontrada.' }));
   app.use((error, req, res, next) => {

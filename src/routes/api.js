@@ -54,9 +54,9 @@ export function apiRouter(db, flw, campaigns, config, inboxChannels, chatCache) 
   const lastReplies = new Map();
   const activeReplies = new Set();
   const revisionSecret = randomBytes(32);
-  async function inboxScope(requestedId) {
+  async function inboxScope(requestedId, account) {
     const rawId = requestedId === undefined ? undefined : id.parse(requestedId).toLowerCase();
-    const channels = await inboxChannels();
+    const channels = await inboxChannels(account);
     if (!rawId) return { channels, channelId: channels.length === 1 ? channels[0].id : undefined };
     const channelId = channels.find((item) => item.id.toLowerCase() === rawId)?.id;
     if (rawId && !channelId) fail('Este canal não está disponível nesta caixa de entrada.', 403);
@@ -415,7 +415,7 @@ export function apiRouter(db, flw, campaigns, config, inboxChannels, chatCache) 
   router.get('/conversations', async (req, res) => {
     const page = pageNumber(req.query.page);
     const days = Number(inboxPeriod.parse(req.query.days));
-    const { channels, channelId } = await inboxScope(req.query.channelId);
+    const { channels, channelId } = await inboxScope(req.query.channelId, res.locals.account);
     const scope = {
       channelId: channelId || '',
       channels: channels.map((channel) => ({
@@ -428,11 +428,16 @@ export function apiRouter(db, flw, campaigns, config, inboxChannels, chatCache) 
     res.json({ ...scope, ...await threads.list(channelId, days, page, req.session.accountId || 'manager') });
   });
   router.get('/conversations/events', async (req, res) => {
-    const { channelId } = await inboxScope(req.query.channelId);
+    const { channelId } = await inboxScope(req.query.channelId, res.locals.account);
     if (!channelId) fail('Selecione um canal WhatsApp.');
     res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store', 'X-Accel-Buffering': 'no' });
     res.write(': conectado\n\n');
-    const notify = channel => { if (channel === channelId) res.write('data: atualizar\n\n'); };
+    const notify = channel => {
+      if (channel !== channelId) return;
+      if (res.locals.account.role !== 'manager' && !db.prepare('SELECT 1 FROM staff_users WHERE id=? AND active=1 AND version=?')
+        .get(req.session.accountId, req.session.accountVersion)) return res.end();
+      res.write('data: atualizar\n\n');
+    };
     chatCache.listeners.add(notify);
     // Reconectar periodicamente revalida a sessão e o acesso ao canal.
     const timeout = setTimeout(() => res.end(), 55000);
@@ -441,7 +446,7 @@ export function apiRouter(db, flw, campaigns, config, inboxChannels, chatCache) 
   router.get('/conversations/:id/messages', async (req, res) => {
     const sessionId = id.parse(req.params.id);
     const page = pageNumber(req.query.page);
-    const { channelId } = await inboxScope(req.query.channelId);
+    const { channelId } = await inboxScope(req.query.channelId, res.locals.account);
     if (!channelId) fail('Selecione um canal WhatsApp antes de abrir a conversa.');
     const detail = id => chatCache.read(`thread:${channelId}:${id}:detail`, () => scopedConversation(id, channelId));
     const source = await detail(sessionId);
@@ -463,7 +468,7 @@ export function apiRouter(db, flw, campaigns, config, inboxChannels, chatCache) 
   });
   router.post('/conversations/:id/read', async (req, res) => {
     const sessionId = id.parse(req.params.id);
-    const { channelId } = await inboxScope(req.query.channelId);
+    const { channelId } = await inboxScope(req.query.channelId, res.locals.account);
     const { seenAt } = z.object({ seenAt: z.number().int().positive() }).parse(req.body);
     const source = await chatCache.read(`thread:${channelId}:${sessionId}:detail`, () => scopedConversation(sessionId, channelId));
     const account = req.session.accountId || 'manager';
@@ -484,7 +489,7 @@ export function apiRouter(db, flw, campaigns, config, inboxChannels, chatCache) 
       t.active && !t.archived && String(t.status).toUpperCase() === 'APPROVED');
   }
   router.get('/conversations/:id/templates', async (req, res) => {
-    const { channelId } = await inboxScope(req.query.channelId);
+    const { channelId } = await inboxScope(req.query.channelId, res.locals.account);
     await scopedConversation(id.parse(req.params.id), channelId);
     res.json(await conversationTemplates(channelId));
   });
@@ -497,7 +502,7 @@ export function apiRouter(db, flw, campaigns, config, inboxChannels, chatCache) 
         fileUrl: z.url().startsWith('https://').optional(), replyVersion: version }),
     ]).parse(req.body);
     const { replyVersion } = body;
-    const { channelId } = await inboxScope(req.query.channelId);
+    const { channelId } = await inboxScope(req.query.channelId, res.locals.account);
     const conversation = await scopedConversation(sessionId, channelId);
     const sessions = await threads.related(channelId, conversation);
     if (sessions[0].id !== sessionId) fail('Chegou uma continuação desta conversa. Atualize as mensagens antes de responder.', 409);

@@ -9,6 +9,7 @@ const staffRoles = { agent: 'Atendente', sender: 'Enviador', manager: 'Gerente' 
 const state = {
   configured: account.configured === 'true',
   users: [],
+  staffChannels: [],
   page: '',
   lists: [],
   contacts: [],
@@ -367,6 +368,7 @@ const pages = {
     const heading = `<div class="page-heading inbox-heading"><h1>Caixa de entrada</h1>
       ${button('Atualizar lista', 'conversation-refresh', 'refresh-cw', '')}</div>`;
     if (!channels.length) {
+      if (account.role === 'agent') return heading + `<div class="panel">${empty('WhatsApp indisponível', 'Peça ao gerente para vincular um número ativo ao seu login em Usuários.', '', 'smartphone')}</div>`;
       return heading + `<div class="panel">${empty('Nenhum canal WhatsApp disponível', 'Confira os canais associados ao token nas configurações da FLW.', '', 'inbox')}</div>`;
     }
     return heading + `
@@ -398,10 +400,18 @@ const pages = {
       </div>`;
   },
   async users() {
-    state.users = await api('/users');
+    const [users, channels] = await Promise.all([
+      api('/users'),
+      state.configured ? api('/users/channels').catch(() => null) : [],
+    ]);
+    state.users = users;
+    state.staffChannels = channels || [];
+    const channelNames = new Map(state.staffChannels.map(c => [c.id, staffChannelLabel(c)]));
     return pageHeading('Usuários', 'Gerencie o acesso da equipe ao painel.', button('Criar usuário', 'new-user', 'user-plus')) +
-      `<div class="panel table-wrap"><table><thead><tr><th>Usuário</th><th>Perfil</th><th>Acesso</th><th></th></tr></thead><tbody>${state.users.map(user => `<tr>
+      (channels === null ? '<p class="alert">Não foi possível carregar os números de WhatsApp. Atualize a página para tentar novamente.</p>' : '') +
+      `<div class="panel table-wrap"><table><thead><tr><th>Usuário</th><th>Perfil</th><th>WhatsApp de atendimento</th><th>Acesso</th><th></th></tr></thead><tbody>${state.users.map(user => `<tr>
         <td><strong>${escape(user.username)}</strong></td><td>${staffRoles[user.role]}</td>
+        <td>${user.role === 'agent' ? escape(user.channelId ? channelNames.get(user.channelId) || 'Número indisponível' : 'Aguardando vínculo') : '—'}</td>
         <td><span class="badge ${user.active ? 'green' : ''}">${user.active ? 'Ativo' : 'Desativado'}</span></td>
         <td>${user.role === 'manager' ? 'Conta do servidor' : `<button class="button ghost" data-action="edit-user" data-id="${escape(user.id)}" aria-label="Editar ${escape(user.username)}">${icon('pencil')}Editar</button>`}</td>
       </tr>`).join('')}</tbody></table></div>`;
@@ -602,6 +612,9 @@ async function splitListModal(list) {
     await renderPage(true);
   });
 }
+function staffChannelLabel(channel) {
+  return [channel.name, channel.number].filter(Boolean).join(' · ');
+}
 function staffModal(user) {
   const editing = Boolean(user);
   const staffRole = user?.role || 'agent';
@@ -611,11 +624,27 @@ function staffModal(user) {
       <label>Usuário<input name="username" autocomplete="off" required minlength="3" maxlength="80" pattern="[a-zA-Z0-9._\\-]{3,80}" value="${escape(user?.username || '')}" ${editing ? 'readonly' : 'autofocus'}></label>
       <label>${editing ? 'Nova senha (opcional)' : 'Senha'}<input name="password" type="password" autocomplete="new-password" minlength="10" maxlength="256" ${editing ? '' : 'required'} placeholder="Pelo menos 10 caracteres"></label>
       <label>Perfil<select name="role"><option value="agent" ${staffRole === 'agent' ? 'selected' : ''}>Atendente</option><option value="sender" ${staffRole === 'sender' ? 'selected' : ''}>Enviador</option></select></label>
-      <p class="field-hint">Atendentes leem e respondem conversas. Enviadores também organizam contatos e listas e usam templates aprovados para disparar campanhas.</p>
+      <div id="staff-channel-field"><label>WhatsApp de atendimento<select name="channelId">
+        <option value="">Selecione o número do atendente</option>
+        ${state.staffChannels.map(c => `<option value="${escape(c.id)}" ${c.id === user?.channelId ? 'selected' : ''}>${escape(staffChannelLabel(c))}</option>`).join('')}
+      </select></label><p class="field-hint">${state.staffChannels.length ? 'Este login atende e recebe notificações apenas deste número.' : 'Confira a integração FLW para disponibilizar um número de atendimento.'}</p></div>
       ${editing ? `<label class="check-label"><input type="checkbox" name="active" ${user.active ? 'checked' : ''}>Acesso ativo</label>` : ''}
     </div>`, formFooter(editing ? 'Salvar alterações' : 'Criar usuário'), false, 'staff-form');
+  const staffForm = $('#staff-form');
+  function updateChannelField() {
+    const assigned = staffForm.elements.role.value === 'agent';
+    const active = !editing || staffForm.elements.active.checked;
+    $('#staff-channel-field').hidden = !assigned;
+    staffForm.elements.channelId.disabled = !assigned || !active;
+    staffForm.elements.channelId.required = assigned && active;
+    if (assigned && !user?.channelId && state.staffChannels.length === 1) staffForm.elements.channelId.value = state.staffChannels[0].id;
+  }
+  staffForm.elements.role.addEventListener('change', updateChannelField);
+  staffForm.elements.active?.addEventListener('change', updateChannelField);
+  updateChannelField();
   bindForm('staff-form', async (form) => {
     const body = { role: form.get('role') };
+    if (form.get('channelId')) body.channelId = form.get('channelId');
     if (editing) body.active = form.has('active');
     else body.username = form.get('username');
     if (form.get('password')) body.password = form.get('password');

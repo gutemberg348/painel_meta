@@ -5,7 +5,7 @@ import { fixture, authenticate } from './helpers.js';
 import { applyProviderStatus } from '../src/services/campaigns.js';
 import { FlwClient } from '../src/services/flw.js';
 import { customerMessage, recordPushEvent } from '../src/services/incoming-push.js';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createECDH, randomBytes } from 'node:crypto';
 
 let f, agent, csrf;
 beforeEach(async () => {
@@ -64,7 +64,7 @@ test('push agrupa eventos recentes por aparelho e ignora eventos internos, lidos
 });
 
 test('gerente cadastra equipe, permissões protegem a API e alterações revogam a sessão', async () => {
-  const entry = { username: 'ana', password: 'senha-da-equipe', role: 'agent' };
+  const entry = { username: 'ana', password: 'senha-da-equipe', role: 'agent', channelId: f.channelId };
   const { body: { id } } = await post('/users', entry).expect(201);
   await post('/users', { ...entry, username: 'ANA' }).expect(409);
   await post('/users', { ...entry, username: 'admin' }).expect(409);
@@ -91,6 +91,38 @@ test('gerente cadastra equipe, permissões protegem a API e alterações revogam
   await staff.get('/api/conversations').expect(401);
 });
 
+test('atendente só atende e cadastra notificações no WhatsApp atribuído pelo gerente', async () => {
+  const [primary] = await f.flw.channels();
+  const other = { ...primary, id: randomUUID(), number: '5591888888899' };
+  f.flw.channels = async () => [primary, other];
+  const login = { username: 'bia', password: 'senha-da-equipe', role: 'agent' };
+  await post('/users', login).expect(400);
+  await post('/users', { ...login, channelId: randomUUID() }).expect(400);
+  const { body: { id } } = await post('/users', { ...login, channelId: primary.id }).expect(201);
+  const staff = request.agent(f.app);
+  const token = await authenticate(staff, login.username, login.password);
+  const inbox = (await staff.get('/api/conversations').expect(200)).body;
+  assert.deepEqual(inbox.channels.map(c => c.id), [primary.id]);
+  assert.equal(inbox.channelId, primary.id);
+  await staff.get('/api/users/channels').expect(403);
+  await staff.get('/api/conversations?channelId=' + other.id).expect(403);
+  await staff.get('/api/conversations/' + f.sessionId + '/messages?channelId=' + other.id).expect(403);
+  await staff.post('/api/conversations/' + f.sessionId + '/reply?channelId=' + other.id)
+    .set('x-csrf-token', token).send({ text: 'Oi' }).expect(403);
+  assert.deepEqual((await staff.get('/api/push').expect(200)).body.channels.map(c => c.id), [primary.id]);
+  const sub = { endpoint: 'https://fcm.googleapis.com/device', keys: {
+    auth: randomBytes(16).toString('base64url'), p256dh: createECDH('prime256v1').generateKeys().toString('base64url'),
+  } };
+  const subscribe = body => staff.put('/api/push').set('x-csrf-token', token).send(body);
+  await subscribe({ ...sub, channelId: other.id }).expect(400);
+  await subscribe(sub).expect(200);
+  assert.equal(f.db.prepare('SELECT channel FROM push_subscriptions WHERE account_id=?').get(id).channel, primary.id);
+  await agent.put('/api/users/' + id).set('x-csrf-token', csrf).send({ role: 'agent', active: true, channelId: other.id }).expect(200);
+  assert.equal(f.db.prepare('SELECT 1 FROM push_subscriptions WHERE account_id=?').get(id), undefined);
+  await staff.get('/api/conversations').expect(401);
+  await authenticate(staff, login.username, login.password);
+  assert.equal((await staff.get('/api/conversations').expect(200)).body.channelId, other.id);
+});
 test('leituras simultâneas compartilham resultado e uma resposta invalida o histórico', async () => {
   const messages = f.flw.messages;
   let reads = 0;
