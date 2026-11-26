@@ -85,12 +85,13 @@ export class FlwClient {
   messageStatus(id) {
     return this.request(`/v1/send/message/${encodeURIComponent(id)}`);
   }
-  sessions(channelId, after, page = 1) {
+  sessions(channelId, after, page = 1, contactId) {
     return this.request('/v2/session', {
       query: {
         PageNumber: page,
         PageSize: 20,
         ChannelsId: channelId,
+        ContactId: contactId,
         'LastInteractionAt.After': after,
         IncludeDetails: 'ContactDetails',
         OrderBy: 'LastInteractionAt',

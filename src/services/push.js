@@ -39,18 +39,25 @@ function signingKeys(db) {
   return JSON.parse(row.value);
 }
 
-export function pushRouter(db, config) {
+export function pushRouter(db, config, inboxChannels) {
   const router = Router();
-  router.get('/', (req, res) => res.json({ publicKey: pushAvailable(config) ? signingKeys(db).publicKey : null }));
-  router.put('/', rateLimit({ windowMs: 60000, limit: 40 }), (req, res) => {
+  router.get('/', async (req, res) => {
+    if (!pushAvailable(config)) return res.json({ publicKey: null, channels: [] });
+    const channels = (await inboxChannels()).map(c => ({ id: c.id, name: c.identity?.displayName || c.name || 'WhatsApp', number: c.numberFormatted || c.number || '' }));
+    res.json({ publicKey: signingKeys(db).publicKey, channels });
+  });
+  router.put('/', rateLimit({ windowMs: 60000, limit: 40 }), async (req, res) => {
     if (!pushAvailable(config)) return res.status(503).json({ error: 'Conecte a conta FLW para receber avisos de mensagens.' });
     const sub = subscription.parse(req.body);
     const account = req.session.accountId || 'manager';
+    const channels = await inboxChannels();
+    const channel = channels.length === 1 ? channels[0] : channels.find(c => c.id === req.body.channelId);
+    if (!channel) return res.status(400).json({ error: 'Selecione o WhatsApp que deseja acompanhar.' });
     db.transaction(() => {
-      db.prepare('DELETE FROM push_subscriptions WHERE endpoint=? AND account_id<>?').run(sub.endpoint, account);
-      db.prepare(`INSERT INTO push_subscriptions(endpoint,keys_json,account_id,sid,subscribed_at) VALUES (?,?,?,?,?)
+      db.prepare('DELETE FROM push_subscriptions WHERE endpoint=? AND (account_id<>? OR channel IS NOT ?)').run(sub.endpoint, account, channel.id);
+      db.prepare(`INSERT INTO push_subscriptions(endpoint,keys_json,account_id,sid,subscribed_at,channel) VALUES (?,?,?,?,?,?)
         ON CONFLICT(endpoint) DO UPDATE SET keys_json=excluded.keys_json, sid=excluded.sid`)
-        .run(sub.endpoint, JSON.stringify(sub.keys), account, req.sessionID, Date.now());
+        .run(sub.endpoint, JSON.stringify(sub.keys), account, req.sessionID, Date.now(), channel.id);
     })();
     res.json({ ok: true });
   });
@@ -65,21 +72,24 @@ export function pushRouter(db, config) {
 export function startPushWorker(db, config) {
   let busy = false;
   async function deliver(row) {
+    // Uma tentativa sem confirmação pode já ter chegado ao telefone.
+    const claim = db.prepare('DELETE FROM push_deliveries WHERE endpoint=? AND event_id=?').run(row.endpoint, row.event_id);
+    if (!claim.changes) return;
     try {
       await sendNotification({ endpoint: row.endpoint, keys: JSON.parse(row.keys_json) }, row.event_id, {
-        vapidDetails: { subject: config.publicUrl || 'https://totalk.testes-techcode.shop', ...signingKeys(db) }, TTL: 3600, timeout: 8000,
+        vapidDetails: { subject: config.publicUrl || 'https://totalk.testes-techcode.shop', ...signingKeys(db) },
+        topic: 'vieira-link-inbox', TTL: Math.max(0, Math.floor((row.expires_at - Date.now()) / 1000)), timeout: 8000,
       });
-      db.prepare('DELETE FROM push_deliveries WHERE endpoint=? AND event_id=?').run(row.endpoint, row.event_id);
     } catch (error) {
       if ([404, 410].includes(error.statusCode)) {
         db.prepare('DELETE FROM push_subscriptions WHERE endpoint=? AND keys_json=?').run(row.endpoint, row.keys_json);
       } else {
         const delay = Math.min(300000, 10000 * 2 ** Math.min(row.attempts, 5));
-        if (row.attempts >= 10) {
-          db.prepare('DELETE FROM push_deliveries WHERE endpoint=? AND event_id=?').run(row.endpoint, row.event_id);
-        } else {
-          db.prepare('UPDATE push_deliveries SET attempts=attempts+1, next_attempt=? WHERE endpoint=? AND event_id=?')
-            .run(Date.now() + delay, row.endpoint, row.event_id);
+        if ((error.statusCode === 429 || error.statusCode >= 500) && Date.now() + delay < row.expires_at) {
+          db.prepare(`INSERT OR IGNORE INTO push_deliveries(endpoint,event_id,next_attempt,attempts,expires_at,channel,session_id,message_time)
+            SELECT endpoint,?,?,?,?,?,?,? FROM push_subscriptions WHERE endpoint=? AND keys_json=? AND channel=? AND subscribed_at<=?`)
+            .run(row.event_id, Date.now() + delay, row.attempts + 1, row.expires_at, row.channel, row.session_id, row.message_time,
+              row.endpoint, row.keys_json, row.channel, row.message_time);
         }
         console.warn('Falha na entrega de push. Código:', error.statusCode || 'rede');
       }
@@ -89,6 +99,7 @@ export function startPushWorker(db, config) {
     if (busy || !pushAvailable(config)) return;
     busy = true;
     try {
+      db.prepare('DELETE FROM push_deliveries WHERE expires_at<=?').run(Date.now());
       const due = db.prepare(`SELECT d.*, s.keys_json FROM push_deliveries d JOIN push_subscriptions s USING(endpoint)
         WHERE d.next_attempt<=? ORDER BY d.next_attempt, d.rowid LIMIT 16`).all(Date.now());
       await Promise.all(due.map(deliver));

@@ -227,11 +227,13 @@ Não é preciso webhook para ler respostas: a caixa de entrada consulta a API di
 
 O aplicativo usa o mesmo endereço HTTPS do painel. Depois do login, toque em **Ativar notificações** no topo do painel. Fechar o convite dispensa o aviso nessa visita. As opções também ficam em **Aplicativo e notificações** no menu. No Android, toque em **Instalar aplicativo**. No iPhone com iOS 16.4 ou superior, abra o painel no Safari, toque em **Compartilhar → Adicionar à Tela de Início** e entre pelo ícone Vieira Link. Toque em **Ativar notificações** e confirme **Permitir**. Cada aparelho tem sua própria preferência.
 
-Com o token FLW configurado e pelo menos um aparelho inscrito, a VPS verifica as conversas com atividade recente a cada 20 segundos. Cada mensagem recebida de um cliente gera um aviso para os aparelhos inscritos no momento da mensagem, mesmo com o app fechado. Mensagens enviadas pela equipe ficam fora dos avisos. O painel guarda no SQLite as inscrições, as chaves de assinatura e os avisos pendentes. Depois de uma interrupção, a consulta recupera até uma hora de atividade recente.
+Com o token FLW configurado e um aparelho inscrito, a VPS procura mensagens novas de clientes a cada 20 segundos. Cada aparelho acompanha um canal WhatsApp. Os avisos pendentes são agrupados e expiram em 90 segundos. Ao reiniciar, o monitor acompanha as mensagens que chegarem a partir desse momento.
 
 O webhook é opcional. Se já houver uma assinatura de **MESSAGE_RECEIVED** na FLW apontando para o painel, ela pode antecipar o aviso. O identificador da mensagem evita que a consulta e o webhook gerem dois avisos para o mesmo aparelho.
 
-O aviso abre a caixa de entrada e exibe apenas que chegou uma mensagem. Com `FLW_INBOX_CHANNEL_ID` preenchido, os avisos acompanham esse canal. Com o campo vazio, os canais WhatsApp disponíveis para o token podem gerar avisos. Para parar em um aparelho, escolha **Desativar notificações**. Sair da conta pelo menu também encerra o recebimento nesse aparelho.
+O aviso abre a caixa de entrada e exibe apenas que chegou uma mensagem. Se o token tiver vários canais disponíveis no painel, escolha o número ao ativar as notificações. Para parar em um aparelho, escolha **Desativar notificações**. Sair da conta pelo menu também encerra o recebimento nesse aparelho.
+
+A caixa de entrada reúne as sessões do mesmo contato no mesmo canal e usa a sessão mais recente para responder. A leitura é registrada por usuário do painel quando as últimas mensagens estão visíveis na conversa. A lista e o chat se atualizam ao receber um evento e também consultam as novidades a cada cinco segundos enquanto a caixa estiver aberta.
 
 ## Testar
 

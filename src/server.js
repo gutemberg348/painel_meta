@@ -6,15 +6,17 @@ import { createApp } from './app.js';
 import { startPushWorker } from './services/push.js';
 import { startIncomingMonitor } from './services/incoming-push.js';
 import { createInboxChannels } from './services/inbox-channels.js';
+import { ChatCache } from './services/chat-cache.js';
 
 const config = loadConfig();
 const db = openDatabase(config.databasePath);
 const flw = new FlwClient(config);
 const campaigns = new CampaignService(db, flw, config);
 const inboxChannels = createInboxChannels(flw, config);
-const app = createApp({ config, db, flw, campaigns, inboxChannels });
+const chatCache = new ChatCache();
+const app = createApp({ config, db, flw, campaigns, inboxChannels, chatCache });
 const push = startPushWorker(db, config);
-const incoming = startIncomingMonitor(db, flw, inboxChannels, config);
+const incoming = startIncomingMonitor(db, flw, inboxChannels, config, channel => chatCache.inboxChanged(channel));
 const server = app.listen(config.port, config.host, () => {
   console.log(`Totalk Studio disponível em http://${config.host}:${config.port}`);
   console.log(

@@ -25,12 +25,18 @@
     const installButton = document.querySelector('#device-install');
     const help = document.querySelector('#install-help');
     const status = document.querySelector('#device-status');
+    const channelField = document.querySelector('#push-channel-field');
+    const channelSelect = document.querySelector('#push-channel');
     const preferenceKey = 'vieira-push:' + card.dataset.user;
     let reg;
     let supported = window.isSecureContext && 'serviceWorker' in navigator && 'Notification' in window &&
       ('PushManager' in window || 'pushManager' in (window.ServiceWorkerRegistration?.prototype || {}));
     const iosInstall = appleMobile && !installed;
     let publicKey;
+    let channels = [];
+    function subscriptionBody(sub) {
+      return { ...sub.toJSON(), channelId: channels.length === 1 ? channels[0].id : channelSelect.value };
+    }
     let serverKeyBytes;
     let active = false;
     let busy = false;
@@ -41,7 +47,8 @@
     function render() {
       installButton.hidden = installed;
       pushButton.hidden = true;
-      pushButton.disabled = busy || loading;
+      pushButton.disabled = busy || loading || (!active && channels.length > 1 && !channelSelect.value);
+      channelField.hidden = channels.length < 2 || active || iosInstall;
       if (!window.isSecureContext) status.textContent = 'Abra o painel por HTTPS para instalar e receber avisos.';
       else if (iosInstall) status.textContent = 'Adicione o app à Tela de Início e abra pelo ícone para ativar os avisos.';
       else if (!supported) status.textContent = 'Este navegador não oferece notificações push para o painel.';
@@ -51,6 +58,7 @@
         status.textContent = 'Preparando as notificações neste aparelho…';
       }
       else if (!publicKey) status.textContent = 'Peça ao gerente para conectar a conta FLW do painel.';
+      else if (!channels.length) status.textContent = 'Conecte um canal WhatsApp ao painel para receber avisos.';
       else if (Notification.permission === 'denied') status.textContent = 'Para receber avisos, permita as notificações nas configurações deste app ou site.';
       else {
         status.textContent = active ? 'Notificações de novas mensagens ativadas neste aparelho.' :
@@ -106,9 +114,10 @@
               sub = null;
             }
             sub ||= await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: serverKeyBytes });
-            await api('/push', { method: 'PUT', body: sub.toJSON() });
+            await api('/push', { method: 'PUT', body: subscriptionBody(sub) });
             active = true;
             localStorage.setItem(preferenceKey, 'on');
+            localStorage.setItem(preferenceKey + ':channel', subscriptionBody(sub).channelId);
             if (automatic) {
               card.hidden = true;
               toast('Notificações ativadas neste aparelho.');
@@ -141,12 +150,15 @@
       reg = await registration;
       supported = Boolean(reg && 'pushManager' in reg && 'Notification' in window);
       if (supported && !iosInstall) {
-        ({ publicKey } = await api('/push'));
+        ({ publicKey, channels = [] } = await api('/push'));
+        for (const channel of channels) channelSelect.add(new Option([channel.name, channel.number].filter(Boolean).join(' · '), channel.id));
+        channelSelect.value = localStorage.getItem(preferenceKey + ':channel') || document.body.dataset.inboxChannel || '';
+        channelSelect.addEventListener('change', render);
         if (publicKey) serverKeyBytes = Uint8Array.from(atob(publicKey.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
         if (publicKey && Notification.permission === 'granted' && localStorage.getItem(preferenceKey) === 'on') {
           const sub = await reg.pushManager.getSubscription();
-          if (sub && sameServerKey(sub)) {
-            await api('/push', { method: 'PUT', body: sub.toJSON() });
+          if (sub && sameServerKey(sub) && (channels.length === 1 || channelSelect.value)) {
+            await api('/push', { method: 'PUT', body: subscriptionBody(sub) });
             active = true;
           }
         }

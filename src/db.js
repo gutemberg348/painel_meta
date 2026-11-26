@@ -57,6 +57,15 @@ export function openDatabase(path) {
       PRIMARY KEY(endpoint, event_id)
     );
     CREATE INDEX IF NOT EXISTS push_due ON push_deliveries(next_attempt);
+    CREATE TABLE IF NOT EXISTS inbox_sessions (
+      channel TEXT NOT NULL, id TEXT NOT NULL, peer TEXT NOT NULL, activity INTEGER NOT NULL,
+      PRIMARY KEY(channel,id)
+    );
+    CREATE INDEX IF NOT EXISTS inbox_peer ON inbox_sessions(channel,peer,activity DESC);
+    CREATE TABLE IF NOT EXISTS inbox_reads (
+      account TEXT NOT NULL, channel TEXT NOT NULL, peer TEXT NOT NULL, seen_at INTEGER NOT NULL,
+      PRIMARY KEY(account,channel,peer)
+    );
     CREATE INDEX IF NOT EXISTS deliveries_campaign ON deliveries(campaign_id);
     CREATE INDEX IF NOT EXISTS deliveries_status ON deliveries(status);
   `);
@@ -69,6 +78,18 @@ export function openDatabase(path) {
         UPDATE push_subscriptions SET pending_event=NULL WHERE pending_event IS NOT NULL`);
     }
   })();
+  if (!db.pragma('table_info(push_deliveries)').some(column => column.name === 'expires_at')) {
+    db.transaction(() => {
+      // Os avisos da fila antiga não têm origem ou validade verificáveis.
+      db.exec('ALTER TABLE push_deliveries ADD COLUMN expires_at INTEGER NOT NULL DEFAULT 0');
+      db.exec('ALTER TABLE push_deliveries ADD COLUMN channel TEXT');
+      db.exec('ALTER TABLE push_deliveries ADD COLUMN session_id TEXT');
+      db.exec('ALTER TABLE push_deliveries ADD COLUMN message_time INTEGER');
+      db.exec('ALTER TABLE push_subscriptions ADD COLUMN channel TEXT');
+      db.exec('DELETE FROM push_deliveries WHERE expires_at=0');
+      db.exec('CREATE UNIQUE INDEX push_device_pending ON push_deliveries(endpoint)');
+    })();
+  }
   // Não repetir automaticamente uma requisição cujo resultado ficou desconhecido.
   db.prepare(
     "UPDATE deliveries SET status='unknown', error='Servidor reiniciado durante o envio. Confira na FLW antes de reenviar.' WHERE status='sending'",

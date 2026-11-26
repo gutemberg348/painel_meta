@@ -3,7 +3,7 @@ import { createHmac, randomBytes, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { audienceSchema, parseAudience, requireValidAudience, saveAudience } from '../services/audience.js';
 import { now } from '../services/campaigns.js';
-import { ChatCache } from '../services/chat-cache.js';
+import { createInboxThreads, peerKey } from '../services/inbox-threads.js';
 import { planDivision, partName } from '../../public/js/list-division.js';
 
 const name = z.string().trim().min(1, 'Informe um nome.').max(120);
@@ -48,14 +48,12 @@ function required(db, table, value) {
   return row;
 }
 
-export function apiRouter(db, flw, campaigns, config, inboxChannels) {
+export function apiRouter(db, flw, campaigns, config, inboxChannels, chatCache) {
   const router = Router();
-  const chatCache = new ChatCache();
+  const threads = createInboxThreads(db, flw, chatCache);
   const lastReplies = new Map();
   const activeReplies = new Set();
   const revisionSecret = randomBytes(32);
-  const revision = (key) => createHmac('sha256', revisionSecret)
-    .update(`${key}:${Math.floor(Date.now() / 30000)}:${lastReplies.get(key) || '0'}`).digest('base64url');
   async function inboxScope(requestedId) {
     const rawId = requestedId === undefined ? undefined : id.parse(requestedId).toLowerCase();
     const channels = await inboxChannels();
@@ -427,26 +425,58 @@ export function apiRouter(db, flw, campaigns, config, inboxChannels) {
       })),
     };
     if (!channelId) return res.json({ ...scope, items: [], hasMorePages: false });
-    const after = new Date(Date.now() - days * 86400000).toISOString();
-    const data = await chatCache.read(`list:${channelId}:${days}:${page}`, () => flw.sessions(channelId, after, page));
-    const items = (data.items || []).filter((item) => item.channelId?.toLowerCase() === channelId.toLowerCase());
-    res.json({ ...scope, items, hasMorePages: Boolean(data.hasMorePages || data.totalPages > page) });
+    res.json({ ...scope, ...await threads.list(channelId, days, page, req.session.accountId || 'manager') });
+  });
+  router.get('/conversations/events', async (req, res) => {
+    const { channelId } = await inboxScope(req.query.channelId);
+    if (!channelId) fail('Selecione um canal WhatsApp.');
+    res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store', 'X-Accel-Buffering': 'no' });
+    res.write(': conectado\n\n');
+    const notify = channel => { if (channel === channelId) res.write('data: atualizar\n\n'); };
+    chatCache.listeners.add(notify);
+    // Reconectar periodicamente revalida a sessão e o acesso ao canal.
+    const timeout = setTimeout(() => res.end(), 55000);
+    res.on('close', () => { clearTimeout(timeout); chatCache.listeners.delete(notify); });
   });
   router.get('/conversations/:id/messages', async (req, res) => {
     const sessionId = id.parse(req.params.id);
     const page = pageNumber(req.query.page);
     const { channelId } = await inboxScope(req.query.channelId);
     if (!channelId) fail('Selecione um canal WhatsApp antes de abrir a conversa.');
-    const key = `thread:${channelId}:${sessionId}:`;
-    const versionAtRead = lastReplies.get(key) || '0';
-    const version = revision(key);
-    if (page === 1 && req.query.since === version) return res.json({ unchanged: true });
-    const data = await chatCache.read(key + page, async () => {
-      const conversation = await scopedConversation(sessionId, channelId);
-      const messages = await flw.messages(sessionId, page);
-      return { ...messages, windowStatus: conversation.windowStatus };
-    });
-    res.json({ ...data, revision: version, replyVersion: versionAtRead });
+    const detail = id => chatCache.read(`thread:${channelId}:${id}:detail`, () => scopedConversation(id, channelId));
+    const source = await detail(sessionId);
+    const sessions = await threads.related(channelId, source);
+    const latest = await detail(sessions[0].id);
+    const replyVersion = lastReplies.get(`thread:${channelId}:${latest.id}:`) || '0';
+    const messages = await threads.history(channelId, sessions, page);
+    const visibleMessages = messages.items || [];
+    const lastMessage = visibleMessages.reduce((last, message) =>
+      !last || Date.parse(message.createdAt) > Date.parse(last.createdAt) ? message : last, null);
+    let seenAt = Math.max(0, ...visibleMessages.map(message => Math.max(Date.parse(message.createdAt) || 0, Date.parse(message.timestamp) || 0)));
+    if (page === 1 && lastMessage?.direction === 'FROM_HUB' && lastMessage.text && lastMessage.text === latest.lastMessageText) {
+      seenAt = Math.max(seenAt, Date.parse(latest.lastMessageIn) || 0);
+    }
+    const data = { ...messages, seenAt, sessionId: latest.id, windowStatus: latest.windowStatus, replyVersion };
+    const revision = createHmac('sha256', revisionSecret).update(JSON.stringify(data)).digest('base64url');
+    if (page === 1 && req.query.since === revision) return res.json({ unchanged: true });
+    res.json({ ...data, revision });
+  });
+  router.post('/conversations/:id/read', async (req, res) => {
+    const sessionId = id.parse(req.params.id);
+    const { channelId } = await inboxScope(req.query.channelId);
+    const { seenAt } = z.object({ seenAt: z.number().int().positive() }).parse(req.body);
+    const source = await chatCache.read(`thread:${channelId}:${sessionId}:detail`, () => scopedConversation(sessionId, channelId));
+    const account = req.session.accountId || 'manager';
+    const peer = peerKey(source);
+    const until = Math.min(seenAt, Date.now());
+    db.transaction(() => {
+      db.prepare(`INSERT INTO inbox_reads VALUES (?,?,?,?) ON CONFLICT(account,channel,peer)
+        DO UPDATE SET seen_at=MAX(seen_at,excluded.seen_at)`).run(account, channelId, peer, until);
+      db.prepare(`DELETE FROM push_deliveries WHERE channel=? AND message_time<=? AND session_id IN
+        (SELECT id FROM inbox_sessions WHERE channel=? AND peer=?) AND endpoint IN
+        (SELECT endpoint FROM push_subscriptions WHERE account_id=?)`).run(channelId, until, channelId, peer, account);
+    })();
+    res.json({ seenAt: until });
   });
   async function conversationTemplates(channelId) {
     const templates = await flw.templates(channelId);
@@ -469,6 +499,8 @@ export function apiRouter(db, flw, campaigns, config, inboxChannels) {
     const { replyVersion } = body;
     const { channelId } = await inboxScope(req.query.channelId);
     const conversation = await scopedConversation(sessionId, channelId);
+    const sessions = await threads.related(channelId, conversation);
+    if (sessions[0].id !== sessionId) fail('Chegou uma continuação desta conversa. Atualize as mensagens antes de responder.', 409);
     if ('text' in body && conversation.windowStatus !== 'ACTIVE')
       fail('A janela de atendimento está fechada. Inicie uma nova conversa com um template aprovado.');
     let templateMessage;

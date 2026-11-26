@@ -10,11 +10,14 @@ self.addEventListener('fetch', event => {
   event.respondWith(fetch(event.request).catch(() => caches.match('/offline.html')));
 });
 self.addEventListener('push', event => {
-  event.waitUntil(self.registration.showNotification('Vieira Link', {
+  event.waitUntil(Promise.all([self.registration.showNotification('Vieira Link', {
     body: 'Nova mensagem de cliente. Toque para abrir a caixa de entrada.',
     icon: '/icons/vieira-192.png',
-    tag: event.data?.text() || 'vieira-link-inbox',
-  }));
+    tag: 'vieira-link-inbox',
+    renotify: false,
+  }), self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windows => {
+    for (const panel of windows) panel.postMessage({ type: 'inbox-changed' });
+  })]));
 });
 self.addEventListener('notificationclick', event => {
   event.notification.close();

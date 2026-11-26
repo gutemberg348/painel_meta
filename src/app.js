@@ -13,7 +13,8 @@ import { verifyPassword, roleNames, landingPage, canUseApi } from './services/us
 import { applyProviderStatus, now } from './services/campaigns.js';
 import { createInboxChannels } from './services/inbox-channels.js';
 import { pushAvailable, pushRouter } from './services/push.js';
-import { incomingEventId, recordPushEvent } from './services/incoming-push.js';
+import { incomingEventId, recordPushEvent, customerMessage } from './services/incoming-push.js';
+import { ChatCache } from './services/chat-cache.js';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const equal = (a, b) =>
@@ -26,7 +27,7 @@ const equal = (a, b) =>
       .digest(),
   );
 
-export function createApp({ config, db, flw, campaigns, inboxChannels = createInboxChannels(flw, config) }) {
+export function createApp({ config, db, flw, campaigns, inboxChannels = createInboxChannels(flw, config), chatCache = new ChatCache() }) {
   const app = express();
   app.disable('x-powered-by');
   if (config.trustProxy) app.set('trust proxy', 1);
@@ -70,15 +71,18 @@ export function createApp({ config, db, flw, campaigns, inboxChannels = createIn
       const received = body.eventType === 'MESSAGE_RECEIVED';
       const eventId = received && typeof content.id === 'string' ? incomingEventId(content.id)
         : createHash('sha256').update(JSON.stringify(body)).digest('hex');
-      let notify = false;
-      if (received && pushAvailable(config) && db.prepare('SELECT 1 FROM push_subscriptions LIMIT 1').get()
+      let notifyChannel;
+      if (received && customerMessage(content) && pushAvailable(config)
           && !db.prepare('SELECT 1 FROM webhook_events WHERE id=?').get(eventId)) {
         const channelId = content.channelId || (typeof content.sessionId === 'string' && (await flw.session(content.sessionId)).channelId);
-        notify = typeof channelId === 'string' && (await inboxChannels()).some(c => c.id.toLowerCase() === channelId.toLowerCase());
+        if (typeof channelId === 'string') notifyChannel = (await inboxChannels()).find(c => c.id.toLowerCase() === channelId.toLowerCase());
       }
       // A consulta periódica ainda pode confirmar um evento de canal desconhecido.
-      if (!received || notify) recordPushEvent(db, eventId, String(body.eventType || 'SEND_CALLBACK').slice(0, 100),
-        notify ? Date.parse(content.createdAt || body.date) || Date.now() : null);
+      if (!received) recordPushEvent(db, eventId, String(body.eventType || 'SEND_CALLBACK').slice(0, 100), null);
+      const messageTime = Date.parse(content.timestamp || content.createdAt);
+      if (notifyChannel && Number.isFinite(messageTime) && recordPushEvent(db, eventId, 'MESSAGE_RECEIVED', messageTime, notifyChannel.id, content.sessionId || null)) {
+        chatCache.inboxChanged(notifyChannel.id);
+      }
       db.prepare("INSERT OR REPLACE INTO metadata VALUES ('lastWebhook',?)").run(now());
       res.json({ received: true });
     },
@@ -168,8 +172,8 @@ export function createApp({ config, db, flw, campaigns, inboxChannels = createIn
     res.status(403).json({ error: 'Seu perfil não tem acesso a esta operação.' });
   });
   app.use('/api/users', usersRouter(db, config));
-  app.use('/api/push', pushRouter(db, config));
-  app.use('/api', apiRouter(db, flw, campaigns, config, inboxChannels));
+  app.use('/api/push', pushRouter(db, config, inboxChannels));
+  app.use('/api', apiRouter(db, flw, campaigns, config, inboxChannels, chatCache));
   app.get('/', (req, res) => {
     const { username, role } = res.locals.account;
     res.render('index', { username, role, roleName: roleNames[role], homePage: landingPage[role],

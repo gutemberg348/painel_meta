@@ -352,15 +352,13 @@ const pages = {
         pageHeading('Caixa de entrada', 'Acompanhe suas conversas e continue de onde parou.') +
         connectionBanner()
       );
-    const query = new URLSearchParams({
-      page: state.conversationPage,
-      days: state.conversationDays,
-    });
-    if (state.conversationChannel) query.set('channelId', state.conversationChannel);
-    const data = await api(`/conversations?${query}`);
+    const data = await inboxPage();
     if (current !== navigation) return;
     state.conversationChannel = data.channelId;
+    watchInbox(data.channelId);
     state.conversations = data.items || [];
+    if (state.selectedConversation?.peerKey) state.selectedConversation =
+      state.conversations.find(c => c.peerKey === state.selectedConversation.peerKey) || state.selectedConversation;
     const channels = data.channels || [];
     const channelLabel = (channel) => escape([channel.name, channel.number].filter(Boolean).join(' · '));
     const channelField = channels.length === 1
@@ -706,7 +704,24 @@ async function campaignDetails(id) {
 
 const replyDrafts = new Map();
 const pendingReplies = new Set();
-const draftKey = (id) => state.conversationChannel + '/' + id;
+const draftKey = (id) => {
+  const row = state.conversations.find(c => c.id === id) || (state.selectedConversation?.id === id ? state.selectedConversation : null);
+  return state.conversationChannel + '/' + (row?.peerKey || id);
+};
+function inboxPage() {
+  const query = new URLSearchParams({ page: state.conversationPage, days: state.conversationDays });
+  if (state.conversationChannel) query.set('channelId', state.conversationChannel);
+  return api(`/conversations?${query}`);
+}
+function updateInboxRows() {
+  const list = $('#conversation-items');
+  if (!list) return;
+  list.innerHTML = conversationItems();
+  const badge = $('.inbox-segments [data-mode="unread"] b');
+  if (badge) badge.textContent = number(state.conversations.filter(c => c.unreadCount > 0).length);
+  if (!state.selectedConversation) $('#conversation-thread').innerHTML = idleThread();
+  icons();
+}
 
 function visibleConversations() {
   const query = state.conversationSearch.trim().toLocaleLowerCase('pt-BR');
@@ -752,15 +767,56 @@ function conversationItems() {
 let conversationRequest = 0;
 let syncVisibleThread;
 let threadSyncBusy = false;
-setInterval(async () => {
-  if (!syncVisibleThread || threadSyncBusy || document.hidden || modal.open) return;
+let inboxRetryAt = 0;
+let inboxWakePending = false;
+let inboxEvents;
+function watchInbox(channel) {
+  const url = channel && new URL('/api/conversations/events?channelId=' + encodeURIComponent(channel), location.origin).href;
+  if (url && inboxEvents?.url === url) return;
+  inboxEvents?.close();
+  inboxEvents = null;
+  if (url && 'EventSource' in window && !document.hidden) {
+    inboxEvents = new EventSource(url);
+    inboxEvents.onmessage = syncInbox;
+  }
+}
+async function syncInbox() {
+  if (state.page !== 'conversations' || !state.conversationChannel || !$('#conversation-items') || document.hidden || modal.open || Date.now() < inboxRetryAt) return;
+  if (threadSyncBusy) { inboxWakePending = true; return; }
   threadSyncBusy = true;
+  const current = navigation;
   try {
-    await syncVisibleThread();
+    const data = await inboxPage();
+    if (current !== navigation || !$('#conversation-items') || data.channelId !== state.conversationChannel) return;
+    const next = data.items || [];
+    const changed = JSON.stringify(next) !== JSON.stringify(state.conversations);
+    state.conversations = next;
+    const selected = state.selectedConversation;
+    const latest = selected && next.find(c => c.peerKey === selected.peerKey);
+    if (latest && latest.id !== selected.id && !pendingReplies.size) {
+      await openConversation(latest.id, false);
+    } else if (syncVisibleThread) {
+      await syncVisibleThread();
+    }
+    if (current !== navigation || !$('#conversation-items')) return;
+    if (changed) updateInboxRows();
+    const nextButton = $('[data-action="conversation-next"]');
+    if (nextButton) nextButton.disabled = !data.hasMorePages;
+  } catch {
+    inboxRetryAt = Date.now() + 15000;
   } finally {
     threadSyncBusy = false;
+    if (inboxWakePending) { inboxWakePending = false; void syncInbox(); }
   }
-}, 5000);
+}
+setInterval(syncInbox, 5000);
+document.addEventListener('visibilitychange', () => {
+  watchInbox(!document.hidden && state.page === 'conversations' && state.conversationChannel);
+  if (!document.hidden) void syncInbox();
+});
+navigator.serviceWorker?.addEventListener('message', event => {
+  if (event.data?.type === 'inbox-changed') void syncInbox();
+});
 function conversationPath(id, route, page) {
   const query = new URLSearchParams({ channelId: state.conversationChannel });
   if (page) query.set('page', page);
@@ -819,28 +875,60 @@ async function openConversation(id, reset = true) {
     let historyPage = 1;
     let revision = data.revision;
     let seenReply = data.replyVersion;
+    let replySession = data.sessionId || id;
+    let displayedAt = data.seenAt;
+    let markedAt = 0;
+    let marking = false;
+    async function markVisible() {
+      if (marking || !displayedAt || displayedAt <= markedAt || document.hidden || modal.open ||
+          !history.isConnected || request !== conversationRequest || !scrollArea.getClientRects().length ||
+          scrollArea.scrollHeight - scrollArea.clientHeight - scrollArea.scrollTop > 64) return;
+      marking = true;
+      const until = displayedAt;
+      try {
+        const result = await api(conversationPath(id, 'read'), { method: 'POST', body: { seenAt: until } });
+        markedAt = result.seenAt;
+        if (request !== conversationRequest || !history.isConnected) return;
+        const row = state.conversations.find(c => c.peerKey === conversation.peerKey);
+        if (row && row.incomingAt <= markedAt && row.unreadCount) {
+          row.unreadCount = 0;
+          updateInboxRows();
+        }
+      } catch {
+        // A próxima sincronização confirma a leitura se a conexão voltar.
+      } finally {
+        marking = false;
+      }
+    }
+    scrollArea.addEventListener('scroll', markVisible, { passive: true });
+    void markVisible();
     $('#thread-template', thread)?.addEventListener('click', () => {
-      openThreadTemplate(name, conversationPath(id, 'templates'), conversationPath(id, 'reply'), seenReply,
+      openThreadTemplate(name, conversationPath(replySession, 'templates'), conversationPath(replySession, 'reply'), seenReply,
         () => history.isConnected && openConversation(id, false));
     });
     let retryAt = 0;
     syncVisibleThread = async () => {
-      if (!history.isConnected || historyPage !== 1 || older.disabled || pendingReplies.has(key) || Date.now() < retryAt) return;
+      if (!history.isConnected || older.disabled || pendingReplies.has(key) || Date.now() < retryAt) return;
       try {
         const fresh = await api(conversationPath(id, 'messages', 1) + '&since=' + encodeURIComponent(revision));
-        if (!history.isConnected || older.disabled || historyPage !== 1 || request !== conversationRequest || fresh.unchanged) return;
+        if (!history.isConnected || older.disabled || request !== conversationRequest) return;
+        if (fresh.unchanged) { void markVisible(); return; }
         revision = fresh.revision;
         seenReply = fresh.replyVersion;
+        replySession = fresh.sessionId || id;
+        displayedAt = fresh.seenAt;
         if (fresh.windowStatus !== data.windowStatus) {
           await openConversation(id, false);
           return;
         }
-        older.hidden = !fresh.hasMorePages;
-        if (JSON.stringify(loaded) === JSON.stringify(fresh.items)) return;
+        if (historyPage === 1) older.hidden = !fresh.hasMorePages;
+        if (JSON.stringify(loaded) === JSON.stringify(fresh.items)) { void markVisible(); return; }
         const follow = scrollArea.scrollHeight - scrollArea.clientHeight - scrollArea.scrollTop < 64;
-        loaded = fresh.items || [];
+        loaded = historyPage === 1 ? fresh.items || [] :
+          [...new Map([...loaded, ...(fresh.items || [])].map(m => [m.id, m])).values()];
         history.innerHTML = messageItems({ items: loaded });
         if (follow) scrollArea.scrollTop = scrollArea.scrollHeight;
+        void markVisible();
       } catch (error) {
         retryAt = Date.now() + 30000;
         if (history.isConnected) toast(error.message, true);
@@ -901,7 +989,7 @@ async function openConversation(id, reset = true) {
       field.readOnly = true;
       $('span', submit).textContent = 'Enviando…';
       try {
-        const result = await api(conversationPath(id, 'reply'), { method: 'POST', body: { text, replyVersion: seenReply } });
+        const result = await api(conversationPath(replySession, 'reply'), { method: 'POST', body: { text, replyVersion: seenReply } });
         replyDrafts.delete(key);
         toast(
           `Resposta recebida pela FLW. Status: ${statusMap[result.status?.toLowerCase()]?.[0] || result.status || 'na fila'}.`,
@@ -1179,6 +1267,7 @@ $('#skip-content').addEventListener('click', (event) => {
   main.focus();
 });
 window.addEventListener('hashchange', () => {
+  watchInbox(null);
   syncVisibleThread = null;
   modal.close();
   state.selectedConversation = null;

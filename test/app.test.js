@@ -4,6 +4,8 @@ import request from 'supertest';
 import { fixture, authenticate } from './helpers.js';
 import { applyProviderStatus } from '../src/services/campaigns.js';
 import { FlwClient } from '../src/services/flw.js';
+import { customerMessage, recordPushEvent } from '../src/services/incoming-push.js';
+import { randomUUID } from 'node:crypto';
 
 let f, agent, csrf;
 beforeEach(async () => {
@@ -16,6 +18,50 @@ afterEach(() => {
   f.db.close();
 });
 const post = (path, body = {}) => agent.post(`/api${path}`).set('x-csrf-token', csrf).send(body);
+
+test('continuação preserva o histórico e a leitura por usuário e canal', async () => {
+  const first = f.conversations[0];
+  const time = Date.now() - 5000;
+  first.contactDetails.phonenumber = '55|91999999999';
+  first.lastMessageIn = first.lastInteractionDate = new Date(time).toISOString();
+  const second = { ...first, id: randomUUID(), lastMessageIn: new Date(time + 1000).toISOString() };
+  second.lastInteractionDate = second.lastMessageIn;
+  f.conversations.unshift(second);
+  f.flw.session = async id => f.conversations.find(s => s.id === id);
+  f.flw.messages = async id => ({ items: [{ id, createdAt: (await f.flw.session(id)).lastMessageIn, direction: 'FROM_HUB', text: id }] });
+  const path = '/conversations/' + second.id;
+  const list = async () => (await agent.get('/api/conversations').expect(200)).body.items;
+  assert.equal((await list()).length, 1);
+  const chat = (await agent.get('/api' + path + '/messages').expect(200)).body;
+  assert.equal(chat.sessionId, second.id);
+  assert.equal(chat.items.length, 2);
+  await post(path + '/read', { seenAt: chat.seenAt }).expect(200);
+  assert.equal((await list())[0].unreadCount, 0);
+  second.lastMessageIn = second.lastInteractionDate = new Date(time + 2000).toISOString();
+  assert.equal((await list())[0].unreadCount, 1);
+  await post('/conversations/' + first.id + '/reply', { text: 'Oi' }).expect(409);
+});
+
+test('push agrupa eventos recentes por aparelho e ignora eventos internos, lidos e de outros canais', () => {
+  const time = Date.now() - 1000;
+  const message = { id: randomUUID(), direction: 'FROM_HUB', type: 'TEXT', text: 'Oi' };
+  assert.ok(customerMessage(message));
+  for (const fields of [{ type: 'NOTE' }, { type: 'TRANSITION' }, { direction: 'TO_HUB' }, { origin: 'CAMPAIGN' }]) {
+    assert.equal(customerMessage({ ...message, ...fields }), false);
+  }
+  f.db.prepare('INSERT INTO push_subscriptions(endpoint,keys_json,account_id,sid,channel,subscribed_at) VALUES (?,?,?,?,?,?)')
+    .run('device', '{}', 'manager', 'session', f.channelId, time - 100000);
+  const queue = () => f.db.prepare('SELECT event_id FROM push_deliveries').all();
+  recordPushEvent(f.db, 'old', 'MESSAGE_RECEIVED', time - 95000, f.channelId, f.sessionId);
+  recordPushEvent(f.db, 'other', 'MESSAGE_RECEIVED', time, randomUUID(), f.sessionId);
+  assert.deepEqual(queue(), []);
+  for (const event of ['first', 'latest', 'latest']) recordPushEvent(f.db, event, 'MESSAGE_RECEIVED', time, f.channelId, f.sessionId);
+  assert.deepEqual(queue(), [{ event_id: 'latest' }]);
+  f.db.prepare('INSERT INTO inbox_sessions VALUES (?,?,?,?)').run(f.channelId, f.sessionId, 'contact', time);
+  f.db.prepare('INSERT INTO inbox_reads VALUES (?,?,?,?)').run('manager', f.channelId, 'contact', time);
+  recordPushEvent(f.db, 'already-read', 'MESSAGE_RECEIVED', time, f.channelId, f.sessionId);
+  assert.deepEqual(queue(), [{ event_id: 'latest' }]);
+});
 
 test('gerente cadastra equipe, permissões protegem a API e alterações revogam a sessão', async () => {
   const entry = { username: 'ana', password: 'senha-da-equipe', role: 'agent' };
