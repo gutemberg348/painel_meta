@@ -94,6 +94,18 @@ input:not([type='checkbox']):not([type='file']):focus, select:focus, textarea:fo
 }
 .sidebar nav a.active svg { color: #b0ddff; }
 .sidebar-bottom { padding-top: 28px; margin-top: auto; }
+.device-menu { display: flex; gap: 10px; align-items: center; padding: 11px 9px; background: transparent; color: #deebf7; text-align: left; border: 0; border-radius: 8px; }
+.device-menu:hover { background: #203d5f; }
+.device-menu svg { width: 19px; height: 19px; }
+.device-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 14px clamp(12px, 3vw, 32px); background: #f1f7ff; border-bottom: 1px solid #c9dcef; color: #173754; }
+.device-card img { border-radius: 12px; }
+.device-card p { margin: 4px 0 8px; font-size: .86rem; line-height: 1.45; }
+.device-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.device-card [hidden], .device-card[hidden] { display: none; }
+@media (max-width: 440px) {
+  .device-card { gap: 8px; }
+  .device-card img { width: 32px; height: 32px; }
+}
 .sidebar .profile { border-color: #ffffff21; padding: 18px 4px; }
 .sidebar .profile > div { min-width: 0; }
 .sidebar .profile strong { overflow: hidden; text-overflow: ellipsis; }
@@ -362,6 +374,14 @@ tbody tr:hover { background: #f8fbff; }
 .template-card .message-preview { flex: 1; overflow-wrap: anywhere; }
 .template-card-footer { flex-wrap: wrap; gap: 8px; color: var(--muted); }
 .template-card h3, .list-card h3 { overflow-wrap: anywhere; }
+.list-card-footer, .list-actions { flex-wrap: wrap; gap: 8px; }
+.list-actions { display: flex; align-items: center; }
+#split-value-field[hidden] { display: none; }
+.division-preview { padding: 14px 16px; border: 1px solid #c7dbee; border-radius: 10px; background: #f4f8ff; }
+.division-preview ul { list-style: none; margin: 0; padding: 0; }
+.division-preview li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-top: 8px; font-size: .86rem; }
+.division-preview li span { overflow-wrap: anywhere; }
+.division-preview li small { white-space: nowrap; }
 
 /* Acesso administrativo */
 .access-page { background: white; }

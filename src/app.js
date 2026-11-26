@@ -11,6 +11,8 @@ import { apiRouter } from './routes/api.js';
 import { usersRouter } from './routes/users.js';
 import { verifyPassword, roleNames, landingPage, canUseApi } from './services/users.js';
 import { applyProviderStatus, now } from './services/campaigns.js';
+import { createInboxChannels } from './services/inbox-channels.js';
+import { pushAvailable, pushRouter } from './services/push.js';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const equal = (a, b) =>
@@ -25,6 +27,7 @@ const equal = (a, b) =>
 
 export function createApp({ config, db, flw, campaigns }) {
   const app = express();
+  const inboxChannels = createInboxChannels(flw, config);
   app.disable('x-powered-by');
   if (config.trustProxy) app.set('trust proxy', 1);
   app.set('view engine', 'ejs');
@@ -64,12 +67,22 @@ export function createApp({ config, db, flw, campaigns }) {
           ? db.prepare('SELECT id,provider_id FROM deliveries WHERE provider_id=?').get(content.id)
           : null;
       if (delivery) applyProviderStatus(db, delivery.id, await flw.messageStatus(delivery.provider_id));
-      const eventId = createHash('sha256').update(JSON.stringify(body)).digest('hex');
-      db.prepare('INSERT OR IGNORE INTO webhook_events VALUES (?,?,?)').run(
-        eventId,
-        String(body.eventType || 'SEND_CALLBACK').slice(0, 100),
-        now(),
-      );
+      const received = body.eventType === 'MESSAGE_RECEIVED';
+      const eventId = createHash('sha256').update(received && typeof content.id === 'string'
+        ? 'MESSAGE_RECEIVED:' + content.id : JSON.stringify(body)).digest('hex');
+      let notify = false;
+      if (received && pushAvailable(config) && db.prepare('SELECT 1 FROM push_subscriptions LIMIT 1').get()
+          && !db.prepare('SELECT 1 FROM webhook_events WHERE id=?').get(eventId)) {
+        const channelId = content.channelId || (typeof content.sessionId === 'string' && (await flw.session(content.sessionId)).channelId);
+        notify = typeof channelId === 'string' && (await inboxChannels()).some(c => c.id.toLowerCase() === channelId.toLowerCase());
+      }
+      db.transaction(() => {
+        const inserted = db.prepare('INSERT OR IGNORE INTO webhook_events VALUES (?,?,?)')
+          .run(eventId, String(body.eventType || 'SEND_CALLBACK').slice(0, 100), now());
+        if (notify && inserted.changes) {
+          db.prepare('UPDATE push_subscriptions SET pending_event=?, next_attempt=0, attempts=0').run(eventId);
+        }
+      })();
       db.prepare("INSERT OR REPLACE INTO metadata VALUES ('lastWebhook',?)").run(now());
       res.json({ received: true });
     },
@@ -146,19 +159,21 @@ export function createApp({ config, db, flw, campaigns }) {
     if (req.path.startsWith('/api/')) return res.status(401).json({ error: 'Faça login para continuar.' });
     res.redirect('/login');
   });
-  app.post('/logout', (req, res, next) =>
+  app.post('/logout', (req, res, next) => {
+    db.prepare('DELETE FROM push_subscriptions WHERE sid=?').run(req.sessionID);
     req.session.destroy((error) => {
       if (error) return next(error);
       res.clearCookie('totalk.sid');
       res.redirect('/login');
-    }),
-  );
+    });
+  });
   app.use('/api', (req, res, next) => {
     if (canUseApi(res.locals.account.role, req.path)) return next();
     res.status(403).json({ error: 'Seu perfil não tem acesso a esta operação.' });
   });
   app.use('/api/users', usersRouter(db, config));
-  app.use('/api', apiRouter(db, flw, campaigns, config));
+  app.use('/api/push', pushRouter(db, config));
+  app.use('/api', apiRouter(db, flw, campaigns, config, inboxChannels));
   app.get('/', (req, res) => {
     const { username, role } = res.locals.account;
     res.render('index', { username, role, roleName: roleNames[role], homePage: landingPage[role],

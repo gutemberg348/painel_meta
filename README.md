@@ -223,6 +223,16 @@ O servidor inclui automaticamente a URL `PUBLIC_URL/webhooks/flw/WEBHOOK_SECRET`
 
 Não é preciso webhook para ler respostas: a caixa de entrada consulta a API diretamente. Não exponha URLs com o segredo em logs públicos.
 
+## Instalar o Vieira Link no celular e receber notificações
+
+O aplicativo usa o mesmo endereço HTTPS do painel. Depois do login, abra **Aplicativo e notificações** no menu. No Android, toque em **Instalar aplicativo**. No iPhone com iOS 16.4 ou superior, abra o painel no Safari, toque em **Compartilhar → Adicionar à Tela de Início** e entre pelo ícone Vieira Link. Toque em **Ativar notificações** e confirme **Permitir**. Cada aparelho tem sua própria preferência.
+
+Para habilitar os avisos na VPS, configure `FLW_API_TOKEN`, `PUBLIC_URL` e `WEBHOOK_SECRET` no `.env` do painel. Use o valor existente de `WEBHOOK_SECRET` se os callbacks já estiverem configurados. As chaves de assinatura Web Push são geradas pelo painel e guardadas no SQLite do volume `./data`.
+
+Na FLW, acesse **Ajustes → Integrações → Webhooks**. Crie uma assinatura ativa para o evento **MESSAGE_RECEIVED**, com o endereço `https://totalk.testes-techcode.shop/webhooks/flw/<WEBHOOK_SECRET>`. Substitua o marcador, inclusive os sinais de menor e maior, pelo segredo da VPS ao cadastrar o endereço na FLW. O callback individual de uma campanha atualiza a entrega. A assinatura de mensagens recebidas aciona o aviso de nova conversa ou resposta. [Webhooks da FLW](https://flwchat.readme.io/reference/webhooks-1)
+
+O aviso abre a caixa de entrada e exibe apenas que chegou uma mensagem. Com `FLW_INBOX_CHANNEL_ID` preenchido, os avisos acompanham esse canal. Com o campo vazio, os canais WhatsApp disponíveis para o token podem gerar avisos. Para parar em um aparelho, escolha **Desativar notificações**. Sair da conta pelo menu também encerra o recebimento nesse aparelho.
+
 ## Testar
 
 ```bash

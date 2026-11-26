@@ -288,7 +288,7 @@ const pages = {
         'Organize sua audiência em listas e personalize suas campanhas.',
         button('Nova lista', 'new-list', 'folder-plus'),
       ) +
-      `<div class="list-grid">${state.lists.map((list) => `<article class="list-card"><div class="list-card-top"><span class="folder-icon ${list.color}">${icon('folder-open')}</span><div class="card-actions"><button class="icon-button" data-action="edit-list" data-id="${list.id}" aria-label="Editar lista ${escape(list.name)}">${icon('pencil')}</button><button class="icon-button" data-action="delete-list" data-id="${list.id}" aria-label="Excluir lista ${escape(list.name)}">${icon('trash-2')}</button></div></div><h3>${escape(list.name)}</h3><p>${escape(list.description || 'Uma lista pronta para novas conexões.')}</p><div class="list-card-footer"><span class="list-count"><strong>${number(list.contact_count)}</strong> contatos</span><button class="button ghost" data-action="list-contacts" data-id="${list.id}">Ver contatos</button></div><small class="muted">${number(list.opted_in_count)} com autorização de envio</small></article>`).join('')}<button class="list-card-new" data-action="new-list">${icon('folder-plus')}Criar uma nova lista</button></div>`
+      `<div class="list-grid">${state.lists.map((list) => `<article class="list-card"><div class="list-card-top"><span class="folder-icon ${list.color}">${icon('folder-open')}</span><div class="card-actions"><button class="icon-button" data-action="edit-list" data-id="${list.id}" aria-label="Editar lista ${escape(list.name)}">${icon('pencil')}</button><button class="icon-button" data-action="delete-list" data-id="${list.id}" aria-label="Excluir lista ${escape(list.name)}">${icon('trash-2')}</button></div></div><h3>${escape(list.name)}</h3><p>${escape(list.description || 'Uma lista pronta para novas conexões.')}</p><div class="list-card-footer"><span class="list-count"><strong>${number(list.contact_count)}</strong> contatos</span><div class="list-actions"><button class="button ghost" data-action="list-contacts" data-id="${list.id}">Ver contatos</button>${list.contact_count >= 2 ? `<button class="button" data-action="split-list" data-id="${list.id}">${icon('split')}Dividir lista</button>` : ''}</div></div><small class="muted">${number(list.opted_in_count)} com autorização de envio</small></article>`).join('')}<button class="list-card-new" data-action="new-list">${icon('folder-plus')}Criar uma nova lista</button></div>`
     );
   },
   async contacts() {
@@ -529,6 +529,78 @@ function listModal(list) {
     });
     modal.close();
     toast(list ? 'Lista atualizada.' : `Lista criada: ${result.name}.`);
+    await renderPage(true);
+  });
+}
+async function splitListModal(list) {
+  const { planDivision, partName } = await import('/js/list-division.js');
+  const total = list.contact_count;
+  showModal('Dividir lista', `${escape(list.name)} · ${number(total)} contatos`,
+    `<div class="form-stack">
+      <div class="form-grid">
+        <label>Como dividir<select name="method">
+          <option value="size">Por contatos em cada lista</option>
+          <option value="half">Em duas metades</option>
+          <option value="parts">Por quantidade de listas</option>
+        </select></label>
+        <label id="split-value-field"><span id="split-value-label"></span><input type="number" name="value" step="1" inputmode="numeric" required></label>
+      </div>
+      <label>Nome base das novas listas<input name="baseName" value="${escape(list.name)}" required maxlength="120"></label>
+      <div class="division-preview" aria-live="polite"><strong id="division-summary"></strong><ul id="division-parts"></ul></div>
+      <p class="field-hint">A lista original será preservada. Os contatos serão distribuídos na ordem em que foram adicionados à lista.</p>
+    </div>`, formFooter('Salvar novas listas'), false, 'split-list-form');
+  const form = $('#split-list-form');
+  const method = form.elements.namedItem('method');
+  const quantity = form.elements.namedItem('value');
+  const baseName = form.elements.namedItem('baseName');
+  const submit = $('button[type="submit"]', form);
+  function options() {
+    return {
+      mode: method.value === 'size' ? 'size' : 'parts',
+      value: method.value === 'half' ? 2 : quantity.valueAsNumber,
+      baseName: baseName.value.trim(),
+      expectedTotal: total,
+    };
+  }
+  function preview() {
+    const input = options();
+    const plan = planDivision(total, input.mode, input.value);
+    const valid = Boolean(plan && input.baseName);
+    submit.disabled = !valid;
+    const summary = $('#division-summary');
+    const parts = $('#division-parts');
+    parts.replaceChildren();
+    if (!valid) {
+      summary.textContent = input.baseName ? 'Escolha uma quantidade que forme pelo menos duas listas com contatos.' : 'Informe um nome base para as listas.';
+      return;
+    }
+    summary.textContent = `${number(plan.count)} novas listas · ${number(total)} contatos`;
+    const indexes = plan.count > 4 ? [0, 1, -1, plan.count - 1] : Array.from({ length: plan.count }, (_, i) => i);
+    parts.innerHTML = indexes.map(i => {
+      if (i < 0) return `<li class="muted">… e mais ${number(plan.count - 3)} listas intermediárias</li>`;
+      const size = plan.sizeAt(i);
+      return `<li><span>${escape(partName(input.baseName, i, plan.count))}</span><small>${number(size)} ${size === 1 ? 'contato' : 'contatos'}</small></li>`;
+    }).join('');
+  }
+  function selectMethod() {
+    const bySize = method.value === 'size';
+    quantity.disabled = method.value === 'half';
+    $('#split-value-field').hidden = quantity.disabled;
+    $('#split-value-label').textContent = bySize ? 'Contatos por lista' : 'Quantidade de listas';
+    quantity.min = bySize ? 1 : 2;
+    quantity.max = bySize ? total - 1 : total;
+    quantity.value = bySize ? Math.min(50, total - 1) : 2;
+    preview();
+  }
+  method.value = total > 50 ? 'size' : 'half';
+  selectMethod();
+  method.addEventListener('change', selectMethod);
+  quantity.addEventListener('input', preview);
+  baseName.addEventListener('input', preview);
+  bindForm('split-list-form', async () => {
+    const result = await api(`/lists/${list.id}/split`, { method: 'POST', body: options() });
+    modal.close();
+    toast(`${number(result.created)} novas listas salvas.`);
     await renderPage(true);
   });
 }
@@ -898,6 +970,7 @@ const actions = {
     window.location.hash = 'settings';
   },
   'new-list': () => listModal(),
+  'split-list': (element) => splitListModal(state.lists.find(list => list.id === element.dataset.id)),
   'edit-list': (element) => listModal(state.lists.find((l) => l.id === element.dataset.id)),
   'delete-list': (element) =>
     confirmDialog({

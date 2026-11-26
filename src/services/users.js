@@ -24,6 +24,6 @@ const senderResources = new Set(['campaigns', 'contacts', 'lists', 'templates', 
 export function canUseApi(role, path) {
   if (role === 'manager') return true;
   const resource = (path.split('/')[1] || '').toLowerCase();
-  if (resource === 'conversations') return role === 'agent' || role === 'sender';
+  if (resource === 'conversations' || resource === 'push') return role === 'agent' || role === 'sender';
   return role === 'sender' && senderResources.has(resource);
 }

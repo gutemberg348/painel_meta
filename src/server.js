@@ -3,12 +3,14 @@ import { openDatabase } from './db.js';
 import { FlwClient } from './services/flw.js';
 import { CampaignService } from './services/campaigns.js';
 import { createApp } from './app.js';
+import { startPushWorker } from './services/push.js';
 
 const config = loadConfig();
 const db = openDatabase(config.databasePath);
 const flw = new FlwClient(config);
 const campaigns = new CampaignService(db, flw, config);
 const app = createApp({ config, db, flw, campaigns });
+const push = startPushWorker(db, config);
 const server = app.listen(config.port, config.host, () => {
   console.log(`Totalk Studio disponível em http://${config.host}:${config.port}`);
   console.log(
@@ -21,8 +23,9 @@ const server = app.listen(config.port, config.host, () => {
 for (const signal of ['SIGTERM', 'SIGINT'])
   process.on(signal, () => {
     campaigns.stop();
+    push.stop();
     server.close(async () => {
-      while (campaigns.busy) await new Promise((resolve) => setTimeout(resolve, 100));
+      while (campaigns.busy || push.busy) await new Promise((resolve) => setTimeout(resolve, 100));
       db.close();
       process.exit(0);
     });

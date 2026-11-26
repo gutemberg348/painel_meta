@@ -6,6 +6,7 @@
   <meta name="csrf-token" content="<%= csrf %>">
   <meta name="description" content="Painel de campanhas, contatos e conversas da Vieira Link.">
   <title>Visão geral · Vieira Link</title>
+  <%- include('pwa-head') %>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/compose.css">
@@ -42,6 +43,9 @@
         <a href="#settings" data-page="settings"><i data-lucide="settings-2"></i>Configurações</a>
         <a href="https://flwchat.readme.io/reference/autentica%C3%A7%C3%A3o" target="_blank" rel="noreferrer"><i data-lucide="book-open"></i>Documentação<i class="external-icon" data-lucide="external-link"></i></a>
       </nav><% } %>
+      <button type="button" class="device-menu" id="device-menu" aria-controls="device-card">
+        <i data-lucide="smartphone"></i> Aplicativo e notificações
+      </button>
       <div class="profile">
         <span class="avatar" aria-hidden="true"><%= username.slice(0, 2).toUpperCase() %></span>
         <div><strong><%= username %></strong><small><%= roleName %></small></div>
@@ -62,6 +66,18 @@
       <% if (role === 'manager') { %><a href="#settings" class="connection-badge" id="connection-badge"><span class="status-dot"></span>Integração FLW</a>
       <% } else { %><span class="connection-badge" id="connection-badge"><span class="status-dot"></span>Integração FLW</span><% } %>
     </header>
+    <section class="device-card" id="device-card" data-user="<%= username %>" aria-labelledby="device-title" hidden>
+      <img src="/icons/vieira-192.png" width="44" height="44" alt="">
+      <div><strong id="device-title">Vieira Link neste aparelho</strong>
+        <p id="device-status" role="status"></p>
+        <p id="install-help" hidden></p>
+        <div class="device-actions">
+          <button type="button" class="button primary" id="device-push" hidden></button>
+          <button type="button" class="button" id="device-install" hidden>Instalar aplicativo</button>
+        </div>
+      </div>
+      <button type="button" id="device-close" class="icon-button" aria-label="Fechar opções do aplicativo"><i data-lucide="x"></i></button>
+    </section>
     <main id="main" tabindex="-1"><div class="loading-state"><span class="spinner"></span>Carregando painel…</div></main>
   </div>
   <dialog id="modal"><div id="modal-content"></div></dialog>

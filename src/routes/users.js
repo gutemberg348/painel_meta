@@ -36,6 +36,7 @@ export function usersRouter(db, config) {
     const result = db.prepare('UPDATE staff_users SET role=?, active=?, password_hash=COALESCE(?,password_hash), version=version+1 WHERE id=?')
       .run(data.role, Number(data.active), hash, id);
     if (!result.changes) return res.status(404).json({ error: 'Usuário não encontrado.' });
+    db.prepare('DELETE FROM push_subscriptions WHERE account_id=?').run(id);
     res.json({ ok: true });
   });
   return router;

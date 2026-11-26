@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { audienceSchema, parseAudience, requireValidAudience, saveAudience } from '../services/audience.js';
 import { now } from '../services/campaigns.js';
 import { ChatCache } from '../services/chat-cache.js';
+import { planDivision, partName } from '../../public/js/list-division.js';
 
 const name = z.string().trim().min(1, 'Informe um nome.').max(120);
 const id = z.string().uuid();
@@ -47,7 +48,7 @@ function required(db, table, value) {
   return row;
 }
 
-export function apiRouter(db, flw, campaigns, config) {
+export function apiRouter(db, flw, campaigns, config, inboxChannels) {
   const router = Router();
   const chatCache = new ChatCache();
   const lastReplies = new Map();
@@ -55,29 +56,6 @@ export function apiRouter(db, flw, campaigns, config) {
   const revisionSecret = randomBytes(32);
   const revision = (key) => createHmac('sha256', revisionSecret)
     .update(`${key}:${Math.floor(Date.now() / 30000)}:${lastReplies.get(key) || '0'}`).digest('base64url');
-  let inboxChannelsRequest;
-  let inboxChannelsExpireAt = 0;
-  async function inboxChannels() {
-    if (!inboxChannelsRequest || Date.now() >= inboxChannelsExpireAt) {
-      inboxChannelsExpireAt = Infinity;
-      inboxChannelsRequest = flw.channels()
-        .then((channels) => {
-          inboxChannelsExpireAt = Date.now() + 60000;
-          return channels.filter((channel) => id.safeParse(channel.id).success);
-        })
-        .catch((error) => {
-          inboxChannelsRequest = undefined;
-          throw error;
-        });
-    }
-    const channels = await inboxChannelsRequest;
-    if (!config.inboxChannelId) return channels;
-    const channel = channels.find((item) => item.id.toLowerCase() === config.inboxChannelId);
-    if (!channel) {
-      fail('O canal configurado em FLW_INBOX_CHANNEL_ID não aparece entre os canais WhatsApp desse token.', 409);
-    }
-    return [channel];
-  }
   async function inboxScope(requestedId) {
     const rawId = requestedId === undefined ? undefined : id.parse(requestedId).toLowerCase();
     const channels = await inboxChannels();
@@ -156,7 +134,7 @@ export function apiRouter(db, flw, campaigns, config) {
         .prepare(
           `SELECT l.*, COUNT(lc.contact_id) contact_count,
     COALESCE(SUM(c.opted_in),0) opted_in_count FROM lists l LEFT JOIN list_contacts lc ON lc.list_id=l.id
-    LEFT JOIN contacts c ON c.id=lc.contact_id GROUP BY l.id ORDER BY l.created_at DESC`,
+    LEFT JOIN contacts c ON c.id=lc.contact_id GROUP BY l.id ORDER BY l.created_at DESC, l.name COLLATE NOCASE`,
         )
         .all(),
     ),
@@ -173,6 +151,40 @@ export function apiRouter(db, flw, campaigns, config) {
       now(),
     );
     res.status(201).json({ id: newId, name: listName });
+  });
+  router.post('/lists/:id/split', (req, res) => {
+    const { mode, value, baseName, expectedTotal } = z.object({
+      mode: z.enum(['size', 'parts']),
+      value: z.number().int().positive(),
+      baseName: name,
+      expectedTotal: z.number().int().min(2),
+    }).parse(req.body);
+    const created = db.transaction(() => {
+      const source = required(db, 'lists', req.params.id);
+      const members = db.prepare('SELECT contact_id FROM list_contacts WHERE list_id=? ORDER BY rowid').all(source.id);
+      if (members.length !== expectedTotal) fail('A quantidade de contatos mudou. Atualize a página para conferir a nova divisão.', 409);
+      const plan = planDivision(members.length, mode, value);
+      if (!plan) fail('Escolha uma divisão que forme ao menos duas listas com contatos.');
+
+      const existingNames = new Set(db.prepare('SELECT name FROM lists').all().map(row => row.name.toLowerCase()));
+      const insertList = db.prepare('INSERT INTO lists (id,name,description,color,created_at) VALUES (?,?,?,?,?)');
+      const linkContact = db.prepare('INSERT INTO list_contacts (list_id,contact_id) VALUES (?,?)');
+      const createdAt = now();
+      let position = 0;
+      for (let index = 0; index < plan.count; index++) {
+        const listName = partName(baseName, index, plan.count);
+        if (existingNames.has(listName.toLowerCase())) fail(`Já existe uma lista chamada “${listName}”. Escolha outro nome base.`, 409);
+        const listId = randomUUID();
+        insertList.run(listId, listName, source.description, source.color, createdAt);
+        const end = position + plan.sizeAt(index);
+        while (position < end) {
+          linkContact.run(listId, members[position].contact_id);
+          position++;
+        }
+      }
+      return plan.count;
+    }).immediate();
+    res.status(201).json({ created });
   });
   router.put('/lists/:id', (req, res) => {
     required(db, 'lists', req.params.id);

@@ -47,6 +47,10 @@ export function openDatabase(path) {
     );
     CREATE TABLE IF NOT EXISTS webhook_events (id TEXT PRIMARY KEY, event_type TEXT NOT NULL, received_at TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS push_subscriptions (
+      endpoint TEXT PRIMARY KEY, keys_json TEXT NOT NULL, account_id TEXT NOT NULL, sid TEXT NOT NULL,
+      pending_event TEXT, next_attempt INTEGER NOT NULL DEFAULT 0, attempts INTEGER NOT NULL DEFAULT 0
+    );
     CREATE INDEX IF NOT EXISTS deliveries_campaign ON deliveries(campaign_id);
     CREATE INDEX IF NOT EXISTS deliveries_status ON deliveries(status);
   `);
