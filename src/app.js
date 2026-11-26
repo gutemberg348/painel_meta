@@ -13,7 +13,7 @@ import { verifyPassword, roleNames, landingPage, canUseApi } from './services/us
 import { applyProviderStatus, now } from './services/campaigns.js';
 import { createInboxChannels } from './services/inbox-channels.js';
 import { pushAvailable, pushRouter } from './services/push.js';
-import { incomingEventId, recordPushEvent, customerMessage } from './services/incoming-push.js';
+import { incomingEventId, recordPushEvent, customerMessage, captureIncoming } from './services/incoming-push.js';
 import { ChatCache } from './services/chat-cache.js';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -79,8 +79,7 @@ export function createApp({ config, db, flw, campaigns, inboxChannels = createIn
       }
       // A consulta periódica ainda pode confirmar um evento de canal desconhecido.
       if (!received) recordPushEvent(db, eventId, String(body.eventType || 'SEND_CALLBACK').slice(0, 100), null);
-      const messageTime = Date.parse(content.createdAt) || Date.parse(content.timestamp);
-      if (notifyChannel && Number.isFinite(messageTime) && recordPushEvent(db, eventId, 'MESSAGE_RECEIVED', messageTime, notifyChannel.id, content.sessionId || null)) {
+      if (notifyChannel && captureIncoming(db, content, notifyChannel.id, content.sessionId || null) === 'detected') {
         chatCache.inboxChanged(notifyChannel.id);
       }
       db.prepare("INSERT OR REPLACE INTO metadata VALUES ('lastWebhook',?)").run(now());

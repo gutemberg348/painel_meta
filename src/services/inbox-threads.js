@@ -1,3 +1,5 @@
+import { captureIncoming } from './incoming-push.js';
+
 const activity = s => Date.parse(s.lastInteractionDate || s.createdAt) || 0;
 const more = (data, page) => Boolean(data.items?.length && (data.hasMorePages || data.totalPages > page));
 
@@ -62,7 +64,13 @@ export function createInboxThreads(db, flw, cache) {
   }
 
   async function history(channel, sessions, page) {
-    const load = (session, n) => cache.read(`thread:${channel}:${session}:raw:${n}`, () => flw.messages(session, n));
+    const load = (session, n) => cache.read(`thread:${channel}:${session}:raw:${n}`, async () => {
+      const history = await flw.messages(session, n);
+      if (n === 1 && db.prepare('SELECT 1 FROM push_subscriptions WHERE channel=? LIMIT 1').get(channel)) {
+        for (const message of history.items || []) captureIncoming(db, message, channel, session);
+      }
+      return history;
+    });
     if (sessions.length === 1) return load(sessions[0].id, page);
     const end = page * 25;
     const messages = new Map();

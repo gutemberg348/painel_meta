@@ -4,7 +4,7 @@ import request from 'supertest';
 import { fixture, authenticate } from './helpers.js';
 import { applyProviderStatus } from '../src/services/campaigns.js';
 import { FlwClient } from '../src/services/flw.js';
-import { customerMessage, recordPushEvent } from '../src/services/incoming-push.js';
+import { customerMessage, recordPushEvent, incomingEventId, scanIncoming } from '../src/services/incoming-push.js';
 import { randomUUID, createECDH, randomBytes } from 'node:crypto';
 
 let f, agent, csrf;
@@ -45,6 +45,7 @@ test('continuação preserva o histórico e a leitura por usuário e canal', asy
 test('push agrupa mensagens novas do canal mesmo quando o painel confirma a leitura antes ou depois da fila', async () => {
   const time = Date.now() - 1000;
   const message = { id: randomUUID(), direction: 'FROM_HUB', type: 'TEXT', text: 'Oi' };
+  f.flw.messages = async () => ({ items: [{ ...message, createdAt: new Date(time).toISOString() }] });
   assert.ok(customerMessage(message));
   for (const fields of [{ type: 'NOTE' }, { type: 'TRANSITION' }, { direction: 'TO_HUB' }, { origin: 'CAMPAIGN' }]) {
     assert.equal(customerMessage({ ...message, ...fields }), false);
@@ -55,11 +56,12 @@ test('push agrupa mensagens novas do canal mesmo quando o painel confirma a leit
   recordPushEvent(f.db, 'old', 'MESSAGE_RECEIVED', time - 95000, f.channelId, f.sessionId);
   recordPushEvent(f.db, 'other', 'MESSAGE_RECEIVED', time, randomUUID(), f.sessionId);
   assert.deepEqual(queue(), []);
-  for (const event of ['first', 'latest', 'latest']) recordPushEvent(f.db, event, 'MESSAGE_RECEIVED', time, f.channelId, f.sessionId);
-  assert.deepEqual(queue(), [{ event_id: 'latest' }]);
+  const latest = incomingEventId(message.id);
+  for (const event of ['first', latest, latest]) recordPushEvent(f.db, event, 'MESSAGE_RECEIVED', time, f.channelId, f.sessionId);
+  assert.deepEqual(queue(), [{ event_id: latest }]);
   await agent.get('/api/conversations/' + f.sessionId + '/messages').expect(200);
   await post('/conversations/' + f.sessionId + '/read', { seenAt: time }).expect(200);
-  assert.deepEqual(queue(), [{ event_id: 'latest' }]);
+  assert.deepEqual(queue(), [{ event_id: latest }]);
   f.db.prepare('DELETE FROM push_deliveries').run();
   await post('/conversations/' + f.sessionId + '/read', { seenAt: time + 1 }).expect(200);
   recordPushEvent(f.db, 'next', 'MESSAGE_RECEIVED', time + 1, f.channelId, f.sessionId);
@@ -67,6 +69,24 @@ test('push agrupa mensagens novas do canal mesmo quando o painel confirma a leit
   f.db.prepare('DELETE FROM push_deliveries').run();
   recordPushEvent(f.db, 'next', 'MESSAGE_RECEIVED', time + 1, f.channelId, f.sessionId);
   assert.deepEqual(queue(), []);
+});
+
+test('monitor detecta entrada com userId no histórico mesmo com o painel fechado e compartilha a deduplicação com a caixa aberta', async () => {
+  const received = { id: randomUUID(), sessionId: f.sessionId, userId: randomUUID(), text: 'Olá', type: 'TEXT',
+    direction: 'FROM_HUB', origin: 'API', createdAt: new Date().toISOString() };
+  f.flw.messages = async () => ({ items: [received, { ...received, id: randomUUID(), direction: 'TO_HUB' }] });
+  const since = Date.now() - 60000;
+  f.db.prepare('INSERT INTO push_subscriptions(endpoint,keys_json,account_id,sid,channel,subscribed_at) VALUES (?,?,?,?,?,?)')
+    .run('device', '{}', 'manager', 'sid', f.channelId, since);
+  const scan = () => scanIncoming(f.db, f.flw, { id: f.channelId }, since, () => false, () => {});
+  const stats = await scan();
+  assert.equal(stats.detected, 1);
+  assert.equal(stats.filtered, 1);
+  assert.equal(f.db.prepare('SELECT event_id FROM push_deliveries').get().event_id, incomingEventId(received.id));
+  f.db.prepare('DELETE FROM push_deliveries').run();
+  await agent.get('/api/conversations/' + f.sessionId + '/messages').expect(200);
+  assert.equal((await scan()).duplicate, 1);
+  assert.equal(f.db.prepare('SELECT COUNT(*) n FROM push_deliveries').get().n, 0);
 });
 
 test('gerente cadastra equipe, permissões protegem a API e alterações revogam a sessão', async () => {
