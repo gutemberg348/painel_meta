@@ -486,6 +486,21 @@ dialog.composer-modal {
   margin-top: 10px;
   color: #a97737;
 }
+.audience-phone-filter {
+  margin-top: 18px;
+  padding: 12px 15px;
+  border: 1px solid #edd6ac;
+  border-radius: 11px;
+  background: #fff8ec;
+  color: #704711;
+}
+.audience-phone-filter p {
+  margin: 4px 0 10px;
+  font-size: 0.8125rem;
+}
+.audience-phone-filter select {
+  width: 100%;
+}
 .audience-samples {
   border-top: 1px solid #e4edf7;
   margin-top: 12px;

@@ -279,6 +279,7 @@ export function apiRouter(db, flw, campaigns, config) {
       total: result.total,
       duplicates: result.duplicates,
       blocked: result.blocked,
+      excluded: result.excluded,
     });
   });
   router.get('/channels', async (req, res) => res.json(await flw.channels()));

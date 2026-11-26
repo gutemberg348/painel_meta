@@ -36,6 +36,17 @@ function audienceMarkup(allowList = true) {
     <div data-source-panel="file" hidden><label class="upload-area" id="audience-drop" for="audience-file">${icon('cloud-upload')}<strong>Arraste seu arquivo aqui</strong><span>ou clique para escolher no computador</span><small>CSV ou TXT · até 900 KB · 5.000 contatos</small><input id="audience-file" type="file" accept=".csv,.txt,text/csv,text/plain"></label><p id="audience-file-name" class="field-hint" role="status"></p><div class="file-examples"><span>CSV: <code>nome,telefone,email</code> ou apenas <code>telefone</code></span><span>TXT sem cabeçalho · uma linha por empresa, por exemplo <code>Provedor Alfa;5591999990001</code>. Também aceitamos um telefone por linha.</span><div>${button('Modelo CSV', 'download-csv', 'download', 'ghost')}${button('Modelo TXT', 'download-txt', 'download', 'ghost')}</div></div></div>
     ${allowList ? `<div data-source-panel="list" hidden><label>Lista de contatos<select id="audience-list"><option value="">Selecione uma lista</option>${state.lists.map((list) => `<option value="${list.id}">${escape(list.name)} · ${number(list.opted_in_count)} autorizados</option>`).join('')}</select></label>${!state.lists.length ? '<p class="field-hint">Ainda não há listas. Use “Colar números” ou “Enviar arquivo”; a lista será criada ao salvar a campanha.</p>' : ''}</div>` : ''}
     <div id="audience-new-options"><label class="country-field">Formato dos números<select id="audience-country"><option value="55">Brasil (+55) · adicionar DDI aos números com 10 ou 11 dígitos</option><option value="">Internacional · todos os números já incluem DDI</option></select></label><p class="field-hint">Números começando com + mantêm o DDI informado. Confira a prévia abaixo.</p></div>
+    <div class="audience-phone-filter" id="audience-phone-filter" hidden>
+      <strong id="audience-phone-count" role="status"></strong>
+      <p id="audience-phone-hint">O painel identifica esses números pelo formato. Alguns fixos e 0800 podem ter WhatsApp Business.</p>
+      <label>Quer remover os fixos e 0800 desta seleção?
+        <select id="audience-phone-choice" aria-describedby="audience-phone-count audience-phone-hint">
+          <option value="">Escolha uma opção</option>
+          <option value="exclude">Remover fixos e 0800</option>
+          <option value="keep">Manter fixos e 0800</option>
+        </select>
+      </label>
+    </div>
     <div id="audience-result" class="audience-result" aria-live="polite"><span>${icon('users-round')} Seus contatos aparecerão aqui para conferência.</span></div>
     <label class="check-label consent-box" id="audience-consent-label"><input type="checkbox" id="audience-consent">Confirmo que estes contatos autorizaram o recebimento de mensagens pelo WhatsApp.</label>
   </div>`;
@@ -44,6 +55,8 @@ function audienceMarkup(allowList = true) {
 class AudiencePicker {
   constructor(onChange = () => {}) {
     this.root = $('#audience-picker');
+    this.phoneFilter = $('#audience-phone-filter', this.root);
+    this.phoneChoice = $('#audience-phone-choice', this.root);
     this.mode = 'paste';
     this.file = null;
     this.version = 0;
@@ -55,6 +68,7 @@ class AudiencePicker {
       .forEach((button) => button.addEventListener('click', () => this.select(button.dataset.source)));
     $('#audience-text').addEventListener('input', () => this.changed());
     $('#audience-country').addEventListener('change', () => this.changed());
+    this.phoneChoice.addEventListener('change', () => this.changed(false));
     $('#audience-list')?.addEventListener('change', () => this.changed());
     $('#audience-file').addEventListener('change', (event) => this.readFile(event.target.files[0]));
     const drop = $('#audience-drop');
@@ -118,11 +132,19 @@ class AudiencePicker {
   input() {
     if (this.mode === 'list') return { listId: $('#audience-list').value };
     const source = this.mode === 'file' ? this.file : { text: $('#audience-text').value, format: 'paste' };
-    return source ? { audience: { ...source, countryCode: $('#audience-country').value } } : null;
+    return source ? { audience: {
+      ...source,
+      countryCode: $('#audience-country').value,
+      excludeFixedOrTollFree: this.phoneChoice.value === 'exclude',
+    } } : null;
   }
-  changed() {
+  changed(resetPhoneChoice = true) {
     clearTimeout(this.timer);
     this.version++;
+    if (resetPhoneChoice) {
+      this.phoneChoice.value = '';
+      this.phoneFilter.hidden = true;
+    }
     this.summary = null;
     this.onChange(null);
     const input = this.input();
@@ -152,10 +174,15 @@ class AudiencePicker {
     try {
       const result = await api('/contacts/preview', { method: 'POST', body: input.audience });
       if (!this.root.isConnected || version !== this.version) return null;
+      const { fixed, tollFree } = result.phoneTypes;
+      this.phoneFilter.hidden = !(fixed || tollFree);
+      $('#audience-phone-count', this.root).textContent =
+        `Detectados ${number(fixed)} fixo(s) e ${number(tollFree)} número(s) 0800`;
       this.summary = result;
       this.onChange(result);
       $('#audience-result').innerHTML =
         `<div class="audience-totals"><span><strong>${number(result.eligible)}</strong> aptos para envio</span><span><strong>${number(result.duplicates)}</strong> repetidos removidos</span><span class="${result.errors.length ? 'invalid-count' : ''}"><strong>${number(result.errors.length)}</strong> linhas inválidas</span></div>
+        ${result.excluded ? `<p class="audience-warning">${number(result.excluded)} fixo(s) ou 0800 removido(s) desta seleção.</p>` : ''}
         ${result.blocked ? `<p class="audience-warning">${number(result.blocked)} contato(s) já estavam sem autorização e continuarão bloqueados.</p>` : ''}
         ${
           result.errors.length
@@ -171,7 +198,7 @@ class AudiencePicker {
                 .slice(0, 4)
                 .map(
                   (contact) =>
-                    `<span><b>${escape(contact.name)}</b><span>${escape(phone(contact.phone))}${contact.blocked ? ' · Sem autorização' : ''}</span></span>`,
+                    `<span><b>${escape(contact.name)}</b><span>${escape(phone(contact.phone))}${contact.phoneType === 'fixed' ? ' · Fixo' : contact.phoneType === 'tollFree' ? ' · 0800' : ''}${contact.blocked ? ' · Sem autorização' : ''}</span></span>`,
                 )
                 .join(
                   '',
@@ -201,6 +228,12 @@ class AudiencePicker {
     if (version !== this.version) throw new Error('Os contatos mudaram. Confira novamente antes de salvar.');
     if (!result || result.errors.length)
       throw new Error('Corrija as linhas indicadas na prévia de contatos.');
+    if ((result.phoneTypes.fixed || result.phoneTypes.tollFree) && !this.phoneChoice.value) {
+      this.phoneChoice.focus();
+      throw new Error('Escolha se quer remover ou manter os fixos e 0800.');
+    }
+    if (!result.unique && result.excluded)
+      throw new Error('O filtro removeu todos os números. Mantenha os fixos e 0800 ou adicione outros contatos.');
     if (!result.eligible) throw new Error('Não há contatos autorizados disponíveis.');
     return { ...input, optedIn: true };
   }
@@ -230,7 +263,8 @@ async function openEasyImport() {
       body: { ...payload, ...(listId ? { listId } : { listName }) },
     });
     modal.close();
-    toast(`${result.linked} contato(s) adicionado(s) à lista “${result.listName}”. Novos cadastros: ${result.created}.`);
+    const filtered = result.excluded ? ` ${number(result.excluded)} fixo(s) ou 0800 ficaram de fora.` : '';
+    toast(`${result.linked} contato(s) adicionado(s) à lista “${result.listName}”. Novos cadastros: ${result.created}.${filtered}`);
     await renderPage(true);
   });
 }

@@ -1,9 +1,9 @@
-PROVEDORES REGIONAIS DE INTERNET | 24/11/2026
-363 telefones distintos em 130 de 163 cidades da lista.
-394 registros por cidade (centrais regionais podem atender mais de um município).
+PROVEDORES REGIONAIS DE INTERNET | 26/11/2026
+424 telefones distintos em 163 de 163 cidades da lista.
+467 registros por cidade (centrais regionais podem atender mais de um município).
 Formato: provedor | telefone | tipo | fonte.
-Fontes: canais institucionais e cadastro SCM/STEL da Anatel. Para o cadastro, a cidade corresponde ao endereço registrado. Foram selecionados até 10 números de cadastro por cidade, sem completar dígitos ausentes.
-WhatsApp indicado quando anunciado pelo provedor na fonte consultada. A pesquisa não confirma que os números estejam ativos, que cheguem ao setor de compras ou que o provedor tenha interesse em contratar link.
+Fontes: sites de provedores, registros públicos, guias empresariais e cadastro SCM/STEL da Anatel. No levantamento inicial, foram selecionados até 10 números do cadastro por cidade; o município do cadastro corresponde ao endereço registrado.
+A coluna tipo indica a origem do número. Centrais de atendimento podem ser compartilhadas entre cidades. As fontes não confirmam se a linha está ativa nem se atende o setor de compras.
 Todos os telefones distintos deste relatório estão em provedores_whatsapp_publico.txt, no formato Nome;telefone. Centrais 0800 foram formatadas como 55800. Consulte a coluna tipo neste relatório para identificar os números divulgados como WhatsApp.
 
 Arapiraca - AL
@@ -17,6 +17,8 @@ Arapiraca - AL
 
 Delmiro Gouveia - AL
   DG Net Provedor | +55 (82) 98114-9568 | WhatsApp divulgado pelo provedor | https://www.dgnetprovedor.com.br/
+  Timernet Telecom | +55 (82) 99957-6938 | Telefone divulgado pelo provedor | https://site.timernet.com.br/
+  Flash Network | +55 (82) 98129-5589 | Telefone divulgado pelo provedor | https://flashnetwork.com.br/
 
 Maceió - AL
   Rupi Telecom | +55 (82) 98193-6552 | WhatsApp divulgado pelo provedor | https://rupitelecom.com.br/
@@ -39,9 +41,12 @@ Olho d’Água das Flores - AL
 
 Palmeira dos Índios - AL
   Supply Net | +55 (82) 3421-3256 | Telefone em lista empresarial pública | https://www.solutudo.com.br/empresas/al/palmeira-indios/provedores%2Bde%2Binternet?pagina=1
+  Supply Net | +55 (82) 99911-0235 | WhatsApp divulgado pelo provedor | https://www.provedorsupply.net.br/
+  Supply Net | +55 (82) 99665-1314 | Telefone divulgado pelo provedor | https://www.provedorsupply.net.br/
+  Supply Net | 0800 000 3664 | Telefone divulgado pelo provedor | https://www.provedorsupply.net.br/
 
 Piranhas - AL
-  GNet Telecom | +55 (82) 98724-5403 | Telefone divulgado pelo provedor | https://gnettelecom.inf.br/fale-conosco
+  GNet Telecom | +55 (82) 98724-5403 | WhatsApp divulgado pelo provedor | https://gnettelecom.inf.br/fale-conosco
 
 Rio Largo - AL
   Rupi Telecom | +55 (82) 98193-6552 | WhatsApp divulgado pelo provedor | https://rupitelecom.com.br/
@@ -132,7 +137,7 @@ Acaraú - CE
   CYBER INFO PROVEDOR DE ACESSO LTDA - ME | +55 (88) 3661-0236 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
 
 Acopiara - CE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Moreira Holanda Informática | +55 (88) 99712-7800 | WhatsApp indicado em lista empresarial pública | https://www.solutudo.com.br/empresas/ce/acopiara/provedores%2Bde%2Binternet?pagina=1
 
 Aquiraz - CE
   AQUIRAZ SERVICOS DE INTERNET LTDA | +55 (85) 98916-1538 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
@@ -165,7 +170,8 @@ Caucaia - CE
   UNT TELECOM SOLUCOES EM TELECOMUNICACOES E SERVICOS TI LTDA | +55 (85) 3253-3410 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
 
 Cedro - CE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  ClickCedro | +55 (88) 99781-6285 | WhatsApp divulgado pelo provedor | https://clickcedro.com.br/
+  ClickCedro | +55 (88) 99264-3335 | Telefone divulgado pelo provedor | https://clickcedro.com.br/
 
 Crateús - CE
   Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco
@@ -189,7 +195,8 @@ Fortaleza - CE
   Ping Net Telecom Ltda | +55 (85) 98559-5567 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
 
 Guaraciaba do Norte - CE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Guaraciaba Net | +55 (88) 99901-2383 | WhatsApp divulgado pelo provedor | https://guaraciabanet.com/
+  Ibiapaba.com | +55 (88) 99261-5049 | Telefone divulgado pelo provedor | https://www.ibiapaba.com/
 
 Horizonte - CE
   Informais Comercio e Servicos de Informatica e Telecomunicaces Ltda | +55 (85) 3348-0572 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
@@ -208,7 +215,7 @@ Ipu - CE
   J S de Farias Telecomunicacoes e Comercio Ltda | +55 (88) 99762-7404 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
 
 Iracema - CE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Brisanet | +55 (84) 98111-8525 | WhatsApp divulgado pelo provedor | https://www.brisanet.com.br/ofertas-especiais/5g-solo-100gb-pago-portabilidade/ | https://redesmoveisfixas.com/cidade/iracema-ce | https://brisasite-api.brisanet.com.br/uploads/portifolio_d3a184082c.pdf
 
 Itapajé - CE
   Itapajenet Servicos de Acesso A Internet Eireli | +55 (85) 99177-5713 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
@@ -223,7 +230,7 @@ Jaguaretama - CE
   Fradenet Servicos de Comunicacao Multimidia Eireli | +55 (88) 3279-1713 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
 
 Jaguaribara - CE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Brisanet | +55 (84) 98111-8525 | WhatsApp divulgado pelo provedor | https://www.brisanet.com.br/ofertas-especiais/5g-solo-100gb-pago-portabilidade/ | https://redesmoveisfixas.com/cidade/jaguaribara-ce | https://brisasite-api.brisanet.com.br/uploads/portifolio_d3a184082c.pdf
 
 Jaguaribe - CE
   VEX TELECOM SERVIÇOS DE TELECOMUNICAÇÃO LTDA - ME | +55 (88) 3522-1865 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=3&c=1
@@ -234,7 +241,9 @@ Juazeiro do Norte - CE
   S. D. SERVICOS DE COMUNICACAO LTDA | +55 (88) 3571-8027 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
 
 Lavras da Mangabeira - CE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  ClickCedro | +55 (88) 99781-6285 | WhatsApp divulgado pelo provedor | https://clickcedro.com.br/
+  OSNet Telecom | +55 (88) 99290-0506 | Telefone divulgado pelo provedor | https://www.osnettelecom.com.br/
+  OSNet Telecom | +55 (88) 99713-8306 | Telefone divulgado pelo provedor | https://www.osnettelecom.com.br/
 
 Limoeiro do Norte - CE
   Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco
@@ -251,10 +260,12 @@ Maranguape - CE
   RAPIX TELECOMUNICACAO E SERVICOS LTDA | +55 (85) 3254-7617 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
 
 Milagres - CE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  ADLLink Telecom | +55 (83) 3531-9800 | Telefone divulgado pelo provedor | https://www.adllink.com.br/ | https://www-storage.voxtecnologia.com.br/?f=764&i=publicado_102444_2024-09-12_dd22f6133101cee0430d9fd9a289c757.pdf&m=sigpub.publicacao
+  ADLLink Telecom | 0800 083 2988 | Telefone divulgado pelo provedor | https://www.adllink.com.br/ | https://www-storage.voxtecnologia.com.br/?f=764&i=publicado_102444_2024-09-12_dd22f6133101cee0430d9fd9a289c757.pdf&m=sigpub.publicacao
 
 Missão Velha - CE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Acesso Simples | +55 (88) 98862-2472 | WhatsApp divulgado pelo provedor | https://acessosimples.com/internet-fibra-em-missao-velha
+  Acesso Simples | 0800 280 1028 | Telefone divulgado pelo provedor | https://acessosimples.com/internet-fibra-em-missao-velha
 
 Mombaça - CE
   Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco
@@ -278,16 +289,18 @@ Pedra Branca - CE
   Nett Virtual Telecom | +55 (88) 99992-2627 | Telefone divulgado pelo provedor | https://nettvirtual.com.br/quem-somos/
 
 Pereiro - CE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Brisanet | +55 (84) 98111-8525 | WhatsApp divulgado pelo provedor | https://www.brisanet.com.br/ofertas-especiais/5g-solo-100gb-pago-portabilidade/ | https://www.brisanet.com.br/seguranca | https://brisasite-api.brisanet.com.br/uploads/portifolio_d3a184082c.pdf
 
 Quixadá - CE
   Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco
 
 Quixeramobim - CE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Conecta Fibra Óptica | 0800 002 9000 | WhatsApp divulgado pelo provedor | https://conectace.com.br/quixeramobim-ce
+  Conecta Fibra Óptica | +55 (88) 3441-3271 | Telefone em lista empresarial pública | https://www.solutudo.com.br/empresas/ce/quixeramobim/provedores-de-internet/conecta-provedor-de-internet-ltda-8475170
 
 Quixeré - CE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Telecab | +55 (84) 3323-1210 | WhatsApp divulgado pelo provedor | https://telecab.com.br/home.php | https://telecab.com.br/wp-content/uploads/2025/05/TELECAB-Regulamento-Autorizado.pdf
+  Telecab | +55 (84) 3323-1212 | WhatsApp divulgado pelo provedor | https://telecab.com.br/home.php | https://telecab.com.br/wp-content/uploads/2025/05/TELECAB-Regulamento-Autorizado.pdf
 
 Russas - CE
   Solucoes Net Telecom Ltda | +55 (88) 3411-6418 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
@@ -298,7 +311,7 @@ São Benedito - CE
   Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco | https://www.gigamaisfibra.com.br/wp-content/uploads/2025/04/SO%CC%81CIO_VOZAO_Novo-regulamento-de-oferta-B2C-GIGA-FIBRA-Abr.25-1.pdf
 
 Senador Pompeu - CE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Brisanet | +55 (84) 98111-8525 | WhatsApp divulgado pelo provedor | https://www.brisanet.com.br/ofertas-especiais/5g-solo-100gb-pago-portabilidade/ | https://taforahoje.com.br/brisanet/ce/senador-pompeu
 
 Sobral - CE
   Cmnet Fibra Optica Ltda | +55 (88) 99360-1881 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045
@@ -321,7 +334,9 @@ Ubajara - CE
   Giga+ Fibra (central regional) | +55 (22) 2041-0353 | WhatsApp divulgado pelo provedor | https://www.gigamaisfibra.com.br/fale-conosco | https://www.gigamaisfibra.com.br/wp-content/uploads/2025/04/SO%CC%81CIO_VOZAO_Novo-regulamento-de-oferta-B2C-GIGA-FIBRA-Abr.25-1.pdf
 
 Várzea Alegre - CE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Líder Link | +55 (88) 99224-0120 | Telefone divulgado pelo provedor | https://www.liderlink.com.br/
+  Líder Link | 0800 071 0711 | Telefone divulgado pelo provedor | https://www.liderlink.com.br/
+  Agility Telecom | +55 (88) 98119-6944 | Telefone divulgado pelo provedor | https://www.agilitytelecomvza.com.br/
 
 Viçosa do Ceará - CE
   Teknet Servicos de Telecomunicacoes Ltda | +55 (88) 98136-9466 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=CE&pNumServico=045&nav=2&c=1
@@ -383,13 +398,18 @@ Patos - PB
   MIO SERVICOS DE TELECOMUNICACOES PATOS LTDA - ME | +55 (83) 3423-3381 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
 
 Pombal - PB
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Torpedo Telecom | +55 (83) 99634-0099 | WhatsApp divulgado pelo provedor | https://torpedolinktelecom.com.br/
+  Torpedo Telecom | +55 (83) 99624-5252 | WhatsApp divulgado pelo provedor | https://torpedolinktelecom.com.br/
+  Torpedo Telecom | +55 (83) 3431-1442 | Telefone divulgado pelo provedor | https://torpedolinktelecom.com.br/
+  MTec Telecom | 0800 591 3179 | WhatsApp divulgado pelo provedor | https://www.mtectelecompb.com.br/quem-somos/
+  MTec Telecom | +55 (83) 99894-0514 | Telefone divulgado pelo provedor | https://www.mtectelecompb.com.br/quem-somos/
 
 Queimadas - PB
   AMOR SERVICOS DE TELECOMUNICACOES LTDA-ME | +55 (83) 3392-1130 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
 
 Santa Luzia - PB
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Mylink Internet | +55 (83) 99895-3181 | WhatsApp divulgado pelo provedor | https://mylinkinternet.net/
+  LGNET | 0800 591 7274 | WhatsApp divulgado pelo provedor | https://www.lgnetpb.com.br/cidade/santa-luzia
 
 Santa Rita - PB
   Fibra Net Tecnologia e Telecomunicacoes Ltda | +55 (83) 99604-1035 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PB&pNumServico=045
@@ -419,13 +439,15 @@ Belo Jardim - PE
   Digital Tecnologia & Telecomunicacao Ltda | +55 (81) 3726-3125 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
 
 Bezerros - PE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  DTEL Telecom | 0800 001 2008 | Telefone divulgado pelo provedor | https://dtel.com.br/src/assets/documents/NOVO%20REGULAMENTO%20DTEL%20M%C3%93VEL%20%281%29_1739986434.pdf | https://dtel.com.br/src/assets/documents/OFERTA%20PROMOCIONAL%20BEZERROS%20E%20SAIR%C3%89_1741359380.pdf
+  Planeta Net | +55 (81) 3728-3190 | Telefone em lista empresarial pública | https://www.cylex.com.br/bezerros/servi%C3%A7os-de-provedores-de-internet/
+  Mentrix Telecom | +55 (81) 3728-1479 | Telefone em lista empresarial pública | https://www.cylex.com.br/bezerros/servi%C3%A7os-de-provedores-de-internet/
 
 Bom Conselho - PE
   J L Net Telecom Ltda | +55 (87) 98178-7187 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
 
 Brejo da Madre de Deus - PE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Atel Telecom | 0800 000 0089 | WhatsApp divulgado pelo provedor | https://ateltelecom.com.br/contato/ | https://www.fiquemovel.com.br/unidades
 
 Cabo de Santo Agostinho - PE
   Turbo Net Telecomunicacoes Ltda | +55 (81) 3518-3810 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=2&c=1
@@ -552,7 +574,8 @@ Santa Cruz do Capibaribe - PE
   Rede.com Telecom Ltda | +55 (81) 3731-9783 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045
 
 São Lourenço da Mata - PE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Fibernett | +55 (81) 98980-0301 | WhatsApp divulgado pelo provedor | https://fibernett.com.br/
+  Fibernett | +55 (81) 3519-3873 | Telefone divulgado pelo provedor | https://fibernett.com.br/
 
 Serra Talhada - PE
   Serra Telecomunicacoes Ltda | +55 (87) 98154-9099 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PE&pNumServico=045&nav=3&c=1
@@ -578,16 +601,19 @@ Altos - PI
   Loop Fibra Ltda | +55 (86) 3263-2848 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=PI&pNumServico=045
 
 Buriti dos Montes - PI
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Buriti Net Telecom | +55 (86) 98102-7082 | WhatsApp indicado em lista empresarial pública | https://www.solutudo.com.br/empresas/pi/buriti-montes/provedores-de-internet/buriti-net-telecom-12757178
 
 Campo Maior - PI
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Alcantaranet | +55 (86) 99541-0954 | Telefone divulgado pelo provedor | https://www.alcantaranet.net.br/
+  Alcantaranet | +55 (86) 98143-1253 | Telefone divulgado pelo provedor | https://www.alcantaranet.net.br/
+  Infornet Campo Maior | +55 (86) 98147-6677 | Telefone em lista empresarial pública | https://consertabrasil.com/manutencao-de-computadores/campo-maior/infornet-campo-maior/
+  G3 Telecom | 0800 186 6000 | Telefone divulgado pelo provedor | https://vemprag3.com.br/atendimento
 
 Hugo Napoleão - PI
-  Sem telefone empresarial localizado nas fontes consultadas.
+  G3 Telecom | 0800 186 6000 | Telefone divulgado pelo provedor | https://vemprag3.com.br/atendimento
 
 Luís Correia - PI
-  Sem telefone empresarial localizado nas fontes consultadas.
+  PortalNet Telecom | +55 (86) 99501-6755 | WhatsApp divulgado pelo provedor | https://portalnettelecom.net.br/
 
 Parnaíba - PI
   Delta Connect | 0800 086 0100 | Telefone divulgado pelo provedor | https://www.deltaconnect.com.br/
@@ -602,7 +628,10 @@ Pio IX - PI
   VirteX Telecom | 0800 089 0089 | WhatsApp divulgado pelo provedor | https://virtex.com.br/pio-ix
 
 Piripiri - PI
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Infototal Piripiri | +55 (86) 3276-1173 | Telefone divulgado pelo provedor | https://infototalpiripiri.com.br/fale-conosco/
+  Infototal Piripiri | +55 (86) 99964-9595 | Telefone divulgado pelo provedor | https://infototalpiripiri.com.br/fale-conosco/
+  Infototal Piripiri | +55 (86) 99924-2715 | Telefone divulgado pelo provedor | https://infototalpiripiri.com.br/fale-conosco/
+  Piripirinet | +55 (86) 99995-5124 | Telefone divulgado pelo provedor | https://piripirinet.com.br/sobre/
 
 Teresina - PI
   G3 Telecom | 0800 186 6000 | Telefone divulgado pelo provedor | https://vemprag3.com.br/atendimento
@@ -633,7 +662,8 @@ Ceará-Mirim - RN
   Proxxima Telecom | 0800 083 1155 | WhatsApp divulgado pelo provedor | https://internet-fibra.proxxima.net/rn/ceara-mirim/ | https://proxxima.net/atendimento/
 
 Coronel João Pessoa - RN
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Glee Telecom | +55 (84) 99894-7953 | Telefone em registro empresarial/documento público | https://www.efirma.com.br/empresa/glee-telecom | https://www.coroneljoaopessoa.rn.gov.br/portal/contrato/141
+  Local Telecom | +55 (84) 99617-9171 | Telefone em registro empresarial/documento público | https://guiapj.com.br/consulta-cnpj/25257331000132 | https://diariooficial.fecamrn.com.br/files/20f4ff42537ce4276ec4bb8b044aa2459538d195.pdf
 
 Doutor Severiano - RN
   Local Telecom | +55 (84) 99617-9171 | Telefone em registro empresarial/documento público | https://guiapj.com.br/consulta-cnpj/25257331000132 | https://diariooficial.fecamrn.com.br/files/2340_2026-02-09.pdf
@@ -648,10 +678,10 @@ Francisco Dantas - RN
   TCM Telecom | +55 (84) 3315-0700 | WhatsApp divulgado pelo provedor | https://tcmtelecom.com.br/
 
 José da Penha - RN
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Brisanet | +55 (84) 98111-8525 | WhatsApp divulgado pelo provedor | https://www.brisanet.com.br/ofertas-especiais/5g-solo-100gb-pago-portabilidade/ | https://taforahoje.com.br/brisanet/rn/jose-da-penha
 
 Luís Gomes - RN
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Brisanet | +55 (84) 98111-8525 | WhatsApp divulgado pelo provedor | https://www.brisanet.com.br/ofertas-especiais/5g-solo-100gb-pago-portabilidade/ | https://redesmoveisfixas.com/cidade/luis-gomes-rn
 
 Macaíba - RN
   Wr Net Provedor Limitada | +55 (84) 3211-9729 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
@@ -660,10 +690,10 @@ Macaíba - RN
   MT INTERNET COMÉRCIO E SERVIÇOS LTDA | +55 (84) 99175-1000 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
 
 Major Sales - RN
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Agil Net Provedor de Internet | +55 (84) 99942-7032 | Telefone em registro empresarial/documento público | https://cnpj.biz/18981754000135
 
 Martins - RN
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Provedor Gnet | +55 (84) 99972-5675 | WhatsApp divulgado pelo provedor | https://provedorgnet.com.br/
 
 Mossoró - RN
   TCM Telecom | +55 (84) 3315-0700 | WhatsApp divulgado pelo provedor | https://tcmtelecom.com.br/
@@ -700,7 +730,7 @@ Pau dos Ferros - RN
   REDE OESTE DE COMUNICACAO LTDA | +55 (84) 3315-0717 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=RN&pNumServico=045
 
 Portalegre - RN
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Provedor Gnet | +55 (84) 99972-5675 | WhatsApp divulgado pelo provedor | https://provedorgnet.com.br/
 
 Rafael Fernandes - RN
   TCM Telecom | +55 (84) 3315-0700 | WhatsApp divulgado pelo provedor | https://tcmtelecom.com.br/
@@ -709,13 +739,20 @@ São Gonçalo do Amarante - RN
   Proxxima Telecom | 0800 083 1155 | WhatsApp divulgado pelo provedor | https://internet-fibra.proxxima.net/rn/ceara-mirim/ | https://proxxima.net/atendimento/
 
 São José de Mipibu - RN
-  Sem telefone empresarial localizado nas fontes consultadas.
+  JL Telecom | +55 (84) 98159-1247 | Telefone divulgado pelo provedor | https://jltelecomrn.com.br/
+  JL Telecom | 0800 000 3058 | Telefone divulgado pelo provedor | https://jltelecomrn.com.br/
+  Net4You | +55 (84) 3034-9999 | WhatsApp divulgado pelo provedor | https://www.net4you.com.br/aempresa.php
+  Atlântica Banda Larga | +55 (84) 98189-1096 | WhatsApp divulgado pelo provedor | https://www.atlanticabandalarga.com/fale.html
+  Atlântica Banda Larga | +55 (84) 99456-0621 | WhatsApp divulgado pelo provedor | https://www.atlanticabandalarga.com/fale.html
+  Mipibu Telecom | +55 (84) 3190-1235 | Telefone divulgado pelo provedor | https://mipibutelecom.com.br/empresa/
+  Mipibu Telecom | +55 (84) 99443-4844 | Telefone divulgado pelo provedor | https://mipibutelecom.com.br/empresa/
+  WLink Telecomunicações | +55 (84) 3633-6072 | Telefone divulgado pelo provedor | https://wlinktelecom.net.br/contato/
 
 São Miguel - RN
   Local Telecom | +55 (84) 99617-9171 | Telefone em registro empresarial/documento público | https://guiapj.com.br/consulta-cnpj/25257331000132
 
 Umarizal - RN
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Provedor Gnet | +55 (84) 99972-5675 | WhatsApp divulgado pelo provedor | https://provedorgnet.com.br/
 
 Aracaju - SE
   Fibracom Servicos de Comunicacao Ltda | +55 (79) 99848-5710 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
@@ -730,13 +767,16 @@ Aracaju - SE
   SPEED TELECOM LTDA - ME | +55 (79) 3231-8781 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
 
 Barra dos Coqueiros - SE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Digital Telecom | +55 (79) 99658-0645 | WhatsApp divulgado pelo provedor | https://www.sejadigitaltelecom.com.br/
+  Digital Telecom | +55 (79) 3042-2807 | Telefone divulgado pelo provedor | https://www.sejadigitaltelecom.com.br/
+  Digital Telecom | 0800 440 8888 | Telefone divulgado pelo provedor | https://www.sejadigitaltelecom.com.br/
 
 Canindé de São Francisco - SE
   Turbo Online | +55 (79) 99832-8629 | WhatsApp divulgado pelo provedor | https://turboonline.com.br/contato
 
 Estância - SE
-  Sem telefone empresarial localizado nas fontes consultadas.
+  Acesso Fibra | 0800 731 1030 | Telefone divulgado pelo provedor | https://www.acesso.net.br/
+  Acesso Fibra | +55 (79) 3522-1030 | Telefone em lista empresarial pública | https://paginaamarela.com.br/empresa/acesso-net/estancia/se/11090464
 
 Itabaiana - SE
   ITNET | +55 (79) 3431-5555 | Telefone em registro empresarial/documento público | https://itabaiana.se.gov.br/download/licitanet-ata-de-registro-de-preco_ddb279047f426984a454a87.pdf
@@ -758,4 +798,3 @@ São Cristóvão - SE
 Tobias Barreto - SE
   Ligeirinha Solucoes de Internet Ltda | +55 (79) 3431-1640 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
   G R V TELECOM LTDA | +55 (79) 3541-3572 | Cadastro SCM/Anatel | https://sistemas.anatel.gov.br/stel/consultas/ListaPrestadorasLocalidade/tela.asp?SiglaUF=SE&pNumServico=045
-

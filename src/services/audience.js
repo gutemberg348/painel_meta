@@ -6,11 +6,23 @@ export const audienceSchema = z.object({
   text: z.string().trim().min(1, 'Adicione os números ou selecione um arquivo.').max(900000),
   format: z.enum(['csv', 'txt', 'paste']),
   countryCode: z.enum(['', '55']).default(''),
+  excludeFixedOrTollFree: z.boolean().default(false),
 });
+
+function contactLookup(db) {
+  const lookup = db.prepare(
+    'SELECT id,name,opted_in FROM contacts WHERE phone IN (?,?) ORDER BY opted_in, phone = ? DESC LIMIT 1',
+  );
+  return (phone) => {
+    // Importações antigas podiam manter o zero nacional depois do DDI.
+    const legacyPhone = /^55800\d{7}$/.test(phone) ? `550${phone.slice(2)}` : phone;
+    return lookup.get(phone, legacyPhone, phone);
+  };
+}
 
 // Uma única interpretação no servidor para prévia, importação e campanha.
 export function parseAudience(input, db) {
-  const { text, format, countryCode } = audienceSchema.parse(input);
+  const { text, format, countryCode, excludeFixedOrTollFree } = audienceSchema.parse(input);
   let rows;
   if (format === 'csv') {
     try {
@@ -61,10 +73,13 @@ export function parseAudience(input, db) {
   let duplicates = 0,
     blocked = 0,
     existingCount = 0;
+  const phoneTypes = { fixed: 0, tollFree: 0 };
+  const findContact = contactLookup(db);
   for (const row of rows) {
     let phone = row.phone.replace(/[\s()+.\-]/g, '');
     if (countryCode === '55' && !row.phone.trim().startsWith('+') && /^(\d{10}|\d{11})$/.test(phone))
       phone = `55${phone}`;
+    if (/^550800\d{7}$/.test(phone)) phone = `55${phone.slice(3)}`;
     const name = row.name.trim() || `Contato ${phone}`;
     const email = row.email.trim();
     if (
@@ -84,13 +99,19 @@ export function parseAudience(input, db) {
       continue;
     }
     seen.add(phone);
-    const existing = db.prepare('SELECT name,opted_in FROM contacts WHERE phone=?').get(phone);
+    const phoneType = /^55800\d{7}$/.test(phone) ? 'tollFree' : /^55[1-9]\d[2-5]\d{7}$/.test(phone) ? 'fixed' : null;
+    if (phoneType) {
+      phoneTypes[phoneType]++;
+      if (excludeFixedOrTollFree) continue;
+    }
+    const existing = findContact(phone);
     if (existing) existingCount++;
     if (existing && !existing.opted_in) blocked++;
     contacts.push({
       name: existing?.name || name,
       phone,
       email,
+      phoneType,
       blocked: Boolean(existing && !existing.opted_in),
     });
   }
@@ -102,6 +123,8 @@ export function parseAudience(input, db) {
     duplicates,
     blocked,
     existing: existingCount,
+    phoneTypes,
+    excluded: excludeFixedOrTollFree ? phoneTypes.fixed + phoneTypes.tollFree : 0,
     errors,
   };
 }
@@ -114,6 +137,8 @@ export function requireValidAudience(result) {
       ),
       { status: 400 },
     );
+  if (!result.contacts.length && result.excluded)
+    throw Object.assign(new Error('O filtro removeu todos os números. Mantenha os fixos e 0800 ou adicione outros contatos.'), { status: 400 });
   if (!result.contacts.length)
     throw Object.assign(new Error('Nenhum número válido encontrado.'), { status: 400 });
 }
@@ -122,8 +147,9 @@ export function requireValidAudience(result) {
 export function saveAudience(db, listId, contacts) {
   let created = 0,
     linked = 0;
+  const findContact = contactLookup(db);
   for (const row of contacts) {
-    const existing = db.prepare('SELECT id FROM contacts WHERE phone=?').get(row.phone);
+    const existing = findContact(row.phone);
     const contactId = existing?.id || randomUUID();
     if (!existing) {
       db.prepare('INSERT INTO contacts VALUES (?,?,?,?,?,?)').run(

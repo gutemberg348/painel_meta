@@ -343,6 +343,31 @@ test('TXT pode criar uma lista; importação preserva contato existente sem auto
   assert.equal(f.db.prepare('SELECT opted_in FROM contacts WHERE phone=?').get('5591999999999').opted_in, 0);
 });
 
+test('prévia e importação aplicam a escolha sobre números fixos e 0800', async () => {
+  const audience = {
+    format: 'csv',
+    countryCode: '55',
+    text: 'nome;telefone\nFixo;(91) 3344-5566\nCentral;0800 123 4567\nCentral;558001234567\nMóvel;91999999999',
+  };
+  const original = await post('/contacts/preview', audience).expect(200);
+  assert.deepEqual(original.body.phoneTypes, { fixed: 1, tollFree: 1 });
+  assert.equal(original.body.duplicates, 1);
+  assert.equal(original.body.eligible, 3);
+  assert.deepEqual(original.body.contacts.map(contact => contact.phoneType), ['fixed', 'tollFree', null]);
+
+  const filtered = { ...audience, excludeFixedOrTollFree: true };
+  const preview = await post('/contacts/preview', filtered).expect(200);
+  assert.equal(preview.body.excluded, 2);
+  assert.equal(preview.body.eligible, 1);
+  const imported = await post('/contacts/import', { audience: filtered, optedIn: true }).expect(200);
+  assert.equal(imported.body.excluded, 2);
+  assert.deepEqual(f.db.prepare('SELECT phone FROM contacts').all(), [{ phone: '5591999999999' }]);
+
+  const kept = await post('/contacts/import', { audience, optedIn: true }).expect(200);
+  assert.equal(kept.body.excluded, 0);
+  assert.equal(kept.body.linked, 3);
+});
+
 test('campanha aceita APPROVED e parâmetros entre colchetes, criando audiência sem disparar', async () => {
   const originalTemplates = f.flw.templates;
   f.flw.templates = async () =>
@@ -358,7 +383,12 @@ test('campanha aceita APPROVED e parâmetros entre colchetes, criando audiência
     templateId: f.templateId,
     optedIn: true,
     parameters: { '[nome_provedor]': '{{nome}}', '[nome_empresa]': 'Totalk' },
-    audience: { format: 'paste', countryCode: '55', text: 'Provedor Alfa;91999999999' },
+    audience: {
+      format: 'paste',
+      countryCode: '55',
+      text: 'Provedor Alfa;91999999999\nCentral;0800 123 4567',
+      excludeFixedOrTollFree: true,
+    },
   };
   await post('/campaigns', { ...body, parameters: {} }).expect(400);
   assert.equal(f.db.prepare('SELECT COUNT(*) n FROM lists').get().n, 0);
