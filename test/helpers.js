@@ -24,7 +24,7 @@ export function fixture() {
     {
       id: randomUUID(),
       text: 'Olá, quero saber mais!',
-      direction: 'TO_HUB',
+      direction: 'FROM_HUB',
       status: 'DELIVERED',
       createdAt: new Date().toISOString(),
       type: 'TEXT',
@@ -79,7 +79,7 @@ export function fixture() {
         id: randomUUID(),
         text,
         sessionId: id,
-        direction: 'FROM_HUB',
+        direction: 'TO_HUB',
         status: 'QUEUED',
         createdAt: new Date().toISOString(),
         type: 'TEXT',

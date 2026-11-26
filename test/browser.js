@@ -91,10 +91,10 @@ try {
 
   await page.locator('nav [data-page=conversations]').click();
   await page.locator('.conversation-item').first().click();
-  await page.locator('#messages').getByText('Olá, quero saber mais!', { exact: false }).waitFor();
+  await page.locator('#messages .message:not(.outgoing)').filter({ hasText: 'Olá, quero saber mais!' }).waitFor();
   await page.locator('#reply-form textarea').fill('Olá, Marina! Como posso ajudar?');
   await page.getByRole('button', { name: 'Enviar resposta' }).click();
-  await page.locator('#messages').getByText('Olá, Marina! Como posso ajudar?', { exact: false }).waitFor();
+  await page.locator('#messages .message.outgoing').filter({ hasText: 'Olá, Marina! Como posso ajudar?' }).waitFor();
   await page.screenshot({ path: 'test-results/inbox-desktop.png', fullPage: true });
   await page.locator('nav [data-page=templates]').click();
   await page.getByRole('heading', { name: 'boas_vindas' }).waitFor();

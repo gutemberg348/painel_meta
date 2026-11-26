@@ -872,7 +872,7 @@ function messageItems(data) {
           const day = m.createdAt ? new Date(m.createdAt).toLocaleDateString('pt-BR', { dateStyle: 'long' }) : '';
           const separator = day && day !== previousDay ? `<span class="message-day">${escape(day)}</span>` : '';
           previousDay = day;
-          const outgoing = m.direction === 'FROM_HUB';
+          const outgoing = m.direction === 'TO_HUB';
           const status = outgoing && m.status ? ` · ${escape(statusMap[m.status.toLowerCase()]?.[0] || m.status)}` : '';
           const startsGroup = separator || index === 0 || messages[index - 1].direction !== m.direction;
           const author = outgoing ? 'Equipe' : (state.selectedConversation?.contactDetails?.name || state.selectedConversation?.title || 'Contato');
