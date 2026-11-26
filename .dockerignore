@@ -11,5 +11,6 @@
 !scripts/
 !scripts/flw-conexao.js
 !scripts/flw-templates.js
+!scripts/push-status.js
 !scripts/lib/
 !scripts/lib/**

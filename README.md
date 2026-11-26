@@ -237,6 +237,8 @@ O aviso abre a caixa de entrada e exibe apenas que chegou uma mensagem. Se o tok
 
 A caixa de entrada reúne as sessões do mesmo contato no mesmo canal e usa a sessão mais recente para responder. A leitura é registrada por usuário do painel quando as últimas mensagens estão visíveis na conversa. A lista e o chat se atualizam ao receber um evento e também consultam as novidades a cada cinco segundos enquanto a caixa estiver aberta.
 
+Para diagnosticar os avisos, rode `sudo docker compose exec -T painel node scripts/push-status.js` na pasta do projeto da VPS. O comando lê o SQLite e mostra o número de inscrições, a última consulta do monitor, os eventos e o retorno mais recente do serviço de push. Todos os horários estão em UTC. Um HTTP 2xx indica que o serviço aceitou o envio. A exibição na tela depende do aparelho. Os registros de aceite e falha começam com a publicação desta versão.
+
 ## Testar
 
 ```bash

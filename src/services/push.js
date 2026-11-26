@@ -73,16 +73,19 @@ export function pushRouter(db, config, inboxChannels) {
 
 export function startPushWorker(db, config) {
   let busy = false;
+  const saveResult = db.prepare('INSERT OR REPLACE INTO metadata(key,value) VALUES (?,?)');
   async function deliver(row) {
     // Uma tentativa sem confirmação pode já ter chegado ao telefone.
     const claim = db.prepare('DELETE FROM push_deliveries WHERE endpoint=? AND event_id=?').run(row.endpoint, row.event_id);
     if (!claim.changes) return;
     try {
-      await sendNotification({ endpoint: row.endpoint, keys: JSON.parse(row.keys_json) }, row.event_id, {
+      const response = await sendNotification({ endpoint: row.endpoint, keys: JSON.parse(row.keys_json) }, row.event_id, {
         vapidDetails: { subject: config.publicUrl || 'https://totalk.testes-techcode.shop', ...signingKeys(db) },
         topic: 'vieira-link-inbox', TTL: Math.max(0, Math.floor((row.expires_at - Date.now()) / 1000)), timeout: 8000,
       });
+      saveResult.run('pushLastAccepted', JSON.stringify({ at: Date.now(), code: response.statusCode }));
     } catch (error) {
+      saveResult.run('pushLastFailure', JSON.stringify({ at: Date.now(), code: Number(error.statusCode) || 0 }));
       if ([404, 410].includes(error.statusCode)) {
         db.prepare('DELETE FROM push_subscriptions WHERE endpoint=? AND keys_json=?').run(row.endpoint, row.keys_json);
       } else {

@@ -53,9 +53,13 @@ export function usersRouter(db, config, inboxChannels) {
     const channel = await assignment(data, previous);
     const hash = data.password ? await hashPassword(data.password) : null;
     db.transaction(() => {
+      // Preservar os aparelhos quando o gerente salva o mesmo vínculo de atendimento.
+      const current = db.prepare('SELECT role, channel_id FROM staff_users WHERE id=?').get(id);
+      if (!data.active || hash || current.role !== data.role || current.channel_id !== channel) {
+        db.prepare('DELETE FROM push_subscriptions WHERE account_id=?').run(id);
+      }
       db.prepare('UPDATE staff_users SET role=?, active=?, channel_id=?, password_hash=COALESCE(?,password_hash), version=version+1 WHERE id=?')
         .run(data.role, Number(data.active), channel, hash, id);
-      db.prepare('DELETE FROM push_subscriptions WHERE account_id=?').run(id);
     })();
     res.json({ ok: true });
   });

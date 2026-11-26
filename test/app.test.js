@@ -123,6 +123,8 @@ test('atendente só atende e cadastra notificações no WhatsApp atribuído pelo
   await subscribe({ ...sub, channelId: other.id }).expect(400);
   await subscribe(sub).expect(200);
   assert.equal(f.db.prepare('SELECT channel FROM push_subscriptions WHERE account_id=?').get(id).channel, primary.id);
+  await agent.put('/api/users/' + id).set('x-csrf-token', csrf).send({ role: 'agent', active: true, channelId: primary.id }).expect(200);
+  assert.equal(f.db.prepare('SELECT channel FROM push_subscriptions WHERE account_id=?').get(id).channel, primary.id);
   await agent.put('/api/users/' + id).set('x-csrf-token', csrf).send({ role: 'agent', active: true, channelId: other.id }).expect(200);
   assert.equal(f.db.prepare('SELECT 1 FROM push_subscriptions WHERE account_id=?').get(id), undefined);
   await staff.get('/api/conversations').expect(401);

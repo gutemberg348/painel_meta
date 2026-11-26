@@ -20,7 +20,7 @@ COPY package.json ./
 COPY src ./src
 COPY views ./views
 COPY public ./public
-COPY scripts/flw-conexao.js scripts/flw-templates.js ./scripts/
+COPY scripts/flw-conexao.js scripts/flw-templates.js scripts/push-status.js ./scripts/
 COPY scripts/lib ./scripts/lib
 RUN install -d -o node -g node -m 0700 /app/data
 USER node
