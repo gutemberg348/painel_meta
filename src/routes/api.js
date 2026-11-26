@@ -425,7 +425,7 @@ export function apiRouter(db, flw, campaigns, config, inboxChannels, chatCache) 
       })),
     };
     if (!channelId) return res.json({ ...scope, items: [], hasMorePages: false });
-    res.json({ ...scope, ...await threads.list(channelId, days, page, req.session.accountId || 'manager') });
+    res.json({ ...scope, ...await threads.list(channelId, days, page, req.session.accountId || 'manager', req.query.continuous === '1') });
   });
   router.get('/conversations/events', async (req, res) => {
     const { channelId } = await inboxScope(req.query.channelId, res.locals.account);
@@ -443,6 +443,13 @@ export function apiRouter(db, flw, campaigns, config, inboxChannels, chatCache) 
     const timeout = setTimeout(() => res.end(), 55000);
     res.on('close', () => { clearTimeout(timeout); chatCache.listeners.delete(notify); });
   });
+  router.delete('/conversations/:id', async (req, res) => {
+    if (!['manager', 'agent'].includes(res.locals.account.role)) fail('Seu perfil não pode apagar conversas.', 403);
+    const { channelId } = await inboxScope(req.query.channelId, res.locals.account);
+    const source = await scopedConversation(id.parse(req.params.id), channelId);
+    threads.remove(channelId, source);
+    res.sendStatus(204);
+  });
   router.get('/conversations/:id/messages', async (req, res) => {
     const sessionId = id.parse(req.params.id);
     const page = pageNumber(req.query.page);
@@ -450,10 +457,13 @@ export function apiRouter(db, flw, campaigns, config, inboxChannels, chatCache) 
     if (!channelId) fail('Selecione um canal WhatsApp antes de abrir a conversa.');
     const detail = id => chatCache.read(`thread:${channelId}:${id}:detail`, () => scopedConversation(id, channelId));
     const source = await detail(sessionId);
-    const sessions = await threads.related(channelId, source);
+    const related = await threads.related(channelId, source);
+    const removedAt = threads.removedAt(channelId, peerKey(source));
+    const sessions = removedAt ? related.filter(s => s.activity > removedAt) : related;
+    if (!sessions.length) return res.json({ removed: true });
     const latest = await detail(sessions[0].id);
     const replyVersion = lastReplies.get(`thread:${channelId}:${latest.id}:`) || '0';
-    const messages = await threads.history(channelId, sessions, page);
+    const messages = await threads.history(channelId, sessions, page, removedAt);
     const visibleMessages = messages.items || [];
     const lastMessage = visibleMessages.reduce((last, message) =>
       !last || Date.parse(message.createdAt) > Date.parse(last.createdAt) ? message : last, null);
@@ -461,7 +471,7 @@ export function apiRouter(db, flw, campaigns, config, inboxChannels, chatCache) 
     if (page === 1 && lastMessage?.direction === 'FROM_HUB' && lastMessage.text && lastMessage.text === latest.lastMessageText) {
       seenAt = Math.max(seenAt, Date.parse(latest.lastMessageIn) || 0);
     }
-    const data = { ...messages, seenAt, sessionId: latest.id, windowStatus: latest.windowStatus, replyVersion };
+    const data = { ...messages, removedAt, seenAt, sessionId: latest.id, windowStatus: latest.windowStatus, replyVersion };
     const revision = createHmac('sha256', revisionSecret).update(JSON.stringify(data)).digest('base64url');
     if (page === 1 && req.query.since === revision) return res.json({ unchanged: true });
     res.json({ ...data, revision });
@@ -500,6 +510,8 @@ export function apiRouter(db, flw, campaigns, config, inboxChannels, chatCache) 
     const { channelId } = await inboxScope(req.query.channelId, res.locals.account);
     const conversation = await scopedConversation(sessionId, channelId);
     const sessions = await threads.related(channelId, conversation);
+    const removedAt = threads.removedAt(channelId, peerKey(conversation));
+    if (removedAt && sessions[0].activity <= removedAt) fail('Esta conversa foi apagada da caixa de entrada.', 409);
     if (sessions[0].id !== sessionId) fail('Chegou uma continuação desta conversa. Atualize as mensagens antes de responder.', 409);
     if ('text' in body && conversation.windowStatus !== 'ACTIVE')
       fail('A janela de atendimento está fechada. Inicie uma nova conversa com um template aprovado.');

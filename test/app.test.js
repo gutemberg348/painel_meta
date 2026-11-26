@@ -19,6 +19,58 @@ afterEach(() => {
 });
 const post = (path, body = {}) => agent.post(`/api${path}`).set('x-csrf-token', csrf).send(body);
 
+test('rolagem mantém as conversas anteriores e agrupa sessões do mesmo contato entre lotes', async () => {
+  const rows = Array.from({ length: 43 }, (_, i) => ({
+    ...f.conversations[0], id: randomUUID(), number: String(5583999990000 + i),
+  }));
+  const sessions = [...rows.slice(0, 20), { ...rows[0], id: randomUUID() }, ...rows.slice(20)];
+  f.flw.sessions = async (_channel, _after, page) => ({
+    items: sessions.slice((page - 1) * 20, page * 20), hasMorePages: sessions.length > page * 20,
+  });
+  for (const depth of [1, 2, 3]) {
+    const response = await agent.get('/api/conversations?continuous=1&page=' + depth).expect(200);
+    assert.deepEqual(response.body.items.map(c => c.number), rows.slice(0, depth * 20).map(c => c.number));
+    assert.equal(response.body.hasMorePages, depth < 3);
+  }
+});
+
+test('exclusão pelo atendente limpa o histórico do canal também para o gerente e permite nova entrada', async () => {
+  const login = { username: 'bia', password: 'senha-da-equipe', role: 'agent', channelId: f.channelId };
+  await post('/users', login).expect(201);
+  const staff = request.agent(f.app);
+  const token = await authenticate(staff, login.username, login.password);
+  const path = '/api/conversations/' + f.sessionId;
+  await staff.delete(path + '?channelId=' + randomUUID()).set('x-csrf-token', token).expect(403);
+  await staff.delete(path).set('x-csrf-token', token).expect(204);
+  assert.deepEqual((await agent.get('/api/conversations').expect(200)).body.items, []);
+  assert.equal((await agent.get(path + '/messages').expect(200)).body.removed, true);
+
+  const { removed_at } = f.db.prepare('SELECT removed_at FROM inbox_removals').get();
+  const old = { ...f.conversations[0] };
+  const fresh = { ...old, id: randomUUID(), lastMessageIn: new Date(removed_at + 1000).toISOString() };
+  f.conversations.unshift(fresh);
+  f.flw.session = async id => f.conversations.find(s => s.id === id);
+  f.flw.messages = async () => ({ items: [
+    { id: 'nova', direction: 'FROM_HUB', createdAt: fresh.lastMessageIn },
+    { id: 'antiga', direction: 'TO_HUB', createdAt: old.createdAt },
+  ] });
+  const inbox = (await agent.get('/api/conversations?days=30').expect(200)).body;
+  assert.deepEqual(inbox.items.map(s => s.id), [fresh.id]);
+  const chat = (await staff.get('/api/conversations/' + fresh.id + '/messages').expect(200)).body;
+  assert.deepEqual(chat.items.map(m => m.id), ['nova']);
+});
+
+test('falha isolada sai da caixa e um atendimento com entrega anterior continua visível', async () => {
+  const base = { ...f.conversations[0], unreadCount: 0, windowStatus: 'NOT_STARTED' };
+  const mixed = { ...base, id: randomUUID(), number: '5591999990001' };
+  f.conversations.splice(0, 1, base, mixed);
+  const failed = { id: randomUUID(), direction: 'TO_HUB', status: 'FAILED' };
+  const delivered = { ...failed, id: randomUUID(), status: 'DELIVERED' };
+  f.flw.messages = async id => ({ items: id === base.id ? [failed] : [failed, delivered] });
+  const inbox = (await agent.get('/api/conversations').expect(200)).body;
+  assert.deepEqual(inbox.items.map(s => s.id), [mixed.id]);
+});
+
 test('continuação preserva o histórico e a leitura por usuário e canal', async () => {
   const first = f.conversations[0];
   const time = Date.now() - 5000;

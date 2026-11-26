@@ -19,7 +19,6 @@ const state = {
   channels: [],
   conversations: [],
   selectedConversation: null,
-  conversationPage: 1,
   conversationChannel: '',
   conversationDays: '7',
   conversationSearch: '',
@@ -151,6 +150,12 @@ async function renderPage(silent = false) {
     if (current !== navigation) return;
     main.innerHTML = html;
     icons();
+    if (state.page === 'conversations' && $('#conversation-more')) {
+      const list = $('#conversation-items');
+      list.addEventListener('scroll', () => checkInboxScroll(list), { passive: true });
+      showInboxLoadState();
+      requestAnimationFrame(() => checkInboxScroll(list));
+    }
     if (state.page === 'conversations' && state.selectedConversation) {
       await openConversation(state.selectedConversation.id, false);
     }
@@ -355,6 +360,7 @@ const pages = {
       );
     const data = await inboxPage();
     if (current !== navigation) return;
+    inboxStream = { navigation: current, depth: 1, more: data.hasMorePages, checkedAt: Date.now(), loading: false, error: false };
     state.conversationChannel = data.channelId;
     watchInbox(data.channelId);
     state.conversations = data.items || [];
@@ -383,16 +389,16 @@ const pages = {
                 ['1', 'Últimas 24 horas'], ['7', 'Últimos 7 dias'], ['30', 'Últimos 30 dias'], ['90', 'Últimos 90 dias'],
               ].map(([days, label]) => `<option value="${days}" ${days === state.conversationDays ? 'selected' : ''}>${label}</option>`).join('')}</select></label>` : ''}
             </div>
-            ${data.channelId ? `<div class="search-field">${icon('search')}<input id="conversation-search" type="search" placeholder="Buscar nome ou telefone" aria-label="Buscar conversas por nome ou telefone nesta página" value="${escape(state.conversationSearch)}"></div>
-              <div class="inbox-segments" role="group" aria-label="Conversas nesta página">
+            ${data.channelId ? `<div class="search-field">${icon('search')}<input id="conversation-search" type="search" placeholder="Buscar nome ou telefone" aria-label="Buscar entre as conversas carregadas" value="${escape(state.conversationSearch)}"></div>
+              <div class="inbox-segments" role="group" aria-label="Filtrar conversas">
                 <button type="button" data-action="filter-inbox-rows" data-mode="all" aria-pressed="${!state.unreadOnly}">Todas</button>
                 <button type="button" data-action="filter-inbox-rows" data-mode="unread" aria-pressed="${state.unreadOnly}">Não lidas <b>${number(state.conversations.filter(c => c.unreadCount > 0).length)}</b></button>
               </div>` : ''}
           </div>
           <div class="conversation-items" id="conversation-items">
-            ${data.channelId ? conversationItems() : empty('Escolha um canal', 'Selecione o número que você quer acompanhar.', '', 'smartphone', true)}
+            <div id="conversation-rows">${data.channelId ? conversationItems() : empty('Escolha um canal', 'Selecione o número que você quer acompanhar.', '', 'smartphone', true)}</div>
+            ${data.channelId ? '<div id="conversation-more" class="conversation-more"></div>' : ''}
           </div>
-          ${data.channelId ? `<div class="pagination"><button class="icon-button" data-action="conversation-prev" ${state.conversationPage <= 1 ? 'disabled' : ''} aria-label="Página anterior">${icon('chevron-left')}</button>Página ${state.conversationPage}<button class="icon-button" data-action="conversation-next" ${!data.hasMorePages ? 'disabled' : ''} aria-label="Próxima página">${icon('chevron-right')}</button></div>` : ''}
         </section>
         <section class="conversation-thread" id="conversation-thread">
           ${idleThread()}
@@ -737,19 +743,81 @@ const draftKey = (id) => {
   const row = state.conversations.find(c => c.id === id) || (state.selectedConversation?.id === id ? state.selectedConversation : null);
   return state.conversationChannel + '/' + (row?.peerKey || id);
 };
-function inboxPage() {
-  const query = new URLSearchParams({ page: state.conversationPage, days: state.conversationDays });
+let inboxStream;
+function inboxPage(depth = 1) {
+  const query = new URLSearchParams({ page: depth, days: state.conversationDays, continuous: '1' });
   if (state.conversationChannel) query.set('channelId', state.conversationChannel);
   return api(`/conversations?${query}`);
 }
+function showInboxLoadState() {
+  const footer = $('#conversation-more');
+  if (!footer) return;
+  let html = '';
+  if (inboxStream.loading) html = '<span role="status">Carregando conversas…</span>';
+  else if (inboxStream.error) html = '<button type="button" class="button ghost" data-action="more-conversations">Falha ao carregar · Tentar novamente</button>';
+  else if (inboxStream.more && (state.unreadOnly || state.conversationSearch.trim())) {
+    html = '<button type="button" class="button ghost" data-action="more-conversations">Buscar em mais conversas</button>';
+  }
+  if (footer.innerHTML !== html) footer.innerHTML = html;
+}
+function checkInboxScroll(list) {
+  if (!list.isConnected || !list.clientHeight || !inboxStream?.more || inboxStream.loading || inboxStream.error) return;
+  if ((state.unreadOnly || state.conversationSearch.trim()) && !list.scrollTop) return;
+  if (list.scrollHeight - list.scrollTop - list.clientHeight < 140) void loadMoreConversations();
+}
+async function loadMoreConversations() {
+  const stream = inboxStream;
+  if (!stream?.more || stream.loading || stream.navigation !== navigation) return;
+  const current = navigation;
+  stream.loading = true;
+  stream.error = false;
+  showInboxLoadState();
+  try {
+    const data = await inboxPage(stream.depth + 1);
+    if (current !== navigation || stream !== inboxStream) return;
+    const previous = state.conversations;
+    state.conversations = data.items || [];
+    stream.depth++;
+    stream.more = data.hasMorePages;
+    stream.checkedAt = Date.now();
+    if (previous.length && !state.unreadOnly && !state.conversationSearch.trim() && state.conversations.length > previous.length &&
+        JSON.stringify(previous) === JSON.stringify(state.conversations.slice(0, previous.length))) {
+      $('#conversation-rows').insertAdjacentHTML('beforeend', conversationItems(state.conversations.slice(previous.length)));
+      updateUnreadBadge();
+    } else updateInboxRows();
+  } catch {
+    stream.error = true;
+  } finally {
+    stream.loading = false;
+    if (current === navigation && stream === inboxStream) {
+      showInboxLoadState();
+      const list = $('#conversation-items');
+      if (list) requestAnimationFrame(() => checkInboxScroll(list));
+    }
+  }
+}
 function updateInboxRows() {
   const list = $('#conversation-items');
-  if (!list) return;
-  list.innerHTML = conversationItems();
+  const rows = $('#conversation-rows');
+  if (!rows || !list) return;
+  const rect = list.getBoundingClientRect();
+  const anchor = list.scrollTop && document.elementFromPoint(rect.left + 12, Math.max(0, rect.top) + 2)?.closest('.conversation-item');
+  const offset = anchor && anchor.getBoundingClientRect().top;
+  const focused = document.activeElement.closest('.conversation-item')?.dataset.peer;
+  rows.innerHTML = conversationItems();
+  if (anchor) {
+    const replacement = rows.querySelector(`[data-peer="${CSS.escape(anchor.dataset.peer)}"]`);
+    if (replacement) list.scrollTop += replacement.getBoundingClientRect().top - offset;
+  }
+  if (focused) rows.querySelector(`[data-peer="${CSS.escape(focused)}"]`)?.focus({ preventScroll: true });
+  updateUnreadBadge();
+  if (!state.selectedConversation) $('#conversation-thread').innerHTML = idleThread();
+  showInboxLoadState();
+  icons();
+}
+function updateUnreadBadge() {
   const badge = $('.inbox-segments [data-mode="unread"] b');
   if (badge) badge.textContent = number(state.conversations.filter(c => c.unreadCount > 0).length);
-  if (!state.selectedConversation) $('#conversation-thread').innerHTML = idleThread();
-  icons();
 }
 
 function visibleConversations() {
@@ -770,12 +838,11 @@ function idleThread() {
   return `<div class="thread-empty">${empty('Selecione uma conversa', 'Escolha um contato na lista para consultar o histórico e responder.', action, 'messages-square')}</div>`;
 }
 
-function conversationItems() {
-  const rows = visibleConversations();
+function conversationItems(rows = visibleConversations()) {
   const query = state.conversationSearch.trim();
   if (!rows.length)
     return empty(
-      query ? 'Nenhum resultado nesta página' : state.unreadOnly ? 'Nenhuma não lida nesta página' : 'Nenhuma conversa no período',
+      query ? 'Nenhum resultado nas conversas carregadas' : state.unreadOnly ? 'Nenhuma conversa não lida entre as carregadas' : 'Nenhuma conversa no período',
       query ? 'Tente outro nome ou número.' : state.unreadOnly ? 'Use Todas para ver as conversas lidas.' : 'Abra os filtros para selecionar um período maior.',
       '',
       'messages-square',
@@ -787,8 +854,8 @@ function conversationItems() {
         const selected = state.selectedConversation?.id === c.id;
         const updated = c.lastInteractionDate || c.createdAt;
         const today = updated && new Date(updated).toDateString() === new Date().toDateString();
-        const draft = replyDrafts.get(draftKey(c.id));
-        return `<button type="button" class="conversation-item ${selected ? 'active' : ''}" aria-pressed="${selected}" data-action="open-conversation" data-id="${escape(c.id)}"><span class="avatar ${c.unreadCount ? 'mint' : ''}">${escape(initials(c.contactDetails?.name || c.title))}</span><span class="conversation-item-content"><strong>${escape(c.contactDetails?.name || c.title || c.number || 'Contato')}</strong><span class="conversation-snippet">${draft ? '<b>Rascunho</b> ' + escape(draft) : escape(c.lastMessageText || 'Ver conversa')}</span></span><span class="conversation-meta"><small>${today ? time(updated) : date(updated)}</small>${c.unreadCount ? `<span class="badge blue" aria-label="${number(c.unreadCount)} não lidas">${number(c.unreadCount)}</span>` : ''}</span></button>`;
+        const draft = replyDrafts.get(state.conversationChannel + '/' + (c.peerKey || c.id));
+        return `<button type="button" class="conversation-item ${selected ? 'active' : ''}" aria-pressed="${selected}" data-action="open-conversation" data-id="${escape(c.id)}" data-peer="${escape(c.peerKey)}"><span class="avatar ${c.unreadCount ? 'mint' : ''}">${escape(initials(c.contactDetails?.name || c.title))}</span><span class="conversation-item-content"><strong>${escape(c.contactDetails?.name || c.title || c.number || 'Contato')}</strong><span class="conversation-snippet">${draft ? '<b>Rascunho</b> ' + escape(draft) : escape(c.lastMessageText || 'Ver conversa')}</span></span><span class="conversation-meta"><small>${today ? time(updated) : date(updated)}</small>${c.unreadCount ? `<span class="badge blue" aria-label="${number(c.unreadCount)} não lidas">${number(c.unreadCount)}</span>` : ''}</span></button>`;
       },
     )
     .join('');
@@ -806,22 +873,38 @@ function watchInbox(channel) {
   inboxEvents = null;
   if (url && 'EventSource' in window && !document.hidden) {
     inboxEvents = new EventSource(url);
-    inboxEvents.onmessage = syncInbox;
+    inboxEvents.onmessage = () => syncInbox(true);
   }
 }
-async function syncInbox() {
-  if (state.page !== 'conversations' || !state.conversationChannel || !$('#conversation-items') || document.hidden || modal.open || Date.now() < inboxRetryAt) return;
+async function syncInbox(full = false) {
+  if (state.page !== 'conversations' || !state.conversationChannel || !$('#conversation-more') || document.hidden || modal.open || (!full && Date.now() < inboxRetryAt)) return;
+  if (inboxStream?.navigation !== navigation || inboxStream.loading) return;
   if (threadSyncBusy) { inboxWakePending = true; return; }
   threadSyncBusy = true;
   const current = navigation;
+  const stream = inboxStream;
+  const depth = stream.depth;
+  const outdated = () => current !== navigation || stream !== inboxStream || stream.depth !== depth || stream.loading;
   try {
-    const data = await inboxPage();
-    if (current !== navigation || !$('#conversation-items') || data.channelId !== state.conversationChannel) return;
-    const next = data.items || [];
-    const changed = JSON.stringify(next) !== JSON.stringify(state.conversations);
-    state.conversations = next;
+    let entire = full || depth === 1 || Date.now() - (stream.checkedAt || 0) > 60000;
+    let data = await inboxPage(entire ? depth : 1);
+    if (outdated() || data.channelId !== state.conversationChannel) return;
+    const head = data.items || [];
+    if (!entire && data.hasMorePages && head.some((row, index) => row.peerKey !== state.conversations[index]?.peerKey)) {
+      data = await inboxPage(depth);
+      if (outdated()) return;
+      entire = true;
+    }
+    const replaceAll = entire || !data.hasMorePages;
+    const incoming = data.items || [];
+    const changed = JSON.stringify(incoming) !== JSON.stringify(replaceAll ? state.conversations : state.conversations.slice(0, incoming.length));
+    if (changed) state.conversations = replaceAll ? incoming : [...head, ...state.conversations.slice(head.length)];
+    if (entire || !data.hasMorePages) {
+      stream.more = data.hasMorePages;
+      stream.checkedAt = Date.now();
+    }
     const selected = state.selectedConversation;
-    const latest = selected && next.find(c => c.peerKey === selected.peerKey);
+    const latest = selected && state.conversations.find(c => c.peerKey === selected.peerKey);
     if (latest && latest.id !== selected.id && !pendingReplies.size) {
       await openConversation(latest.id, false);
     } else if (syncVisibleThread) {
@@ -829,13 +912,12 @@ async function syncInbox() {
     }
     if (current !== navigation || !$('#conversation-items')) return;
     if (changed) updateInboxRows();
-    const nextButton = $('[data-action="conversation-next"]');
-    if (nextButton) nextButton.disabled = !data.hasMorePages;
+    else showInboxLoadState();
   } catch {
     inboxRetryAt = Date.now() + 15000;
   } finally {
     threadSyncBusy = false;
-    if (inboxWakePending) { inboxWakePending = false; void syncInbox(); }
+    if (inboxWakePending) { inboxWakePending = false; void syncInbox(true); }
   }
 }
 setInterval(syncInbox, 5000);
@@ -849,7 +931,17 @@ navigator.serviceWorker?.addEventListener('message', event => {
 function conversationPath(id, route, page) {
   const query = new URLSearchParams({ channelId: state.conversationChannel });
   if (page) query.set('page', page);
-  return `/conversations/${encodeURIComponent(id)}/${route}?${query}`;
+  return `/conversations/${encodeURIComponent(id)}${route ? '/' + route : ''}?${query}`;
+}
+
+function clearRemovedConversation(conversation) {
+  replyDrafts.delete(draftKey(conversation.id));
+  state.conversations = state.conversations.filter(row => row.peerKey !== conversation.peerKey);
+  state.selectedConversation = null;
+  syncVisibleThread = null;
+  conversationRequest++;
+  $('#inbox')?.classList.remove('thread-open');
+  updateInboxRows();
 }
 
 async function openConversation(id, reset = true) {
@@ -875,12 +967,14 @@ async function openConversation(id, reset = true) {
     <div class="thread-contact"><strong>${escape(name)}</strong>${conversation.contactDetails?.phonenumber ? `<small>${escape(phone(conversation.contactDetails.phonenumber))}</small>` : ''}</div>
     ${status ? `<span class="badge ${status === 'ACTIVE' ? 'green' : 'orange'}">${status === 'ACTIVE' ? 'Janela aberta' : status === 'NOT_STARTED' ? 'Aguardando resposta' : status === 'EXPIRED' ? 'Janela encerrada' : 'Janela a confirmar'}</span>
       <button type="button" class="icon-button" data-action="reload-conversation" aria-label="Atualizar mensagens" title="Atualizar mensagens">${icon('refresh-cw')}</button>` : ''}
+    ${['manager', 'agent'].includes(account.role) ? `<button type="button" class="icon-button thread-delete" data-action="delete-conversation" aria-label="Apagar conversa" title="Apagar conversa">${icon('trash-2')}</button>` : ''}
   </header>`;
   thread.innerHTML = threadHeader() + loading();
   icons();
   try {
     const data = await api(conversationPath(id, 'messages', 1));
     if (request !== conversationRequest || !thread.isConnected) return;
+    if (data.removed) return clearRemovedConversation(conversation);
     const active = data.windowStatus === 'ACTIVE';
     const key = draftKey(id);
     const draft = replyDrafts.get(key) || '';
@@ -941,12 +1035,13 @@ async function openConversation(id, reset = true) {
       try {
         const fresh = await api(conversationPath(id, 'messages', 1) + '&since=' + encodeURIComponent(revision));
         if (!history.isConnected || older.disabled || request !== conversationRequest) return;
+        if (fresh.removed) return clearRemovedConversation(conversation);
         if (fresh.unchanged) { void markVisible(); return; }
         revision = fresh.revision;
         seenReply = fresh.replyVersion;
         replySession = fresh.sessionId || id;
         displayedAt = fresh.seenAt;
-        if (fresh.windowStatus !== data.windowStatus) {
+        if (fresh.windowStatus !== data.windowStatus || fresh.removedAt !== data.removedAt) {
           await openConversation(id, false);
           return;
         }
@@ -970,6 +1065,8 @@ async function openConversation(id, reset = true) {
       try {
         const page = await api(conversationPath(id, 'messages', historyPage + 1));
         if (request !== conversationRequest || !history.isConnected) return;
+        if (page.removed) return clearRemovedConversation(conversation);
+        if (page.removedAt !== data.removedAt) return openConversation(id, false);
         historyPage++;
         const ids = new Set(loaded.map(message => message.id).filter(Boolean));
         loaded = [...(page.items || []).filter(message => !message.id || !ids.has(message.id)), ...loaded];
@@ -1036,7 +1133,7 @@ async function openConversation(id, reset = true) {
           $('button span', currentForm).textContent = 'Enviar';
         }
       }
-      if ($('#conversation-items')) $('#conversation-items').innerHTML = conversationItems();
+      if ($('#conversation-rows')) updateInboxRows();
       if ($('#conversation-thread') && draftKey(state.selectedConversation?.id) === key) {
         await openConversation(id, false);
       }
@@ -1062,6 +1159,10 @@ function messageItems(data) {
           const separator = day && day !== previousDay ? `<span class="message-day">${escape(day)}</span>` : '';
           previousDay = day;
           const outgoing = m.direction === 'TO_HUB';
+          if (outgoing && String(m.status).toUpperCase() === 'FAILED') {
+            return `${separator}<details class="failed-message"><summary>Envio falhou · ${time(m.createdAt)}</summary>
+              <p>${escape(m.text || m.type || 'Mensagem')}</p>${m.failedReason ? `<small>${escape(m.failedReason)}</small>` : ''}</details>`;
+          }
           const status = outgoing && m.status ? ` · ${escape(statusMap[m.status.toLowerCase()]?.[0] || m.status)}` : '';
           const startsGroup = separator || index === 0 || messages[index - 1].direction !== m.direction;
           const author = outgoing ? 'Equipe' : (state.selectedConversation?.contactDetails?.name || state.selectedConversation?.title || 'Contato');
@@ -1179,6 +1280,23 @@ const actions = {
     toast('Conexão validada com sucesso.');
   },
   'open-conversation': (element) => openConversation(element.dataset.id),
+  'delete-conversation': () => {
+    const conversation = state.selectedConversation;
+    if (!conversation) return;
+    const path = conversationPath(conversation.id);
+    const name = conversation.contactDetails?.name || conversation.title || 'este contato';
+    confirmDialog({
+      title: 'Apagar conversa?',
+      text: `O histórico de <strong>${escape(name)}</strong> será removido da caixa de entrada de toda a equipe deste número. Uma nova mensagem poderá iniciar outro histórico no painel.`,
+      label: 'Apagar conversa',
+      danger: true,
+      action: async () => {
+        await api(path, { method: 'DELETE' });
+        clearRemovedConversation(conversation);
+        toast('Conversa apagada da caixa de entrada.');
+      },
+    });
+  },
   'reload-conversation': () => openConversation(state.selectedConversation.id, false),
   'toggle-inbox-filters': (element) => {
     const filters = $('#inbox-filters');
@@ -1191,9 +1309,8 @@ const actions = {
     document.querySelectorAll('.inbox-segments button').forEach(button => {
       button.setAttribute('aria-pressed', String(button === element));
     });
-    $('#conversation-items').innerHTML = conversationItems();
-    if (!state.selectedConversation) $('#conversation-thread').innerHTML = idleThread();
-    icons();
+    $('#conversation-items').scrollTop = 0;
+    updateInboxRows();
   },
   'back-conversations': () => {
     syncVisibleThread = null;
@@ -1201,23 +1318,12 @@ const actions = {
     const previous = state.selectedConversation?.id;
     state.selectedConversation = null;
     $('#inbox').classList.remove('thread-open');
-    $('#conversation-items').innerHTML = conversationItems();
-    $('#conversation-thread').innerHTML = idleThread();
-    icons();
+    updateInboxRows();
     const row = [...document.querySelectorAll('.conversation-item')].find(item => item.dataset.id === previous);
-    (row || $('#conversation-search'))?.focus();
+    (row || $('#conversation-search'))?.focus({ preventScroll: true });
   },
-  'conversation-refresh': () => renderPage(true),
-  'conversation-prev': () => {
-    state.conversationPage--;
-    state.selectedConversation = null;
-    return renderPage(true);
-  },
-  'conversation-next': () => {
-    state.conversationPage++;
-    state.selectedConversation = null;
-    return renderPage(true);
-  },
+  'conversation-refresh': () => state.conversationChannel ? syncInbox(true) : renderPage(true),
+  'more-conversations': loadMoreConversations,
 };
 
 document.addEventListener('click', async (event) => {
@@ -1249,9 +1355,8 @@ document.addEventListener('input', (event) => {
   }
   if (event.target.id === 'conversation-search') {
     state.conversationSearch = event.target.value;
-    $('#conversation-items').innerHTML = conversationItems();
-    if (!state.selectedConversation) $('#conversation-thread').innerHTML = idleThread();
-    icons();
+    $('#conversation-items').scrollTop = 0;
+    updateInboxRows();
   }
 });
 document.addEventListener('change', (event) => {
@@ -1263,7 +1368,6 @@ document.addEventListener('change', (event) => {
   if (['conversation-channel', 'conversation-days'].includes(event.target.id)) {
     if (event.target.id === 'conversation-channel') state.conversationChannel = event.target.value;
     else state.conversationDays = event.target.value;
-    state.conversationPage = 1;
     state.conversationSearch = '';
     state.inboxFiltersOpen = false;
     state.selectedConversation = null;

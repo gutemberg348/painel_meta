@@ -62,6 +62,15 @@ export function openDatabase(path) {
       PRIMARY KEY(channel,id)
     );
     CREATE INDEX IF NOT EXISTS inbox_peer ON inbox_sessions(channel,peer,activity DESC);
+    CREATE TABLE IF NOT EXISTS inbox_removals (
+      channel TEXT NOT NULL, peer TEXT NOT NULL, removed_at INTEGER NOT NULL,
+      PRIMARY KEY(channel,peer)
+    );
+    CREATE TABLE IF NOT EXISTS inbox_delivery_checks (
+      channel TEXT NOT NULL, session_id TEXT NOT NULL, activity INTEGER NOT NULL,
+      cutoff INTEGER NOT NULL, failed_only INTEGER NOT NULL, next_page INTEGER NOT NULL, check_after INTEGER NOT NULL,
+      PRIMARY KEY(channel,session_id)
+    );
     CREATE TABLE IF NOT EXISTS inbox_reads (
       account TEXT NOT NULL, channel TEXT NOT NULL, peer TEXT NOT NULL, seen_at INTEGER NOT NULL,
       PRIMARY KEY(account,channel,peer)

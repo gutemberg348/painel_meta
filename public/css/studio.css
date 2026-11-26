@@ -340,12 +340,17 @@ tbody tr:hover { background: #f8fbff; }
 .conversation-snippet { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); font-size: .8125rem; margin-top: 3px; }
 .conversation-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; white-space: nowrap; }
 .conversation-meta .badge { font-size: .75rem; padding: 2px 6px; }
-.inbox .pagination { padding: 6px 12px; gap: 8px; color: var(--muted); background: white; border-top: 1px solid var(--border); }
+.conversation-items { overflow-anchor: none; }
+.conversation-more:not(:empty) { padding: 10px; text-align: center; color: var(--muted); font-size: .8125rem; }
 .inbox .icon-button { min-width: 44px; min-height: 44px; flex-shrink: 0; }
 .conversation-thread .loading-state { min-height: 0; flex: 1; }
 .conversation-thread > .alert { margin: 0; border-radius: 0; padding: 10px 14px; font-size: .875rem; line-height: 1.5; }
 .thread-head { gap: 10px; padding: 12px 16px; box-shadow: 0 2px 6px #13315109; z-index: 1; }
 .thread-head > .badge { white-space: nowrap; flex: none; }
+.thread-delete:hover, .thread-delete:focus-visible { color: #9e302a; background: #fff1ee; }
+.failed-message { align-self: flex-end; max-width: min(85%, 62ch); font-size: .8125rem; background: #fff; border: 1px solid #e3d3ce; border-radius: 10px; }
+.failed-message summary { cursor: pointer; padding: 8px 12px; color: #804137; }
+.failed-message p, .failed-message small { display: block; margin: 0; padding: 0 12px 10px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .thread-contact { min-width: 0; flex: 1; }
 .thread-contact strong, .thread-contact small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .conversation-thread .messages { display: block; overflow-anchor: none; padding: clamp(14px, 2.2vw, 32px); }
@@ -535,5 +540,9 @@ tbody tr:hover { background: #f8fbff; }
   .setup-list { grid-template-columns: 1fr; }
   .connection-badge { font-size: .75rem; }
   .thread-head > .avatar { display: none; }
+  .thread-head:has(> .badge) { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 2px 4px; }
+  .thread-head:has(> .badge) > button { grid-row: 1 / 3; }
+  .thread-head .thread-contact { grid-column: 2; grid-row: 1; }
+  .thread-head > .badge { grid-column: 2; grid-row: 2; justify-self: start; margin: 0; white-space: normal; }
 }
 

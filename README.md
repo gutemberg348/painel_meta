@@ -110,7 +110,7 @@ As senhas da equipe são armazenadas como hashes scrypt com salt individual. Inc
 
 A criação/aprovação de templates ocorre na FLW/Meta. A caixa de entrada mostra conversas do canal WhatsApp selecionado, inclusive as iniciadas na FLW. Mensagens com mídia são identificadas. Os anexos podem ser visualizados na FLW.
 
-Na caixa de entrada, escolha o canal da empresa se o token der acesso a vários canais. O período inicial é de sete dias e usa a data da última interação. As conversas são carregadas em páginas de até 20. A busca atua na página atual. Leituras simultâneas da mesma página compartilham uma consulta à FLW e seu resultado pode ser reutilizado por quatro segundos.
+Na caixa de entrada, escolha o canal da empresa se o token der acesso a vários canais. O período inicial é de sete dias e usa a data da última interação. A lista abre com até 20 conversas e carrega mais ao rolar para baixo. A busca por nome ou telefone e o filtro de não lidas consideram as conversas já carregadas. Com um filtro ativo, “Buscar em mais conversas” amplia os resultados.
 
 Enquanto a conversa está visível e exibe as mensagens recentes, o navegador consulta a versão do histórico no painel a cada cinco segundos. Um envio pela equipe invalida o cache daquela conversa e da lista do canal. O histórico aberto também consulta novidades externas em ciclos de aproximadamente 30 segundos. A lista continua com atualização manual. Uma resposta concorrente pode pedir revisão do rascunho antes de um novo envio.
 
