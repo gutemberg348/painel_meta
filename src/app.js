@@ -79,7 +79,7 @@ export function createApp({ config, db, flw, campaigns, inboxChannels = createIn
       }
       // A consulta periódica ainda pode confirmar um evento de canal desconhecido.
       if (!received) recordPushEvent(db, eventId, String(body.eventType || 'SEND_CALLBACK').slice(0, 100), null);
-      const messageTime = Date.parse(content.timestamp || content.createdAt);
+      const messageTime = Date.parse(content.createdAt) || Date.parse(content.timestamp);
       if (notifyChannel && Number.isFinite(messageTime) && recordPushEvent(db, eventId, 'MESSAGE_RECEIVED', messageTime, notifyChannel.id, content.sessionId || null)) {
         chatCache.inboxChanged(notifyChannel.id);
       }

@@ -20,13 +20,11 @@ export function recordPushEvent(db, eventId, type, messageTime, channel = null, 
       .run(eventId, type, new Date().toISOString());
     if (!saved.changes || !Number.isFinite(messageTime) || messageTime < Date.now() - pushLifetime || messageTime > Date.now() + 5000) return false;
     db.prepare(`INSERT INTO push_deliveries(endpoint,event_id,expires_at,channel,session_id,message_time)
-      SELECT endpoint,?,?,?,?,? FROM push_subscriptions s WHERE subscribed_at<=? AND s.channel=? AND NOT EXISTS
-      (SELECT 1 FROM inbox_reads r JOIN inbox_sessions i ON i.channel=r.channel AND i.peer=r.peer
-       WHERE r.account=s.account_id AND i.channel=? AND i.id=? AND r.seen_at>=?)
+      SELECT endpoint,?,?,?,?,? FROM push_subscriptions s WHERE subscribed_at<=? AND s.channel=?
       ON CONFLICT(endpoint) DO UPDATE SET event_id=excluded.event_id,expires_at=excluded.expires_at,
       channel=excluded.channel,session_id=excluded.session_id,message_time=excluded.message_time,
       next_attempt=0,attempts=0 WHERE excluded.expires_at >= push_deliveries.expires_at`)
-      .run(eventId, messageTime + pushLifetime, channel, sessionId, messageTime, messageTime, channel, channel, sessionId, messageTime);
+      .run(eventId, messageTime + pushLifetime, channel, sessionId, messageTime, messageTime, channel);
     return true;
   })();
 }
@@ -57,10 +55,10 @@ export function startIncomingMonitor(db, flw, inboxChannels, config, inboxChange
     for await (const session of sessions) {
       if (stopped) return;
       if (!session.id || session.channelId?.toLowerCase() !== channel.id.toLowerCase()) continue;
-      if (Date.parse(session.lastMessageIn) < since) continue;
       const messages = itemsByPage(page => flw.messages(session.id, page, { after, before }), () => stopped);
       for await (const message of messages) {
-        const time = Date.parse(message.timestamp || message.createdAt);
+        // A janela de busca da FLW usa CreatedAt.After e CreatedAt.Before.
+        const time = Date.parse(message.createdAt);
         if (customerMessage(message) && (!message.sessionId || message.sessionId === session.id) && time >= since && time <= until) {
           if (recordPushEvent(db, incomingEventId(message.id), 'MESSAGE_RECEIVED', time, channel.id, session.id)) inboxChanged(channel.id);
         }

@@ -474,13 +474,8 @@ export function apiRouter(db, flw, campaigns, config, inboxChannels, chatCache) 
     const account = req.session.accountId || 'manager';
     const peer = peerKey(source);
     const until = Math.min(seenAt, Date.now());
-    db.transaction(() => {
-      db.prepare(`INSERT INTO inbox_reads VALUES (?,?,?,?) ON CONFLICT(account,channel,peer)
-        DO UPDATE SET seen_at=MAX(seen_at,excluded.seen_at)`).run(account, channelId, peer, until);
-      db.prepare(`DELETE FROM push_deliveries WHERE channel=? AND message_time<=? AND session_id IN
-        (SELECT id FROM inbox_sessions WHERE channel=? AND peer=?) AND endpoint IN
-        (SELECT endpoint FROM push_subscriptions WHERE account_id=?)`).run(channelId, until, channelId, peer, account);
-    })();
+    db.prepare(`INSERT INTO inbox_reads VALUES (?,?,?,?) ON CONFLICT(account,channel,peer)
+      DO UPDATE SET seen_at=MAX(seen_at,excluded.seen_at)`).run(account, channelId, peer, until);
     res.json({ seenAt: until });
   });
   async function conversationTemplates(channelId) {

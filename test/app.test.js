@@ -42,7 +42,7 @@ test('continuação preserva o histórico e a leitura por usuário e canal', asy
   await post('/conversations/' + first.id + '/reply', { text: 'Oi' }).expect(409);
 });
 
-test('push agrupa eventos recentes por aparelho e ignora eventos internos, lidos e de outros canais', () => {
+test('push agrupa mensagens novas do canal mesmo quando o painel confirma a leitura antes ou depois da fila', async () => {
   const time = Date.now() - 1000;
   const message = { id: randomUUID(), direction: 'FROM_HUB', type: 'TEXT', text: 'Oi' };
   assert.ok(customerMessage(message));
@@ -57,10 +57,16 @@ test('push agrupa eventos recentes por aparelho e ignora eventos internos, lidos
   assert.deepEqual(queue(), []);
   for (const event of ['first', 'latest', 'latest']) recordPushEvent(f.db, event, 'MESSAGE_RECEIVED', time, f.channelId, f.sessionId);
   assert.deepEqual(queue(), [{ event_id: 'latest' }]);
-  f.db.prepare('INSERT INTO inbox_sessions VALUES (?,?,?,?)').run(f.channelId, f.sessionId, 'contact', time);
-  f.db.prepare('INSERT INTO inbox_reads VALUES (?,?,?,?)').run('manager', f.channelId, 'contact', time);
-  recordPushEvent(f.db, 'already-read', 'MESSAGE_RECEIVED', time, f.channelId, f.sessionId);
+  await agent.get('/api/conversations/' + f.sessionId + '/messages').expect(200);
+  await post('/conversations/' + f.sessionId + '/read', { seenAt: time }).expect(200);
   assert.deepEqual(queue(), [{ event_id: 'latest' }]);
+  f.db.prepare('DELETE FROM push_deliveries').run();
+  await post('/conversations/' + f.sessionId + '/read', { seenAt: time + 1 }).expect(200);
+  recordPushEvent(f.db, 'next', 'MESSAGE_RECEIVED', time + 1, f.channelId, f.sessionId);
+  assert.deepEqual(queue(), [{ event_id: 'next' }]);
+  f.db.prepare('DELETE FROM push_deliveries').run();
+  recordPushEvent(f.db, 'next', 'MESSAGE_RECEIVED', time + 1, f.channelId, f.sessionId);
+  assert.deepEqual(queue(), []);
 });
 
 test('gerente cadastra equipe, permissões protegem a API e alterações revogam a sessão', async () => {

@@ -14,7 +14,7 @@ self.addEventListener('push', event => {
     body: 'Nova mensagem de cliente. Toque para abrir a caixa de entrada.',
     icon: '/icons/vieira-192.png',
     tag: 'vieira-link-inbox',
-    renotify: false,
+    renotify: true,
   }), self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windows => {
     for (const panel of windows) panel.postMessage({ type: 'inbox-changed' });
   })]));

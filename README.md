@@ -229,7 +229,7 @@ Não é preciso webhook para ler respostas: a caixa de entrada consulta a API di
 
 O aplicativo usa o mesmo endereço HTTPS do painel. Depois do login, toque em **Ativar notificações** no topo do painel. Fechar o convite dispensa o aviso nessa visita. As opções também ficam em **Aplicativo e notificações** no menu. No Android, toque em **Instalar aplicativo**. No iPhone com iOS 16.4 ou superior, abra o painel no Safari, toque em **Compartilhar → Adicionar à Tela de Início** e entre pelo ícone Vieira Link. Toque em **Ativar notificações** e confirme **Permitir**. Cada aparelho tem sua própria preferência.
 
-Com o token FLW configurado e um aparelho inscrito, a VPS procura mensagens novas de clientes a cada 20 segundos. Cada aparelho acompanha um canal WhatsApp. Os avisos pendentes são agrupados e expiram em 90 segundos. Ao reiniciar, o monitor acompanha as mensagens que chegarem a partir desse momento.
+Com o token FLW configurado e um aparelho inscrito, a VPS procura mensagens novas de clientes a cada 20 segundos. Cada aparelho acompanha um canal WhatsApp. Ler a conversa no painel atualiza o contador de leitura e mantém o push da mensagem para o aparelho. Os avisos pendentes são agrupados e expiram em 90 segundos. Ao reiniciar, o monitor acompanha as mensagens que chegarem a partir desse momento.
 
 O webhook é opcional. Se já houver uma assinatura de **MESSAGE_RECEIVED** na FLW apontando para o painel, ela pode antecipar o aviso. O identificador da mensagem evita que a consulta e o webhook gerem dois avisos para o mesmo aparelho.
 
