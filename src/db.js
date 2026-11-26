@@ -51,9 +51,24 @@ export function openDatabase(path) {
       endpoint TEXT PRIMARY KEY, keys_json TEXT NOT NULL, account_id TEXT NOT NULL, sid TEXT NOT NULL,
       pending_event TEXT, next_attempt INTEGER NOT NULL DEFAULT 0, attempts INTEGER NOT NULL DEFAULT 0
     );
+    CREATE TABLE IF NOT EXISTS push_deliveries (
+      endpoint TEXT NOT NULL REFERENCES push_subscriptions(endpoint) ON DELETE CASCADE,
+      event_id TEXT NOT NULL, next_attempt INTEGER NOT NULL DEFAULT 0, attempts INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY(endpoint, event_id)
+    );
+    CREATE INDEX IF NOT EXISTS push_due ON push_deliveries(next_attempt);
     CREATE INDEX IF NOT EXISTS deliveries_campaign ON deliveries(campaign_id);
     CREATE INDEX IF NOT EXISTS deliveries_status ON deliveries(status);
   `);
+  db.transaction(() => {
+    if (!db.pragma('table_info(push_subscriptions)').some(column => column.name === 'subscribed_at')) {
+      db.exec('ALTER TABLE push_subscriptions ADD COLUMN subscribed_at INTEGER NOT NULL DEFAULT 0');
+      db.prepare('UPDATE push_subscriptions SET subscribed_at=?').run(Date.now());
+      db.exec(`INSERT INTO push_deliveries(endpoint,event_id,next_attempt,attempts)
+        SELECT endpoint,pending_event,next_attempt,attempts FROM push_subscriptions WHERE pending_event IS NOT NULL;
+        UPDATE push_subscriptions SET pending_event=NULL WHERE pending_event IS NOT NULL`);
+    }
+  })();
   // Não repetir automaticamente uma requisição cujo resultado ficou desconhecido.
   db.prepare(
     "UPDATE deliveries SET status='unknown', error='Servidor reiniciado durante o envio. Confira na FLW antes de reenviar.' WHERE status='sending'",

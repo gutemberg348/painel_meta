@@ -13,7 +13,7 @@ self.addEventListener('push', event => {
   event.waitUntil(self.registration.showNotification('Vieira Link', {
     body: 'Nova mensagem de cliente. Toque para abrir a caixa de entrada.',
     icon: '/icons/vieira-192.png',
-    tag: 'vieira-link-inbox',
+    tag: event.data?.text() || 'vieira-link-inbox',
   }));
 });
 self.addEventListener('notificationclick', event => {

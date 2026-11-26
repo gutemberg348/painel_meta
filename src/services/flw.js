@@ -101,9 +101,10 @@ export class FlwClient {
   session(id) {
     return this.request(`/v2/session/${encodeURIComponent(id)}`, { query: { IncludeDetails: 'ContactDetails' } });
   }
-  messages(id, page = 1) {
+  messages(id, page = 1, { after, before } = {}) {
     return this.request(`/v1/session/${encodeURIComponent(id)}/message`, {
-      query: { PageNumber: page, PageSize: 25, OrderBy: 'CreatedAt', OrderDirection: 'DESCENDING' },
+      query: { PageNumber: page, PageSize: 25, OrderBy: 'CreatedAt', OrderDirection: 'DESCENDING',
+        'CreatedAt.After': after, 'CreatedAt.Before': before },
     });
   }
   reply(id, text) {
